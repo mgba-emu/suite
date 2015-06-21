@@ -1,9 +1,9 @@
 .set _arm_text, 0
-.set _thumb_text, 4
+.set _arm_ewram, 4
 .set _arm_iwram, 8
-.set _thumb_iwram, 12
-.set _arm_ewram, 16
-.set _thumb_ewram, 20
+.set _thumb_text, 12
+.set _thumb_ewram, 16
+.set _thumb_iwram, 20
 
 #define _(...) __VA_ARGS__
 

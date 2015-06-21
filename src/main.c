@@ -11,11 +11,11 @@
 
 struct TestTimings {
 	s32 arm_text;
-	s32 thumb_text;
-	s32 arm_iwram;
-	s32 thumb_iwram;
 	s32 arm_ewram;
+	s32 arm_iwram;
+	s32 thumb_text;
 	s32 thumb_ewram;
+	s32 thumb_iwram;
 };
 
 void calibrate(struct TestTimings*);
@@ -44,24 +44,25 @@ struct TimingTest {
 	const char* testName;
 	void (*test)(struct TestTimings*);
 	int modes;
+	struct TestTimings expected;
 } const tests[] = {
-	{ "Calibration", 0, TEST_ARM | TEST_THUMB },
-	{ "nop", testNop, TEST_ARM | TEST_THUMB },
-	{ "ldrh r2, [sp]", testLdrh, TEST_ARM | TEST_THUMB },
-	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB },
-	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM },
-	{ "ldmia sp, {r2, r3}", testLdmia2, TEST_ARM },
-	{ "ldmia sp, {r2-r7}", testLdmia6, TEST_ARM },
-	{ "stmia sp, {r2}", testStmia1, TEST_ARM },
-	{ "stmia sp, {r2, r3}", testStmia2, TEST_ARM },
-	{ "stmia sp, {r2-r7}", testStmia6, TEST_ARM },
-	{ "mul #0x00000000, #0xFF", testMul0, TEST_ARM | TEST_THUMB },
-	{ "mul #0x00000078, #0xFF", testMul1, TEST_ARM | TEST_THUMB },
-	{ "mul #0x00005678, #0xFF", testMul2, TEST_ARM | TEST_THUMB },
-	{ "mul #0x00345678, #0xFF", testMul3, TEST_ARM | TEST_THUMB },
-	{ "mul #0x12345678, #0xFF", testMul4, TEST_ARM | TEST_THUMB },
-	{ "Division", testDiv, TEST_ARM | TEST_THUMB },
-	{ "CpuSet", testCpuSet, TEST_ARM | TEST_THUMB },
+	{ "Calibration", 0, TEST_ARM | TEST_THUMB, { 7, 5, 0, 4, 2, 0 } },
+	{ "nop", testNop, TEST_ARM | TEST_THUMB, { 6, 6, 1, 3, 3, 1 } },
+	{ "ldrh r2, [sp]", testLdrh, TEST_ARM | TEST_THUMB, { 10, 8, 3, 7, 5, 3} },
+	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2} },
+	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM, { 10, 8, 3 } },
+	{ "ldmia sp, {r2, r3}", testLdmia2, TEST_ARM, { 11, 9, 4 } },
+	{ "ldmia sp, {r2-r7}", testLdmia6, TEST_ARM, { 24, 20, 10 } },
+	{ "stmia sp, {r2}", testStmia1, TEST_ARM, { 9, 7, 2 } },
+	{ "stmia sp, {r2, r3}", testStmia2, TEST_ARM, { 10, 8, 3 } },
+	{ "stmia sp, {r2-r7}", testStmia6, TEST_ARM, { 27, 23, 13 } },
+	{ "mul #0x00000000, #0xFF", testMul0, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2 } },
+	{ "mul #0x00000078, #0xFF", testMul1, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2 } },
+	{ "mul #0x00005678, #0xFF", testMul2, TEST_ARM | TEST_THUMB, { 10, 8, 3, 7, 5, 3 } },
+	{ "mul #0x00345678, #0xFF", testMul3, TEST_ARM | TEST_THUMB, { 11, 9, 4, 8, 6, 4 } },
+	{ "mul #0x12345678, #0xFF", testMul4, TEST_ARM | TEST_THUMB, { 12, 10, 5, 9, 7, 5 } },
+	{ "Division", testDiv, TEST_ARM | TEST_THUMB, { 409, 399, 342, 379, 369, 342 } },
+	{ "CpuSet", testCpuSet, TEST_ARM | TEST_THUMB, { 3465, 3459, 3402, 3468, 3450, 3409 } },
 };
 
 u16* textBase = (u16*) VRAM;
@@ -78,15 +79,50 @@ static void updateTextGrid(void) {
 	}
 }
 
-static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, int mode) {
+static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, const struct TestTimings* expected, int mode) {
 	snprintf(&textGrid[32], 30, "Timing test: %s", preface);
 	snprintf(&textGrid[96], 30, "ARM/ROM:     %5u", values->arm_text - calibration->arm_text);
+	if (values->arm_text - calibration->arm_text == expected->arm_text) {
+		strncpy(&textGrid[96 + 19], "PASS", 11);
+	} else {
+		snprintf(&textGrid[96 + 19], 11, "!= %5u", expected->arm_text);
+	}
+
 	snprintf(&textGrid[128], 30, "ARM/WRAM:    %5u", values->arm_ewram - calibration->arm_ewram);
+	if (values->arm_ewram - calibration->arm_ewram == expected->arm_ewram) {
+		strncpy(&textGrid[128 + 19], "PASS", 11);
+	} else {
+		snprintf(&textGrid[128 + 19], 11, "!= %5u", expected->arm_ewram);
+	}
+
 	snprintf(&textGrid[160], 30, "ARM/IWRAM:   %5u", values->arm_iwram - calibration->arm_iwram);
+	if (values->arm_iwram - calibration->arm_iwram == expected->arm_iwram) {
+		strncpy(&textGrid[160 + 19], "PASS", 11);
+	} else {
+		snprintf(&textGrid[160 + 19], 11, "!= %5u", expected->arm_iwram);
+	}
+
 	if (mode & TEST_THUMB) {
 		snprintf(&textGrid[192], 30, "Thumb/ROM:   %5u", values->thumb_text - calibration->thumb_text);
+		if (values->thumb_text - calibration->thumb_text == expected->thumb_text) {
+			strncpy(&textGrid[192 + 19], "PASS", 11);
+		} else {
+			snprintf(&textGrid[192 + 19], 11, "!= %5u", expected->thumb_text);
+		}
+
 		snprintf(&textGrid[224], 30, "Thumb/WRAM:  %5u", values->thumb_ewram - calibration->thumb_ewram);
+		if (values->thumb_ewram - calibration->thumb_ewram == expected->thumb_ewram) {
+			strncpy(&textGrid[224 + 19], "PASS", 11);
+		} else {
+			snprintf(&textGrid[224 + 19], 11, "!= %5u", expected->thumb_ewram);
+		}
+
 		snprintf(&textGrid[256], 30, "Thumb/IWRAM: %5u", values->thumb_iwram - calibration->thumb_iwram);
+		if (values->thumb_iwram - calibration->thumb_iwram == expected->thumb_iwram) {
+			strncpy(&textGrid[256 + 19], "PASS", 11);
+		} else {
+			snprintf(&textGrid[256 + 19], 11, "!= %5u", expected->thumb_iwram);
+		}
 	} else {
 		strncpy(&textGrid[192], "Thumb not applicable", 30);		
 	}
@@ -132,9 +168,9 @@ int main(void) {
 			struct TestTimings currentTest = {0};
 			if (activeTest->test) {
 				activeTest->test(&currentTest);
-				printResults(activeTest->testName, &currentTest, &calibration, activeTest->modes);
+				printResults(activeTest->testName, &currentTest, &calibration, &activeTest->expected, activeTest->modes);
 			} else {
-				printResults(activeTest->testName, &calibration, &currentTest, activeTest->modes);				
+				printResults(activeTest->testName, &calibration, &currentTest, &activeTest->expected, activeTest->modes);
 			}
 		} else {
 			if (keys & KEY_UP) {
