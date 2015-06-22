@@ -52,7 +52,7 @@ struct TimingTest {
 	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2} },
 	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM, { 10, 8, 3 } },
 	{ "ldmia sp, {r2, r3}", testLdmia2, TEST_ARM, { 11, 9, 4 } },
-	{ "ldmia sp, {r2-r7}", testLdmia6, TEST_ARM, { 24, 20, 10 } },
+	{ "ldmia sp, {r2-r7}", testLdmia6, TEST_ARM, { 28, 24, 14 } },
 	{ "stmia sp, {r2}", testStmia1, TEST_ARM, { 9, 7, 2 } },
 	{ "stmia sp, {r2, r3}", testStmia2, TEST_ARM, { 10, 8, 3 } },
 	{ "stmia sp, {r2-r7}", testStmia6, TEST_ARM, { 27, 23, 13 } },
