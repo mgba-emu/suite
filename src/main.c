@@ -80,51 +80,51 @@ static void updateTextGrid(void) {
 }
 
 static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, const struct TestTimings* expected, int mode) {
-	snprintf(&textGrid[32], 30, "Timing test: %s", preface);
-	snprintf(&textGrid[96], 30, "ARM/ROM:     %5u", values->arm_text - calibration->arm_text);
+	snprintf(&textGrid[32], 31, "Timing test: %s", preface);
+	snprintf(&textGrid[96], 31, "ARM/ROM:     %5u", values->arm_text - calibration->arm_text);
 	if (values->arm_text - calibration->arm_text == expected->arm_text) {
-		strncpy(&textGrid[96 + 19], "PASS", 11);
+		strncpy(&textGrid[96 + 19], "PASS", 12);
 	} else {
-		snprintf(&textGrid[96 + 19], 11, "!= %5u", expected->arm_text);
+		snprintf(&textGrid[96 + 19], 12, "!= %5u", expected->arm_text);
 	}
 
-	snprintf(&textGrid[128], 30, "ARM/WRAM:    %5u", values->arm_ewram - calibration->arm_ewram);
+	snprintf(&textGrid[128], 31, "ARM/WRAM:    %5u", values->arm_ewram - calibration->arm_ewram);
 	if (values->arm_ewram - calibration->arm_ewram == expected->arm_ewram) {
-		strncpy(&textGrid[128 + 19], "PASS", 11);
+		strncpy(&textGrid[128 + 19], "PASS", 12);
 	} else {
-		snprintf(&textGrid[128 + 19], 11, "!= %5u", expected->arm_ewram);
+		snprintf(&textGrid[128 + 19], 12, "!= %5u", expected->arm_ewram);
 	}
 
-	snprintf(&textGrid[160], 30, "ARM/IWRAM:   %5u", values->arm_iwram - calibration->arm_iwram);
+	snprintf(&textGrid[160], 31, "ARM/IWRAM:   %5u", values->arm_iwram - calibration->arm_iwram);
 	if (values->arm_iwram - calibration->arm_iwram == expected->arm_iwram) {
-		strncpy(&textGrid[160 + 19], "PASS", 11);
+		strncpy(&textGrid[160 + 19], "PASS", 12);
 	} else {
-		snprintf(&textGrid[160 + 19], 11, "!= %5u", expected->arm_iwram);
+		snprintf(&textGrid[160 + 19], 12, "!= %5u", expected->arm_iwram);
 	}
 
 	if (mode & TEST_THUMB) {
-		snprintf(&textGrid[192], 30, "Thumb/ROM:   %5u", values->thumb_text - calibration->thumb_text);
+		snprintf(&textGrid[192], 31, "Thumb/ROM:   %5u", values->thumb_text - calibration->thumb_text);
 		if (values->thumb_text - calibration->thumb_text == expected->thumb_text) {
-			strncpy(&textGrid[192 + 19], "PASS", 11);
+			strncpy(&textGrid[192 + 19], "PASS", 12);
 		} else {
-			snprintf(&textGrid[192 + 19], 11, "!= %5u", expected->thumb_text);
+			snprintf(&textGrid[192 + 19], 12, "!= %5u", expected->thumb_text);
 		}
 
-		snprintf(&textGrid[224], 30, "Thumb/WRAM:  %5u", values->thumb_ewram - calibration->thumb_ewram);
+		snprintf(&textGrid[224], 31, "Thumb/WRAM:  %5u", values->thumb_ewram - calibration->thumb_ewram);
 		if (values->thumb_ewram - calibration->thumb_ewram == expected->thumb_ewram) {
-			strncpy(&textGrid[224 + 19], "PASS", 11);
+			strncpy(&textGrid[224 + 19], "PASS", 12);
 		} else {
-			snprintf(&textGrid[224 + 19], 11, "!= %5u", expected->thumb_ewram);
+			snprintf(&textGrid[224 + 19], 12, "!= %5u", expected->thumb_ewram);
 		}
 
-		snprintf(&textGrid[256], 30, "Thumb/IWRAM: %5u", values->thumb_iwram - calibration->thumb_iwram);
+		snprintf(&textGrid[256], 31, "Thumb/IWRAM: %5u", values->thumb_iwram - calibration->thumb_iwram);
 		if (values->thumb_iwram - calibration->thumb_iwram == expected->thumb_iwram) {
-			strncpy(&textGrid[256 + 19], "PASS", 11);
+			strncpy(&textGrid[256 + 19], "PASS", 12);
 		} else {
-			snprintf(&textGrid[256 + 19], 11, "!= %5u", expected->thumb_iwram);
+			snprintf(&textGrid[256 + 19], 12, "!= %5u", expected->thumb_iwram);
 		}
 	} else {
-		strncpy(&textGrid[192], "Thumb not applicable", 30);		
+		strncpy(&textGrid[192], "Thumb not applicable", 31);
 	}
 }
 
@@ -191,7 +191,7 @@ int main(void) {
 			strcpy(&textGrid[32], "Timing tests");
 			size_t i;
 			for (i = 0; i < sizeof(tests) / sizeof(*tests) && i < VIEW_SIZE; ++i) {
-				snprintf(&textGrid[96 + i * 32], 30, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', tests[i + viewIndex].testName);
+				snprintf(&textGrid[96 + i * 32], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', tests[i + viewIndex].testName);
 			}
 		}
 
