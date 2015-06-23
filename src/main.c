@@ -61,6 +61,8 @@ void testMul4(struct TestTimings*);
 void testB(struct TestTimings*);
 void testNopB(struct TestTimings*);
 void testBx(struct TestTimings*);
+void testTrivialLoop(struct TestTimings*);
+void testCLoop(struct TestTimings*);
 void testDiv(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
 
@@ -69,6 +71,14 @@ void testCpuSet(struct TestTimings*);
 #define VIEW_SIZE 16
 
 void longjump() {
+}
+
+void CLoop() {
+	vs32 x = 0;
+	int i;
+	for (i = 0; i < 16; ++i) {
+		x += i;
+	}
 }
 
 struct TimingTest {
@@ -226,6 +236,18 @@ struct TimingTest {
 		72, 22,
 		57, 57, 53, 53, 45, 45, 41, 41,
 		51, 24
+	} },
+	{ "Trivial loop", testTrivialLoop, TEST_ARM | TEST_THUMB, {
+		510, 510, 495, 495, 365, 365, 350, 350,
+		480, 80,
+		270, 270, 255, 255, 205, 205, 190, 190,
+		240, 80
+	} },
+	{ "C loop", testCLoop, TEST_ARM | TEST_THUMB, {
+		346, 231, 309, 227, 309, 161, 272, 157,
+		340, 290,
+		325, 210, 288, 206, 295, 147, 258, 143,
+		319, 292
 	} },
 	{ "Division", testDiv, TEST_ARM | TEST_THUMB, {
 		398, 398, 394, 394, 381, 381, 377, 377,
