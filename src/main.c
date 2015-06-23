@@ -65,6 +65,14 @@ void testTrivialLoop(struct TestTimings*);
 void testCLoop(struct TestTimings*);
 void testDiv(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
+void testTrivialDma(struct TestTimings*);
+void testTrivialDmaRom(struct TestTimings*);
+void testTrivial32Dma(struct TestTimings*);
+void testTrivial32DmaRom(struct TestTimings*);
+void testShortDma(struct TestTimings*);
+void testShortDmaRom(struct TestTimings*);
+void testShort32Dma(struct TestTimings*);
+void testShort32DmaRom(struct TestTimings*);
 
 #define TEST_ARM 1
 #define TEST_THUMB 2
@@ -260,6 +268,54 @@ struct TimingTest {
 		3449, 3397,
 		3456, 3456, 3448, 3448, 3447, 3447, 3439, 3439,
 		3440, 3403
+	} },
+	{ "Trivial DMA (16)", testTrivialDma, TEST_ARM | TEST_THUMB, {
+		77, 68, 70, 64, 66, 54, 59, 50,
+		63, 14,
+		67, 58, 58, 52, 63, 47, 54, 41,
+		49, 16
+	} },
+	{ "Trivial DMA (16/ROM)", testTrivialDmaRom, TEST_ARM | TEST_THUMB, {
+		92, 84, 82, 77, 81, 69, 71, 62,
+		74, 16,
+		82, 74, 70, 65, 78, 58, 66, 50,
+		60, 18
+	} },
+	{ "Trivial DMA (32)", testTrivial32Dma, TEST_ARM | TEST_THUMB, {
+		77, 68, 70, 64, 66, 54, 59, 50,
+		63, 14,
+		67, 58, 58, 52, 63, 47, 54, 41,
+		49, 16
+	} },
+	{ "Trivial DMA (32/ROM)", testTrivial32DmaRom, TEST_ARM | TEST_THUMB, {
+		95, 87, 85, 80, 83, 71, 73, 64,
+		77, 16,
+		85, 77, 73, 68, 80, 58, 68, 50,
+		63, 18
+	} },
+	{ "Short DMA (16)", testShortDma, TEST_ARM | TEST_THUMB, {
+		107, 98, 100, 94, 96, 84, 89, 80,
+		93, 14,
+		97, 88, 88, 82, 93, 47, 84, 41,
+		79, 16
+	} },
+	{ "Short DMA (16/ROM)", testShortDmaRom, TEST_ARM | TEST_THUMB, {
+		152, 144, 142, 137, 126, 114, 116, 107,
+		134, 16,
+		142, 134, 130, 125, 123, 58, 111, 50,
+		120, 18
+	} },
+	{ "Short DMA (32)", testShort32Dma, TEST_ARM | TEST_THUMB, {
+		118, 109, 109, 103, 107, 95, 98, 89,
+		100, 16,
+		97, 88, 88, 82, 93, 47, 84, 41,
+		79, 16
+	} },
+	{ "Short DMA (32/ROM)", testShort32DmaRom, TEST_ARM | TEST_THUMB, {
+		211, 203, 199, 194, 169, 157, 157, 148,
+		189, 18,
+		190, 182, 178, 173, 155, 58, 143, 50,
+		168, 18
 	} },
 };
 

@@ -1,3 +1,4 @@
+#define DMA3SAD 0x40000D4
 #define TM0CNT_LO 0x4000100
 #define WAITCNT 0x4000204
 #define IME 0x4000208
