@@ -441,14 +441,14 @@ int main(void) {
 		if (activeTest) {
 			struct TestTimings currentTest = {0};
 			if (keys & KEY_UP) {
-				--resultIndex;
-				if (resultIndex < 0) {
-					resultIndex = 4;
+				if (resultIndex > 0) {
+					--resultIndex;
 				}
 			}
 			if (keys & KEY_DOWN) {
-				++resultIndex;
-				resultIndex %= 5;
+				if (resultIndex < 4) {
+					++resultIndex;
+				}
 			}
 			if (activeTest->test) {
 				activeTest->test(&currentTest);
