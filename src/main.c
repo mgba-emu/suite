@@ -10,10 +10,24 @@
 #include "font.h"
 
 struct TestTimings {
-	s32 arm_text;
+	s32 arm_text_0000;
+	s32 arm_text_4000;
+	s32 arm_text_0004;
+	s32 arm_text_4004;
+	s32 arm_text_0010;
+	s32 arm_text_4010;
+	s32 arm_text_0014;
+	s32 arm_text_4014;
 	s32 arm_ewram;
 	s32 arm_iwram;
-	s32 thumb_text;
+	s32 thumb_text_0000;
+	s32 thumb_text_4000;
+	s32 thumb_text_0004;
+	s32 thumb_text_4004;
+	s32 thumb_text_0010;
+	s32 thumb_text_4010;
+	s32 thumb_text_0014;
+	s32 thumb_text_4014;
 	s32 thumb_ewram;
 	s32 thumb_iwram;
 };
@@ -46,23 +60,96 @@ struct TimingTest {
 	int modes;
 	struct TestTimings expected;
 } const tests[] = {
-	{ "Calibration", 0, TEST_ARM | TEST_THUMB, { 7, 5, 0, 4, 2, 0 } },
-	{ "nop", testNop, TEST_ARM | TEST_THUMB, { 6, 6, 1, 3, 3, 1 } },
-	{ "ldrh r2, [sp]", testLdrh, TEST_ARM | TEST_THUMB, { 10, 8, 3, 7, 5, 3} },
-	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2} },
-	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM, { 10, 8, 3 } },
-	{ "ldmia sp, {r2, r3}", testLdmia2, TEST_ARM, { 11, 9, 4 } },
-	{ "ldmia sp, {r2-r7}", testLdmia6, TEST_ARM, { 28, 24, 14 } },
-	{ "stmia sp, {r2}", testStmia1, TEST_ARM, { 9, 7, 2 } },
-	{ "stmia sp, {r2, r3}", testStmia2, TEST_ARM, { 10, 8, 3 } },
-	{ "stmia sp, {r2-r7}", testStmia6, TEST_ARM, { 27, 23, 13 } },
-	{ "mul #0x00000000, #0xFF", testMul0, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2 } },
-	{ "mul #0x00000078, #0xFF", testMul1, TEST_ARM | TEST_THUMB, { 9, 7, 2, 6, 4, 2 } },
-	{ "mul #0x00005678, #0xFF", testMul2, TEST_ARM | TEST_THUMB, { 10, 8, 3, 7, 5, 3 } },
-	{ "mul #0x00345678, #0xFF", testMul3, TEST_ARM | TEST_THUMB, { 11, 9, 4, 8, 6, 4 } },
-	{ "mul #0x12345678, #0xFF", testMul4, TEST_ARM | TEST_THUMB, { 12, 10, 5, 9, 7, 5 } },
-	{ "Division", testDiv, TEST_ARM | TEST_THUMB, { 409, 399, 342, 379, 369, 342 } },
-	{ "CpuSet", testCpuSet, TEST_ARM | TEST_THUMB, { 3465, 3459, 3402, 3468, 3450, 3409 } },
+	{ "Calibration", 0, TEST_ARM | TEST_THUMB, {
+		7, 4, 6, 4, 6, 2, 5, 2,
+		5, 0,
+		4, 1, 3, 1, 4, 0, 3, 0,
+		2, 0
+	} },
+	{ "nop", testNop, TEST_ARM | TEST_THUMB, { 
+		6, 6, 6, 6, 4, 4, 4, 4,
+		6, 1,
+		3, 3, 3, 3, 2, 2, 2, 2,
+		3, 1
+	} },
+	{ "ldrh r2, [sp]", testLdrh, TEST_ARM | TEST_THUMB, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+		7, 3, 6, 3, 7, 3, 6, 3,
+		5, 3
+	} },
+	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB, {
+		9, 6, 8, 6, 8, 4, 7, 4,
+		7, 2,
+		6, 3, 5, 3, 6, 2, 5, 2,
+		4, 2
+	} },
+	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3
+	} },
+	{ "ldmia sp, {r2, r3}", testLdmia2, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4
+	} },
+	{ "ldmia sp, {r2-r7}", testLdmia6, TEST_ARM, {
+		15, 8, 14, 8, 14, 8, 13, 8,
+		13, 8
+	} },
+	{ "stmia sp, {r2}", testStmia1, TEST_ARM, {
+		9, 6, 8, 6, 8, 4, 7, 4,
+		7, 2
+	} },
+	{ "stmia sp, {r2, r3}", testStmia2, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3
+	} },
+	{ "stmia sp, {r2-r7}", testStmia6, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7
+	} },
+	{ "mul #0x00000000, #0xFF", testMul0, TEST_ARM | TEST_THUMB, {
+		9, 6, 8, 6, 8, 4, 7, 4,
+		7, 2,
+		6, 3, 5, 3, 6, 2, 5, 2,
+		4, 2
+	} },
+	{ "mul #0x00000078, #0xFF", testMul1, TEST_ARM | TEST_THUMB, {
+		9, 6, 8, 6, 8, 4, 7, 4,
+		7, 2,
+		6, 3, 5, 3, 6, 2, 5, 2,
+		4, 2
+	} },
+	{ "mul #0x00005678, #0xFF", testMul2, TEST_ARM | TEST_THUMB, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+		7, 3, 6, 3, 7, 3, 6, 3,
+		5, 3
+	} },
+	{ "mul #0x00345678, #0xFF", testMul3, TEST_ARM | TEST_THUMB, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+		8, 4, 7, 4, 8, 4, 7, 4,
+		6, 4
+	} },
+	{ "mul #0x12345678, #0xFF", testMul4, TEST_ARM | TEST_THUMB, {
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
+		9, 5, 8, 5, 9, 5, 8, 5,
+		7, 5
+	} },
+	{ "Division", testDiv, TEST_ARM | TEST_THUMB, {
+		398, 398, 394, 394, 381, 381, 377, 377,
+		390, 338,
+		371, 371, 367, 367, 363, 363, 359, 359,
+		363, 338
+	} },
+	{ "CpuSet", testCpuSet, TEST_ARM | TEST_THUMB, {
+		3453, 3453, 3451, 3451, 3434, 3434, 3432, 3432,
+		3449, 3397,
+		3456, 3456, 3448, 3448, 3447, 3447, 3439, 3439,
+		3440, 3403
+	} },
 };
 
 u16* textBase = (u16*) VRAM;
@@ -79,52 +166,45 @@ static void updateTextGrid(void) {
 	}
 }
 
-static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, const struct TestTimings* expected, int mode) {
+static void printResult(int offset, int line, const char* preface, s32 value, s32 calibration, s32 expected) {
+	static const int base = 96;
+	if (offset > line || base + 32 * (line - offset) > 576) {
+		return;
+	}
+
+	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-13s: %5i", preface, value - calibration);
+	if (value - calibration == expected) {
+		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
+	} else {
+		snprintf(&textGrid[base + 32 * (line - offset) + 21], 10, "!= %5i", expected);
+	}
+}
+
+static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, const struct TestTimings* expected, int mode, int base) {
 	snprintf(&textGrid[32], 31, "Timing test: %s", preface);
-	snprintf(&textGrid[96], 31, "ARM/ROM:     %5u", values->arm_text - calibration->arm_text);
-	if (values->arm_text - calibration->arm_text == expected->arm_text) {
-		strncpy(&textGrid[96 + 19], "PASS", 12);
-	} else {
-		snprintf(&textGrid[96 + 19], 12, "!= %5u", expected->arm_text);
-	}
 
-	snprintf(&textGrid[128], 31, "ARM/WRAM:    %5u", values->arm_ewram - calibration->arm_ewram);
-	if (values->arm_ewram - calibration->arm_ewram == expected->arm_ewram) {
-		strncpy(&textGrid[128 + 19], "PASS", 12);
-	} else {
-		snprintf(&textGrid[128 + 19], 12, "!= %5u", expected->arm_ewram);
-	}
-
-	snprintf(&textGrid[160], 31, "ARM/IWRAM:   %5u", values->arm_iwram - calibration->arm_iwram);
-	if (values->arm_iwram - calibration->arm_iwram == expected->arm_iwram) {
-		strncpy(&textGrid[160 + 19], "PASS", 12);
-	} else {
-		snprintf(&textGrid[160 + 19], 12, "!= %5u", expected->arm_iwram);
-	}
+	printResult(base, 0, "ARM/ROM ...", values->arm_text_0000, calibration->arm_text_0000, expected->arm_text_0000);
+	printResult(base, 1, "ARM/ROM P..", values->arm_text_4000, calibration->arm_text_4000, expected->arm_text_4000);
+	printResult(base, 2, "ARM/ROM .N.", values->arm_text_0004, calibration->arm_text_0004, expected->arm_text_0004);
+	printResult(base, 3, "ARM/ROM PN.", values->arm_text_4004, calibration->arm_text_4004, expected->arm_text_4004);
+	printResult(base, 4, "ARM/ROM ..S", values->arm_text_0010, calibration->arm_text_0010, expected->arm_text_0010);
+	printResult(base, 5, "ARM/ROM P.S", values->arm_text_4010, calibration->arm_text_4010, expected->arm_text_4010);
+	printResult(base, 6, "ARM/ROM .NS", values->arm_text_0014, calibration->arm_text_0014, expected->arm_text_0014);
+	printResult(base, 7, "ARM/ROM PNS", values->arm_text_4014, calibration->arm_text_4014, expected->arm_text_4014);
+	printResult(base, 8, "ARM/WRAM", values->arm_ewram, calibration->arm_ewram, expected->arm_ewram);
+	printResult(base, 9, "ARM/IWRAM", values->arm_iwram, calibration->arm_iwram, expected->arm_iwram);
 
 	if (mode & TEST_THUMB) {
-		snprintf(&textGrid[192], 31, "Thumb/ROM:   %5u", values->thumb_text - calibration->thumb_text);
-		if (values->thumb_text - calibration->thumb_text == expected->thumb_text) {
-			strncpy(&textGrid[192 + 19], "PASS", 12);
-		} else {
-			snprintf(&textGrid[192 + 19], 12, "!= %5u", expected->thumb_text);
-		}
-
-		snprintf(&textGrid[224], 31, "Thumb/WRAM:  %5u", values->thumb_ewram - calibration->thumb_ewram);
-		if (values->thumb_ewram - calibration->thumb_ewram == expected->thumb_ewram) {
-			strncpy(&textGrid[224 + 19], "PASS", 12);
-		} else {
-			snprintf(&textGrid[224 + 19], 12, "!= %5u", expected->thumb_ewram);
-		}
-
-		snprintf(&textGrid[256], 31, "Thumb/IWRAM: %5u", values->thumb_iwram - calibration->thumb_iwram);
-		if (values->thumb_iwram - calibration->thumb_iwram == expected->thumb_iwram) {
-			strncpy(&textGrid[256 + 19], "PASS", 12);
-		} else {
-			snprintf(&textGrid[256 + 19], 12, "!= %5u", expected->thumb_iwram);
-		}
-	} else {
-		strncpy(&textGrid[192], "Thumb not applicable", 31);
+		printResult(base, 10, "Thumb/ROM ...", values->thumb_text_0000, calibration->thumb_text_0000, expected->thumb_text_0000);
+		printResult(base, 11, "Thumb/ROM P..", values->thumb_text_4000, calibration->thumb_text_4000, expected->thumb_text_4000);
+		printResult(base, 12, "Thumb/ROM .N.", values->thumb_text_0004, calibration->thumb_text_0004, expected->thumb_text_0004);
+		printResult(base, 13, "Thumb/ROM PN.", values->thumb_text_4004, calibration->thumb_text_4004, expected->thumb_text_4004);
+		printResult(base, 14, "Thumb/ROM ..S", values->thumb_text_0010, calibration->thumb_text_0010, expected->thumb_text_0010);
+		printResult(base, 15, "Thumb/ROM P.S", values->thumb_text_4010, calibration->thumb_text_4010, expected->thumb_text_4010);
+		printResult(base, 16, "Thumb/ROM .NS", values->thumb_text_0014, calibration->thumb_text_0014, expected->thumb_text_0014);
+		printResult(base, 17, "Thumb/ROM PNS", values->thumb_text_4014, calibration->thumb_text_4014, expected->thumb_text_4014);
+		printResult(base, 18, "Thumb/WRAM", values->thumb_ewram, calibration->thumb_ewram, expected->thumb_ewram);
+		printResult(base, 19, "Thumb/IWRAM", values->thumb_iwram, calibration->thumb_iwram, expected->thumb_iwram);
 	}
 }
 
@@ -138,27 +218,110 @@ int main(void) {
 	memset(textGrid, 0, sizeof(textGrid));
 	strcpy(&textGrid[2], "Game Boy Advance Test Suite");
 
+	strcpy(&textGrid[139], "Testing...");
 	updateTextGrid();
 	REG_DISPCNT = MODE_0 | BG1_ON;
 
 	irqEnable(IRQ_VBLANK);
 
-	REG_WAITCNT &= ~0x4000;
-
 	const struct TimingTest* activeTest = 0;
 	int testIndex = 0;
 	int viewIndex = 0;
+	int resultIndex = 0;
 
+	struct TestTimings calibration;
+
+	int passes = 0;
+	int totalResults = 0;
+	int i;
+	for (i = 0; i < sizeof(tests) / sizeof(*tests); ++i) {
+		struct TestTimings currentTest = {0};
+		VBlankIntrWait();
+		REG_IME = 0;
+		calibrate(&calibration);
+		activeTest = &tests[i];
+		if (activeTest->test) {
+			activeTest->test(&currentTest);
+		} else {
+			currentTest = calibration;
+			memset(&calibration, 0, sizeof(calibration));
+		}
+		REG_IME = 1;
+		if (activeTest->expected.arm_text_0000 == currentTest.arm_text_0000 - calibration.arm_text_0000) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4000 == currentTest.arm_text_4000 - calibration.arm_text_4000) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_0004 == currentTest.arm_text_0004 - calibration.arm_text_0004) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4004 == currentTest.arm_text_4004 - calibration.arm_text_4004) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_0010 == currentTest.arm_text_0010 - calibration.arm_text_0010) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4010 == currentTest.arm_text_4010 - calibration.arm_text_4010) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_0014 == currentTest.arm_text_0014 - calibration.arm_text_0014) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4014 == currentTest.arm_text_4014 - calibration.arm_text_4014) {
+			++passes;
+		}
+		if (activeTest->expected.arm_ewram == currentTest.arm_ewram - calibration.arm_ewram) {
+			++passes;
+		}
+		if (activeTest->expected.arm_iwram == currentTest.arm_iwram - calibration.arm_iwram) {
+			++passes;
+		}
+		totalResults += 10;
+		if (activeTest->modes & TEST_THUMB) {
+			if (activeTest->expected.thumb_text_0000 == currentTest.thumb_text_0000 - calibration.thumb_text_0000) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4000 == currentTest.thumb_text_4000 - calibration.thumb_text_4000) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_0004 == currentTest.thumb_text_0004 - calibration.thumb_text_0004) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4004 == currentTest.thumb_text_4004 - calibration.thumb_text_4004) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_0010 == currentTest.thumb_text_0010 - calibration.thumb_text_0010) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4010 == currentTest.thumb_text_4010 - calibration.thumb_text_4010) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_0014 == currentTest.thumb_text_0014 - calibration.thumb_text_0014) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4014 == currentTest.thumb_text_4014 - calibration.thumb_text_4014) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_ewram == currentTest.thumb_ewram - calibration.thumb_ewram) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_iwram == currentTest.thumb_iwram - calibration.thumb_iwram) {
+				++passes;
+			}
+			totalResults += 10;
+		}
+	}
+
+	activeTest = 0;
 	while (1) {
 		memset(&textGrid[32], 0, sizeof(textGrid) - 32);
-		struct TestTimings calibration;
-		calibrate(&calibration);
-
 		scanKeys();
 		u16 keys = keysDown();
 
 		if (keys & KEY_B) {
 			activeTest = 0;
+			resultIndex = 0;
 		}
 		if (keys & KEY_A) {
 			activeTest = &tests[testIndex];
@@ -166,11 +329,21 @@ int main(void) {
 
 		if (activeTest) {
 			struct TestTimings currentTest = {0};
+			if (keys & KEY_UP) {
+				--resultIndex;
+				if (resultIndex < 0) {
+					resultIndex = 4;
+				}
+			}
+			if (keys & KEY_DOWN) {
+				++resultIndex;
+				resultIndex %= 5;
+			}
 			if (activeTest->test) {
 				activeTest->test(&currentTest);
-				printResults(activeTest->testName, &currentTest, &calibration, &activeTest->expected, activeTest->modes);
+				printResults(activeTest->testName, &currentTest, &calibration, &activeTest->expected, activeTest->modes, resultIndex);
 			} else {
-				printResults(activeTest->testName, &calibration, &currentTest, &activeTest->expected, activeTest->modes);
+				printResults(activeTest->testName, &calibration, &currentTest, &activeTest->expected, activeTest->modes, resultIndex);
 			}
 		} else {
 			if (keys & KEY_UP) {
@@ -189,6 +362,7 @@ int main(void) {
 				viewIndex = testIndex - VIEW_SIZE + 1;
 			}
 			strcpy(&textGrid[32], "Timing tests");
+			sprintf(&textGrid[55], "%3u/%-3u", passes, totalResults);
 			size_t i;
 			for (i = 0; i < sizeof(tests) / sizeof(*tests) && i < VIEW_SIZE; ++i) {
 				snprintf(&textGrid[96 + i * 32], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', tests[i + viewIndex].testName);

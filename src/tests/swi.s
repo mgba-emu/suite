@@ -31,7 +31,7 @@ TEST_THUMB(testCpuSetThumb, _(
 	swi $0xC ;
 	mov r0, r4 ;
 	mov r1, r5 ;
-), _(mov r6, lr ; push {r4-r6}), _(pop {r4-r6} ; mov lr, r6))
+), _(push {r4-r5}), _(pop {r4-r5}))
 
 TEST_ARM(testCpuSetArm, _(
 	mov r4, r0 ;
@@ -42,6 +42,6 @@ TEST_ARM(testCpuSetArm, _(
 	swi $0xC0000 ;
 	mov r0, r4 ;
 	mov r1, r5 ;
-), _(push {r4, r5, lr}), _(pop {r4, r5, lr}))
+), _(push {r4, r5}), _(pop {r4, r5}))
 
 TEST_VARIANT(testCpuSet, testCpuSetArm, testCpuSetThumb)
