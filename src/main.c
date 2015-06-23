@@ -34,25 +34,42 @@ struct TestTimings {
 
 void calibrate(struct TestTimings*);
 void testNop(struct TestTimings*);
+void testNop2(struct TestTimings*);
 void testLdrh(struct TestTimings*);
+void testLdrhNop(struct TestTimings*);
+void testNopLdrh(struct TestTimings*);
 void testStrh(struct TestTimings*);
+void testStrhNop(struct TestTimings*);
+void testNopStrh(struct TestTimings*);
 void testLdmia1(struct TestTimings*);
 void testLdmia2(struct TestTimings*);
 void testLdmia6(struct TestTimings*);
+void testLdmia1x2(struct TestTimings*);
+void testLdmia2x2(struct TestTimings*);
+void testLdmia6x2(struct TestTimings*);
 void testStmia1(struct TestTimings*);
 void testStmia2(struct TestTimings*);
 void testStmia6(struct TestTimings*);
+void testStmia1x2(struct TestTimings*);
+void testStmia2x2(struct TestTimings*);
+void testStmia6x2(struct TestTimings*);
 void testMul0(struct TestTimings*);
 void testMul1(struct TestTimings*);
 void testMul2(struct TestTimings*);
 void testMul3(struct TestTimings*);
 void testMul4(struct TestTimings*);
+void testB(struct TestTimings*);
+void testNopB(struct TestTimings*);
+void testBx(struct TestTimings*);
 void testDiv(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
 
 #define TEST_ARM 1
 #define TEST_THUMB 2
 #define VIEW_SIZE 16
+
+void longjump() {
+}
 
 struct TimingTest {
 	const char* testName;
@@ -66,11 +83,17 @@ struct TimingTest {
 		4, 1, 3, 1, 4, 0, 3, 0,
 		2, 0
 	} },
-	{ "nop", testNop, TEST_ARM | TEST_THUMB, { 
+	{ "nop", testNop, TEST_ARM | TEST_THUMB, {
 		6, 6, 6, 6, 4, 4, 4, 4,
 		6, 1,
 		3, 3, 3, 3, 2, 2, 2, 2,
 		3, 1
+	} },
+	{ "nop / nop", testNop2, TEST_ARM | TEST_THUMB, {
+		12, 12, 12, 12, 8, 8, 8, 8,
+		12, 2,
+		6, 6, 6, 6, 4, 4, 4, 4,
+		6, 2
 	} },
 	{ "ldrh r2, [sp]", testLdrh, TEST_ARM | TEST_THUMB, {
 		10, 6, 9, 6, 9, 4, 8, 4,
@@ -78,11 +101,35 @@ struct TimingTest {
 		7, 3, 6, 3, 7, 3, 6, 3,
 		5, 3
 	} },
+	{ "ldrh r2, [sp] / nop", testLdrhNop, TEST_ARM | TEST_THUMB, {
+		16, 12, 15, 12, 13, 8, 12, 8,
+		14, 4,
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 4
+	} },
+	{ "nop / ldrh r2, [sp]", testNopLdrh, TEST_ARM | TEST_THUMB, {
+		16, 12, 15, 12, 13, 8, 12, 8,
+		14, 4,
+		10, 6, 9, 6, 9, 5, 8, 5,
+		8, 4
+	} },
 	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB, {
 		9, 6, 8, 6, 8, 4, 7, 4,
 		7, 2,
 		6, 3, 5, 3, 6, 2, 5, 2,
 		4, 2
+	} },
+	{ "strh r3, [sp] / nop", testStrhNop, TEST_ARM | TEST_THUMB, {
+		15, 12, 14, 12, 12, 8, 11, 8,
+		13, 3,
+		9, 6, 8, 6, 8, 4, 7, 4,
+		7, 3
+	} },
+	{ "nop / strh r3, [sp]", testNopStrh, TEST_ARM | TEST_THUMB, {
+		15, 12, 14, 12, 12, 8, 11, 8,
+		13, 3,
+		9, 6, 8, 6, 8, 4, 7, 4,
+		7, 3
 	} },
 	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM, {
 		10, 6, 9, 6, 9, 4, 8, 4,
@@ -96,6 +143,18 @@ struct TimingTest {
 		15, 8, 14, 8, 14, 8, 13, 8,
 		13, 8
 	} },
+	{ "ldmia sp, {r2} x2", testLdmia1x2, TEST_ARM, {
+		20, 12, 18, 12, 18, 8, 16, 8,
+		16, 6
+	} },
+	{ "ldmia sp, {r2, r3} x2", testLdmia2x2, TEST_ARM, {
+		22, 12, 20, 12, 20, 8, 18, 8,
+		18, 8
+	} },
+	{ "ldmia sp, {r2-r7} x2", testLdmia6x2, TEST_ARM, {
+		30, 16, 28, 16, 28, 16, 26, 16,
+		26, 16
+	} },
 	{ "stmia sp, {r2}", testStmia1, TEST_ARM, {
 		9, 6, 8, 6, 8, 4, 7, 4,
 		7, 2
@@ -107,6 +166,18 @@ struct TimingTest {
 	{ "stmia sp, {r2-r7}", testStmia6, TEST_ARM, {
 		14, 7, 13, 7, 13, 7, 12, 7,
 		12, 7
+	} },
+	{ "stmia sp, {r2} x2", testStmia1x2, TEST_ARM, {
+		18, 12, 16, 12, 16, 8, 14, 8,
+		14, 4
+	} },
+	{ "stmia sp, {r2, r3} x2", testStmia2x2, TEST_ARM, {
+		20, 12, 18, 12, 18, 8, 16, 8,
+		16, 6
+	} },
+	{ "stmia sp, {r2-r7} x2", testStmia6x2, TEST_ARM, {
+		28, 14, 26, 14, 26, 14, 24, 14,
+		24, 14
 	} },
 	{ "mul #0x00000000, #0xFF", testMul0, TEST_ARM | TEST_THUMB, {
 		9, 6, 8, 6, 8, 4, 7, 4,
@@ -137,6 +208,24 @@ struct TimingTest {
 		10, 5,
 		9, 5, 8, 5, 9, 5, 8, 5,
 		7, 5
+	} },
+	{ "b pc", testB, TEST_ARM | TEST_THUMB, {
+		26, 26, 25, 25, 19, 19, 18, 18,
+		24, 4,
+		14, 14, 13, 13, 11, 11, 10, 10,
+		12, 4
+	} },
+	{ "nop ; b pc", testB, TEST_ARM | TEST_THUMB, {
+		26, 26, 25, 25, 19, 19, 18, 18,
+		24, 4,
+		14, 14, 13, 13, 11, 11, 10, 10,
+		12, 4
+	} },
+	{ "bx", testBx, TEST_ARM | TEST_THUMB, {
+		78, 78, 74, 74, 59, 59, 55, 55,
+		72, 22,
+		57, 57, 53, 53, 45, 45, 41, 41,
+		51, 24
 	} },
 	{ "Division", testDiv, TEST_ARM | TEST_THUMB, {
 		398, 398, 394, 394, 381, 381, 377, 377,
