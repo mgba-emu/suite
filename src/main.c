@@ -41,6 +41,8 @@ void testNopLdrh(struct TestTimings*);
 void testStrh(struct TestTimings*);
 void testStrhNop(struct TestTimings*);
 void testNopStrh(struct TestTimings*);
+void testLdrStr(struct TestTimings*);
+void testStrLdr(struct TestTimings*);
 void testLdmia1(struct TestTimings*);
 void testLdmia2(struct TestTimings*);
 void testLdmia6(struct TestTimings*);
@@ -159,6 +161,18 @@ struct TimingTest {
 		13, 3,
 		9, 6, 8, 6, 8, 4, 7, 4,
 		7, 3
+	} },
+	{ "ldr r2, [sp] / str r2, [sp]", testLdrStr, TEST_ARM | TEST_THUMB, {
+		19, 12, 17, 12, 17, 8, 15, 8,
+		15, 5,
+		13, 6, 11, 6, 13, 5, 11, 5,
+		9, 5
+	} },
+	{ "str r3, [sp] / ldr r3, [sp]", testStrLdr, TEST_ARM | TEST_THUMB, {
+		19, 12, 17, 12, 17, 8, 15, 8,
+		15, 5,
+		13, 6, 11, 6, 13, 5, 11, 5,
+		9, 5
 	} },
 	{ "ldmia sp, {r2}", testLdmia1, TEST_ARM, {
 		10, 6, 9, 6, 9, 4, 8, 4,
