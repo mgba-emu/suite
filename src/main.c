@@ -42,7 +42,9 @@ void testStrh(struct TestTimings*);
 void testStrhNop(struct TestTimings*);
 void testNopStrh(struct TestTimings*);
 void testLdrStr(struct TestTimings*);
+void testLdrLdr(struct TestTimings*);
 void testStrLdr(struct TestTimings*);
+void testStrStr(struct TestTimings*);
 void testLdmia1(struct TestTimings*);
 void testLdmia2(struct TestTimings*);
 void testLdmia6(struct TestTimings*);
@@ -161,6 +163,18 @@ struct TimingTest {
 		13, 3,
 		9, 6, 8, 6, 8, 4, 7, 4,
 		7, 3
+	} },
+	{ "ldr r2, [sp] x2", testLdrLdr, TEST_ARM | TEST_THUMB, {
+		20, 12, 18, 12, 18, 8, 16, 8,
+		16, 6,
+		14, 6, 12, 6, 14, 6, 12, 6,
+		10, 6
+	} },
+	{ "str r3, [sp] x2", testStrStr, TEST_ARM | TEST_THUMB, {
+		18, 12, 16, 12, 16, 8, 14, 8,
+		14, 4,
+		12, 6, 10, 6, 12, 4, 10, 4,
+		8, 4
 	} },
 	{ "ldr r2, [sp] / str r2, [sp]", testLdrStr, TEST_ARM | TEST_THUMB, {
 		19, 12, 17, 12, 17, 8, 15, 8,
@@ -620,7 +634,7 @@ int main(void) {
 				viewIndex = testIndex - VIEW_SIZE + 1;
 			}
 			strcpy(&textGrid[32], "Timing tests");
-			sprintf(&textGrid[55], "%3u/%-3u", passes, totalResults);
+			sprintf(&textGrid[53], "%4u/%-4u", passes, totalResults);
 			size_t i;
 			for (i = 0; i < sizeof(tests) / sizeof(*tests) && i < VIEW_SIZE; ++i) {
 				snprintf(&textGrid[96 + i * 32], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', tests[i + viewIndex].testName);
