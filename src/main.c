@@ -38,11 +38,25 @@ void testNop2(struct TestTimings*);
 void testLdrh(struct TestTimings*);
 void testLdrhNop(struct TestTimings*);
 void testNopLdrh(struct TestTimings*);
+void testNopLdrhNop(struct TestTimings*);
+void testLdrhRom(struct TestTimings*);
+void testLdrhRomNop(struct TestTimings*);
+void testNopLdrhRom(struct TestTimings*);
+void testLdrRom(struct TestTimings*);
+void testLdrRomNop(struct TestTimings*);
+void testNopLdrRom(struct TestTimings*);
+void testLdrh(struct TestTimings*);
+void testLdrhNop(struct TestTimings*);
+void testNopLdrh(struct TestTimings*);
 void testStrh(struct TestTimings*);
 void testStrhNop(struct TestTimings*);
+void testNopStrhNop(struct TestTimings*);
 void testNopStrh(struct TestTimings*);
 void testLdrStr(struct TestTimings*);
 void testLdrLdr(struct TestTimings*);
+void testLdrRomLdr(struct TestTimings*);
+void testLdrLdrRom(struct TestTimings*);
+void testLdrRomLdrRom(struct TestTimings*);
 void testStrLdr(struct TestTimings*);
 void testStrStr(struct TestTimings*);
 void testLdmia1(struct TestTimings*);
@@ -79,15 +93,19 @@ void testNullDmaRom(struct TestTimings*);
 void testTrivialDma(struct TestTimings*);
 void testTrivialDmaRom(struct TestTimings*);
 void testTrivialDmaToRom(struct TestTimings*);
+void testTrivialDmaRomRom(struct TestTimings*);
 void testTrivial32Dma(struct TestTimings*);
 void testTrivial32DmaRom(struct TestTimings*);
 void testTrivial32DmaToRom(struct TestTimings*);
+void testTrivial32DmaRomRom(struct TestTimings*);
 void testShortDma(struct TestTimings*);
 void testShortDmaRom(struct TestTimings*);
 void testShortDmaToRom(struct TestTimings*);
+void testShortDmaRomRom(struct TestTimings*);
 void testShort32Dma(struct TestTimings*);
 void testShort32DmaRom(struct TestTimings*);
 void testShort32DmaToRom(struct TestTimings*);
+void testShort32DmaRomRom(struct TestTimings*);
 
 #define TEST_ARM 1
 #define TEST_THUMB 2
@@ -146,6 +164,48 @@ struct TimingTest {
 		10, 6, 9, 6, 9, 5, 8, 5,
 		8, 4
 	} },
+	{ "nop / ldrh r2, [sp] / nop", testNopLdrhNop, TEST_ARM | TEST_THUMB, {
+		22, 18, 21, 18, 17, 12, 16, 12,
+		20, 5,
+		13, 9, 12, 9, 11, 6, 10, 6,
+		11, 5
+	} },
+	{ "ldrh r2, [#0x08000000]", testLdrhRom, TEST_ARM | TEST_THUMB, {
+		14, 14, 12, 12, 13, 13, 11, 11,
+		12, 7,
+		11, 11, 9, 9, 11, 11, 9, 9,
+		9, 7
+	} },
+	{ "ldrh r2, [#0x08000000] / nop", testLdrhRomNop, TEST_ARM | TEST_THUMB, {
+		20, 20, 18, 18, 17, 17, 15, 15,
+		18, 8,
+		14, 14, 12, 12, 13, 13, 11, 11,
+		12, 8
+	} },
+	{ "nop / ldrh r2, [#0x08000000]", testNopLdrhRom, TEST_ARM | TEST_THUMB, {
+		20, 20, 18, 18, 17, 17, 15, 15,
+		18, 8,
+		14, 14, 12, 12, 13, 13, 11, 11,
+		12, 8
+	} },
+	{ "ldr r2, [#0x08000000]", testLdrRom, TEST_ARM | TEST_THUMB, {
+		17, 17, 15, 15, 15, 15, 13, 13,
+		15, 10,
+		14, 14, 12, 12, 13, 13, 11, 11,
+		12, 10
+	} },
+	{ "ldr r2, [#0x08000000] / nop", testLdrRomNop, TEST_ARM | TEST_THUMB, {
+		23, 23, 21, 21, 19, 19, 17, 17,
+		21, 11,
+		17, 17, 15, 15, 15, 15, 13, 13,
+		15, 11
+	} },
+	{ "nop / ldr r2, [#0x08000000]", testNopLdrRom, TEST_ARM | TEST_THUMB, {
+		23, 23, 21, 21, 19, 19, 17, 17,
+		21, 11,
+		17, 17, 15, 15, 15, 15, 13, 13,
+		15, 11
+	} },
 	{ "strh r3, [sp]", testStrh, TEST_ARM | TEST_THUMB, {
 		9, 6, 8, 6, 8, 4, 7, 4,
 		7, 2,
@@ -164,11 +224,35 @@ struct TimingTest {
 		9, 6, 8, 6, 8, 4, 7, 4,
 		7, 3
 	} },
+	{ "nop / strh r3, [sp] / nop", testNopStrhNop, TEST_ARM | TEST_THUMB, {
+		21, 18, 20, 18, 16, 12, 15, 12,
+		19, 4,
+		12, 9, 11, 9, 10, 6, 9, 6,
+		10, 4
+	} },
 	{ "ldr r2, [sp] x2", testLdrLdr, TEST_ARM | TEST_THUMB, {
 		20, 12, 18, 12, 18, 8, 16, 8,
 		16, 6,
 		14, 6, 12, 6, 14, 6, 12, 6,
 		10, 6
+	} },
+	{ "ldr r2, [#0x08000000] / ldr r2, [sp]", testLdrRomLdr, TEST_ARM | TEST_THUMB, {
+		27, 23, 24, 21, 24, 19, 21, 17,
+		23, 13,
+		21, 17, 18, 15, 20, 16, 17, 14,
+		17, 13
+	} },
+	{ "ldr r2, [sp] / ldr r2, [#0x08000000]", testLdrLdrRom, TEST_ARM | TEST_THUMB, {
+		27, 23, 24, 21, 24, 19, 21, 17,
+		23, 13,
+		21, 17, 18, 15, 20, 17, 17, 15,
+		17, 13
+	} },
+	{ "ldr r2, [#0x08000000] x2", testLdrRomLdrRom, TEST_ARM | TEST_THUMB, {
+		34, 34, 30, 30, 30, 30, 26, 26,
+		30, 20,
+		28, 28, 24, 24, 26, 26, 22, 22,
+		24, 20
 	} },
 	{ "str r3, [sp] x2", testStrStr, TEST_ARM | TEST_THUMB, {
 		18, 12, 16, 12, 16, 8, 14, 8,
@@ -368,13 +452,19 @@ struct TimingTest {
 		82, 74, 70, 65, 78, 58, 66, 50,
 		60, 18
 	} },
+	{ "Trivial DMA (16/ROM to ROM)", testTrivialDmaRomRom, TEST_ARM | TEST_THUMB, {
+		83, 74, 75, 69, 71, 60, 63, 55,
+		69, 14,
+		73, 64, 63, 57, 68, 47, 58, 41,
+		55, 16
+	} },
 	{ "Trivial DMA (32)", testTrivial32Dma, TEST_ARM | TEST_THUMB, {
 		77, 68, 70, 64, 66, 54, 59, 50,
 		63, 14,
 		67, 58, 58, 52, 63, 47, 54, 41,
 		49, 16
 	} },
-	{ "Trivial DMA (32/ROM)", testTrivial32DmaRom, TEST_ARM | TEST_THUMB, {
+	{ "Trivial DMA (32/from ROM)", testTrivial32DmaRom, TEST_ARM | TEST_THUMB, {
 		95, 86, 85, 79, 83, 72, 73, 65,
 		77, 16,
 		85, 76, 73, 67, 80, 58, 68, 50,
@@ -386,13 +476,19 @@ struct TimingTest {
 		85, 77, 73, 68, 80, 58, 68, 50,
 		63, 18
 	} },
+	{ "Trivial DMA (32/ROM to ROM)", testTrivial32DmaRomRom, TEST_ARM | TEST_THUMB, {
+		89, 80, 81, 75, 75, 64, 67, 59,
+		75, 14,
+		79, 70, 69, 63, 72, 47, 62, 41,
+		61, 16
+	} },
 	{ "Short DMA (16)", testShortDma, TEST_ARM | TEST_THUMB, {
 		107, 98, 100, 94, 96, 84, 89, 80,
 		93, 14,
 		97, 88, 88, 82, 93, 47, 84, 41,
 		79, 16
 	} },
-	{ "Short DMA (16/ROM)", testShortDmaRom, TEST_ARM | TEST_THUMB, {
+	{ "Short DMA (16/from ROM)", testShortDmaRom, TEST_ARM | TEST_THUMB, {
 		152, 143, 142, 136, 126, 115, 116, 108,
 		134, 16,
 		142, 133, 130, 124, 123, 58, 111, 50,
@@ -404,13 +500,19 @@ struct TimingTest {
 		142, 134, 130, 125, 123, 58, 111, 50,
 		120, 18
 	} },
+	{ "Short DMA (16/ROM to ROM)", testShortDmaRomRom, TEST_ARM | TEST_THUMB, {
+		173, 164, 165, 159, 131, 120, 123, 115,
+		159, 14,
+		163, 154, 153, 147, 128, 47, 118, 41,
+		145, 16
+	} },
 	{ "Short DMA (32)", testShort32Dma, TEST_ARM | TEST_THUMB, {
 		118, 109, 109, 103, 107, 95, 98, 89,
 		100, 16,
 		97, 88, 88, 82, 93, 47, 84, 41,
 		79, 16
 	} },
-	{ "Short DMA (32/ROM)", testShort32DmaRom, TEST_ARM | TEST_THUMB, {
+	{ "Short DMA (32/from ROM)", testShort32DmaRom, TEST_ARM | TEST_THUMB, {
 		211, 202, 199, 193, 169, 158, 157, 149,
 		189, 18,
 		190, 181, 178, 172, 155, 58, 143, 50,
@@ -421,6 +523,12 @@ struct TimingTest {
 		189, 18,
 		190, 182, 178, 173, 155, 58, 143, 50,
 		168, 18
+	} },
+	{ "Short DMA (32/ROM to ROM)", testShort32DmaRomRom, TEST_ARM | TEST_THUMB, {
+		280, 271, 270, 264, 206, 195, 196, 188,
+		262, 16,
+		259, 250, 249, 243, 192, 47, 182, 41,
+		241, 16
 	} },
 };
 
