@@ -8,182 +8,146 @@ dmaIwram:
 dmaRom:
 .space 0x80
 
-TEST_ALL(testNullDma, _(
+TEST_ALL(testTrivialDma, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x00000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000001
+),)
 
-TEST_ALL(testNullDmaRom, _(
+TEST_ALL(testTrivialDmaRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x00000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000001
+),)
 
-TEST_ALL(testTrivialDma, _(
-	ldr r2, =DMA3SAD ;
-	ldr r3, =dmaIwram ;
-	str r3, [r2] ;
-	add r3, #0x40 ;
-	str r3, [r2, #4] ;
-	ldr r3, =0x80000001 ;
-	str r3, [r2, #8]
-), , )
-
-TEST_ALL(testTrivialDmaRom, _(
-	ldr r2, =DMA3SAD ;
-	ldr r3, =dmaRom ;
-	str r3, [r2] ;
-	ldr r3, =dmaIwram ;
-	str r3, [r2, #4] ;
-	ldr r3, =0x80000001 ;
-	str r3, [r2, #8]
-), , )
-
-TEST_ALL(testTrivialDmaToRom, _(
+TEST_ALL(testTrivialDmaToRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	ldr r3, =dmaRom ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x80000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000001
+),)
 
-TEST_ALL(testTrivialDmaRomRom, _(
+TEST_ALL(testTrivialDmaRomRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x80000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000001
+),)
 
-TEST_ALL(testTrivial32Dma, _(
+TEST_ALL(testTrivial32Dma, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000001
+),)
 
-TEST_ALL(testTrivial32DmaRom, _(
+TEST_ALL(testTrivial32DmaRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000001
+),)
 
-TEST_ALL(testTrivial32DmaToRom, _(
+TEST_ALL(testTrivial32DmaToRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	ldr r3, =dmaRom ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000001
+),)
 
-TEST_ALL(testTrivial32DmaRomRom, _(
+TEST_ALL(testTrivial32DmaRomRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000001 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000001
+),)
 
-TEST_ALL(testShortDma, _(
+TEST_ALL(testShortDma, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x80000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000010
+),)
 
-TEST_ALL(testShortDmaRom, _(
+TEST_ALL(testShortDmaRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x80000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000010
+),)
 
-TEST_ALL(testShortDmaToRom, _(
+TEST_ALL(testShortDmaToRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	ldr r3, =dmaRom ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x80000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000010
+),)
 
-TEST_ALL(testShortDmaRomRom, _(
+TEST_ALL(testShortDmaRomRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x80000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x80000010
+),)
 
-TEST_ALL(testShort32Dma, _(
+TEST_ALL(testShort32Dma, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000010
+),)
 
-TEST_ALL(testShort32DmaRom, _(
+TEST_ALL(testShort32DmaRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000010
+),)
 
-TEST_ALL(testShort32DmaToRom, _(
+TEST_ALL(testShort32DmaToRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaIwram ;
 	str r3, [r2] ;
 	ldr r3, =dmaRom ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000010
+),)
 
-TEST_ALL(testShort32DmaRomRom, _(
+TEST_ALL(testShort32DmaRomRom, _(str r3, [r2, #8]), _(
 	ldr r2, =DMA3SAD ;
 	ldr r3, =dmaRom ;
 	str r3, [r2] ;
 	add r3, #0x40 ;
 	str r3, [r2, #4] ;
-	ldr r3, =0x84000010 ;
-	str r3, [r2, #8]
-), , )
+	ldr r3, =0x84000010
+),)

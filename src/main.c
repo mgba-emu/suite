@@ -88,8 +88,6 @@ void testTrivialLoop(struct TestTimings*);
 void testCLoop(struct TestTimings*);
 void testDiv(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
-void testNullDma(struct TestTimings*);
-void testNullDmaRom(struct TestTimings*);
 void testTrivialDma(struct TestTimings*);
 void testTrivialDmaRom(struct TestTimings*);
 void testTrivialDmaToRom(struct TestTimings*);
@@ -422,113 +420,101 @@ struct TimingTest {
 		3456, 3456, 3448, 3448, 3447, 3447, 3439, 3439,
 		3440, 3403
 	} },
-	{ "DMA Calibration", testNullDma, TEST_ARM | TEST_THUMB, {
-		73, 64, 66, 60, 62, 50, 55, 46,
-		59, 14,
-		52, 43, 45, 39, 48, 36, 41, 32,
-		38, 14
-	} },
-	{ "DMA Calibration (ROM)", testNullDmaRom, TEST_ARM | TEST_THUMB, {
-		84, 75, 75, 69, 73, 61, 64, 55,
-		66, 16,
-		63, 54, 54, 48, 59, 47, 50, 41,
-		45, 16
-	} },
 	{ "Trivial DMA (16)", testTrivialDma, TEST_ARM | TEST_THUMB, {
-		77, 68, 70, 64, 66, 54, 59, 50,
-		63, 14,
-		67, 58, 58, 52, 63, 47, 54, 41,
-		49, 16
+		13, 10, 12, 10, 12, 8, 11, 8,
+		11, 2,
+		10, 7, 9, 7, 10, 2, 9, 2,
+		8, 2
 	} },
 	{ "Trivial DMA (16/ROM)", testTrivialDmaRom, TEST_ARM | TEST_THUMB, {
-		92, 83, 82, 76, 81, 70, 71, 63,
-		74, 16,
-		82, 73, 70, 64, 78, 58, 66, 50,
-		60, 18
+		17, 14, 15, 13, 16, 13, 14, 12,
+		15, 2,
+		14, 11, 12, 10, 14, 2, 12, 2,
+		12, 2
 	} },
 	{ "Trivial DMA (16/to ROM)", testTrivialDmaToRom, TEST_ARM | TEST_THUMB, {
-		92, 84, 82, 77, 81, 69, 71, 62,
-		74, 16,
-		82, 74, 70, 65, 78, 58, 66, 50,
-		60, 18
+		17, 15, 15, 14, 16, 12, 14, 11,
+		15, 2,
+		14, 12, 12, 11, 14, 2, 12, 2,
+		12, 2
 	} },
 	{ "Trivial DMA (16/ROM to ROM)", testTrivialDmaRomRom, TEST_ARM | TEST_THUMB, {
-		83, 74, 75, 69, 71, 60, 63, 55,
-		69, 14,
-		73, 64, 63, 57, 68, 47, 58, 41,
-		55, 16
+		19, 16, 17, 15, 17, 14, 15, 13,
+		17, 2,
+		16, 13, 14, 12, 15, 2, 13, 2,
+		14, 2
 	} },
 	{ "Trivial DMA (32)", testTrivial32Dma, TEST_ARM | TEST_THUMB, {
-		77, 68, 70, 64, 66, 54, 59, 50,
-		63, 14,
-		67, 58, 58, 52, 63, 47, 54, 41,
-		49, 16
+		13, 10, 12, 10, 12, 8, 11, 8,
+		11, 2,
+		10, 7, 9, 7, 10, 2, 9, 2,
+		8, 2
 	} },
 	{ "Trivial DMA (32/from ROM)", testTrivial32DmaRom, TEST_ARM | TEST_THUMB, {
-		95, 86, 85, 79, 83, 72, 73, 65,
-		77, 16,
-		85, 76, 73, 67, 80, 58, 68, 50,
-		63, 18
+		20, 17, 18, 16, 18, 15, 16, 14,
+		18, 2,
+		17, 14, 15, 13, 16, 2, 14, 2,
+		15, 2
 	} },
 	{ "Trivial DMA (32/to ROM)", testTrivial32DmaToRom, TEST_ARM | TEST_THUMB, {
-		95, 87, 85, 80, 83, 71, 73, 64,
-		77, 16,
-		85, 77, 73, 68, 80, 58, 68, 50,
-		63, 18
+		20, 18, 18, 17, 18, 14, 16, 13,
+		18, 2,
+		17, 15, 15, 14, 16, 2, 14, 2,
+		15, 2
 	} },
 	{ "Trivial DMA (32/ROM to ROM)", testTrivial32DmaRomRom, TEST_ARM | TEST_THUMB, {
-		89, 80, 81, 75, 75, 64, 67, 59,
-		75, 14,
-		79, 70, 69, 63, 72, 47, 62, 41,
-		61, 16
+		25, 22, 23, 21, 21, 18, 19, 17,
+		23, 2,
+		22, 19, 20, 18, 19, 2, 17, 2,
+		20, 2
 	} },
 	{ "Short DMA (16)", testShortDma, TEST_ARM | TEST_THUMB, {
-		107, 98, 100, 94, 96, 84, 89, 80,
-		93, 14,
-		97, 88, 88, 82, 93, 47, 84, 41,
-		79, 16
+		43, 40, 42, 40, 42, 38, 41, 38,
+		41, 2,
+		40, 37, 39, 37, 40, 2, 39, 2,
+		38, 2
 	} },
 	{ "Short DMA (16/from ROM)", testShortDmaRom, TEST_ARM | TEST_THUMB, {
-		152, 143, 142, 136, 126, 115, 116, 108,
-		134, 16,
-		142, 133, 130, 124, 123, 58, 111, 50,
-		120, 18
+		77, 74, 75, 73, 61, 58, 59, 57,
+		75, 2,
+		74, 71, 72, 70, 59, 2, 57, 2,
+		72, 2
 	} },
 	{ "Short DMA (16/to ROM)", testShortDmaToRom, TEST_ARM | TEST_THUMB, {
-		152, 144, 142, 137, 126, 114, 116, 107,
-		134, 16,
-		142, 134, 130, 125, 123, 58, 111, 50,
-		120, 18
+		77, 75, 75, 74, 61, 57, 59, 56,
+		75, 2,
+		74, 72, 72, 71, 59, 2, 57, 2,
+		72, 2
 	} },
 	{ "Short DMA (16/ROM to ROM)", testShortDmaRomRom, TEST_ARM | TEST_THUMB, {
-		173, 164, 165, 159, 131, 120, 123, 115,
-		159, 14,
-		163, 154, 153, 147, 128, 47, 118, 41,
-		145, 16
+		109, 106, 107, 105, 77, 74, 75, 73,
+		107, 2,
+		106, 103, 104, 102, 75, 2, 73, 2,
+		104, 2
 	} },
 	{ "Short DMA (32)", testShort32Dma, TEST_ARM | TEST_THUMB, {
-		118, 109, 109, 103, 107, 95, 98, 89,
-		100, 16,
-		97, 88, 88, 82, 93, 47, 84, 41,
-		79, 16
+		43, 40, 42, 40, 42, 38, 41, 38,
+		41, 2,
+		40, 37, 39, 37, 40, 2, 39, 2,
+		38, 2
 	} },
 	{ "Short DMA (32/from ROM)", testShort32DmaRom, TEST_ARM | TEST_THUMB, {
-		211, 202, 199, 193, 169, 158, 157, 149,
-		189, 18,
-		190, 181, 178, 172, 155, 58, 143, 50,
-		168, 18
+		125, 122, 123, 121, 93, 90, 91, 89,
+		123, 2,
+		122, 119, 120, 118, 91, 2, 89, 2,
+		120, 2
 	} },
 	{ "Short DMA (32/to ROM)", testShort32DmaToRom, TEST_ARM | TEST_THUMB, {
-		211, 203, 199, 194, 169, 157, 157, 148,
-		189, 18,
-		190, 182, 178, 173, 155, 58, 143, 50,
-		168, 18
+		125, 123, 123, 122, 93, 89, 91, 88,
+		123, 2,
+		122, 120, 120, 119, 91, 2, 89, 2,
+		120, 2
 	} },
 	{ "Short DMA (32/ROM to ROM)", testShort32DmaRomRom, TEST_ARM | TEST_THUMB, {
-		280, 271, 270, 264, 206, 195, 196, 188,
-		262, 16,
-		259, 250, 249, 243, 192, 47, 182, 41,
-		241, 16
+		205, 202, 203, 201, 141, 138, 139, 137,
+		203, 2,
+		202, 199, 200, 198, 139, 2, 137, 2,
+		200, 2
 	} },
 };
 
