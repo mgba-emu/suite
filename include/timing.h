@@ -1,6 +1,6 @@
 #pragma once
 
 #include "common.h"
+#include "suite.h"
 
-struct TestSuite;
-const struct TestSuite* const timingTestSuite;
+extern const struct TestSuite timingTestSuite;

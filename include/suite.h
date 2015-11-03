@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stddef.h>
+
 struct TestSuite {
 	const char* name;
 	void (*run)(void);

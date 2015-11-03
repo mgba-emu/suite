@@ -565,6 +565,8 @@ static void printResults(const char* preface, const struct TestTimings* values, 
 }
 
 static void runTimingSuite(void) {
+	passes = 0;
+	totalResults = 0;
 	const struct TimingTest* activeTest = 0;
 	int i;
 	for (i = 0; i < nTimingTests; ++i) {
@@ -691,7 +693,7 @@ static void showTimingSuite(size_t index) {
 	}
 }
 
-static const struct TestSuite suite = {
+const struct TestSuite timingTestSuite = {
 	.name = "Timing tests",
 	.run = runTimingSuite,
 	.list = listTimingSuite,
@@ -700,5 +702,3 @@ static const struct TestSuite suite = {
 	.passes = &passes,
 	.totalResults = &totalResults
 };
-
-const struct TestSuite* const timingTestSuite = &suite;
