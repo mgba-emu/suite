@@ -1,5 +1,44 @@
 #include "timing.h"
 
+#include <gba_input.h>
+#include <gba_interrupt.h>
+#include <gba_systemcalls.h>
+
+#include <stdio.h>
+#include <string.h>
+
+#include "suite.h"
+
+struct TestTimings {
+	s32 arm_text_0000;
+	s32 arm_text_4000;
+	s32 arm_text_0004;
+	s32 arm_text_4004;
+	s32 arm_text_0010;
+	s32 arm_text_4010;
+	s32 arm_text_0014;
+	s32 arm_text_4014;
+	s32 arm_ewram;
+	s32 arm_iwram;
+	s32 thumb_text_0000;
+	s32 thumb_text_4000;
+	s32 thumb_text_0004;
+	s32 thumb_text_4004;
+	s32 thumb_text_0010;
+	s32 thumb_text_4010;
+	s32 thumb_text_0014;
+	s32 thumb_text_4014;
+	s32 thumb_ewram;
+	s32 thumb_iwram;
+};
+
+struct TimingTest {
+	const char* testName;
+	void (*test)(struct TestTimings*);
+	int modes;
+	struct TestTimings expected;
+};
+
 void calibrate(struct TestTimings*);
 void testNop(struct TestTimings*);
 void testNop2(struct TestTimings*);
@@ -84,7 +123,7 @@ void CLoop() {
 	}
 }
 
-const struct TimingTest timingTests[] = {
+static const struct TimingTest timingTests[] = {
 	{ "Calibration", 0, TEST_ARM | TEST_THUMB, {
 		7, 4, 6, 4, 6, 2, 5, 2,
 		5, 0,
@@ -477,4 +516,189 @@ const struct TimingTest timingTests[] = {
 	} },
 };
 
-const u32 nTimingTests = sizeof(timingTests) / sizeof(*timingTests);
+static const u32 nTimingTests = sizeof(timingTests) / sizeof(*timingTests);
+
+static struct TestTimings calibration;
+static unsigned passes;
+static unsigned totalResults;
+
+static void printResult(int offset, int line, const char* preface, s32 value, s32 calibration, s32 expected) {
+	static const int base = 96;
+	if (offset > line || base + 32 * (line - offset) > 576) {
+		return;
+	}
+
+	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-13s: %5i", preface, value - calibration);
+	if (value - calibration == expected) {
+		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
+	} else {
+		snprintf(&textGrid[base + 32 * (line - offset) + 21], 10, "!= %5i", expected);
+	}
+}
+
+static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, const struct TestTimings* expected, int mode, int base) {
+	snprintf(&textGrid[32], 31, "Timing test: %s", preface);
+
+	printResult(base, 0, "ARM/ROM ...", values->arm_text_0000, calibration->arm_text_0000, expected->arm_text_0000);
+	printResult(base, 1, "ARM/ROM P..", values->arm_text_4000, calibration->arm_text_4000, expected->arm_text_4000);
+	printResult(base, 2, "ARM/ROM .N.", values->arm_text_0004, calibration->arm_text_0004, expected->arm_text_0004);
+	printResult(base, 3, "ARM/ROM PN.", values->arm_text_4004, calibration->arm_text_4004, expected->arm_text_4004);
+	printResult(base, 4, "ARM/ROM ..S", values->arm_text_0010, calibration->arm_text_0010, expected->arm_text_0010);
+	printResult(base, 5, "ARM/ROM P.S", values->arm_text_4010, calibration->arm_text_4010, expected->arm_text_4010);
+	printResult(base, 6, "ARM/ROM .NS", values->arm_text_0014, calibration->arm_text_0014, expected->arm_text_0014);
+	printResult(base, 7, "ARM/ROM PNS", values->arm_text_4014, calibration->arm_text_4014, expected->arm_text_4014);
+	printResult(base, 8, "ARM/WRAM", values->arm_ewram, calibration->arm_ewram, expected->arm_ewram);
+	printResult(base, 9, "ARM/IWRAM", values->arm_iwram, calibration->arm_iwram, expected->arm_iwram);
+
+	if (mode & TEST_THUMB) {
+		printResult(base, 10, "Thumb/ROM ...", values->thumb_text_0000, calibration->thumb_text_0000, expected->thumb_text_0000);
+		printResult(base, 11, "Thumb/ROM P..", values->thumb_text_4000, calibration->thumb_text_4000, expected->thumb_text_4000);
+		printResult(base, 12, "Thumb/ROM .N.", values->thumb_text_0004, calibration->thumb_text_0004, expected->thumb_text_0004);
+		printResult(base, 13, "Thumb/ROM PN.", values->thumb_text_4004, calibration->thumb_text_4004, expected->thumb_text_4004);
+		printResult(base, 14, "Thumb/ROM ..S", values->thumb_text_0010, calibration->thumb_text_0010, expected->thumb_text_0010);
+		printResult(base, 15, "Thumb/ROM P.S", values->thumb_text_4010, calibration->thumb_text_4010, expected->thumb_text_4010);
+		printResult(base, 16, "Thumb/ROM .NS", values->thumb_text_0014, calibration->thumb_text_0014, expected->thumb_text_0014);
+		printResult(base, 17, "Thumb/ROM PNS", values->thumb_text_4014, calibration->thumb_text_4014, expected->thumb_text_4014);
+		printResult(base, 18, "Thumb/WRAM", values->thumb_ewram, calibration->thumb_ewram, expected->thumb_ewram);
+		printResult(base, 19, "Thumb/IWRAM", values->thumb_iwram, calibration->thumb_iwram, expected->thumb_iwram);
+	}
+}
+
+static void runTimingSuite(void) {
+	const struct TimingTest* activeTest = 0;
+	int i;
+	for (i = 0; i < nTimingTests; ++i) {
+		struct TestTimings currentTest = {0};
+		VBlankIntrWait();
+		REG_IME = 0;
+		calibrate(&calibration);
+		activeTest = &timingTests[i];
+		if (activeTest->test) {
+			activeTest->test(&currentTest);
+		} else {
+			currentTest = calibration;
+			memset(&calibration, 0, sizeof(calibration));
+		}
+		REG_IME = 1;
+		if (activeTest->expected.arm_text_0000 == currentTest.arm_text_0000 - calibration.arm_text_0000) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4000 == currentTest.arm_text_4000 - calibration.arm_text_4000) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_0004 == currentTest.arm_text_0004 - calibration.arm_text_0004) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4004 == currentTest.arm_text_4004 - calibration.arm_text_4004) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_0010 == currentTest.arm_text_0010 - calibration.arm_text_0010) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4010 == currentTest.arm_text_4010 - calibration.arm_text_4010) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_0014 == currentTest.arm_text_0014 - calibration.arm_text_0014) {
+			++passes;
+		}
+		if (activeTest->expected.arm_text_4014 == currentTest.arm_text_4014 - calibration.arm_text_4014) {
+			++passes;
+		}
+		if (activeTest->expected.arm_ewram == currentTest.arm_ewram - calibration.arm_ewram) {
+			++passes;
+		}
+		if (activeTest->expected.arm_iwram == currentTest.arm_iwram - calibration.arm_iwram) {
+			++passes;
+		}
+		totalResults += 10;
+		if (activeTest->modes & TEST_THUMB) {
+			if (activeTest->expected.thumb_text_0000 == currentTest.thumb_text_0000 - calibration.thumb_text_0000) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4000 == currentTest.thumb_text_4000 - calibration.thumb_text_4000) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_0004 == currentTest.thumb_text_0004 - calibration.thumb_text_0004) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4004 == currentTest.thumb_text_4004 - calibration.thumb_text_4004) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_0010 == currentTest.thumb_text_0010 - calibration.thumb_text_0010) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4010 == currentTest.thumb_text_4010 - calibration.thumb_text_4010) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_0014 == currentTest.thumb_text_0014 - calibration.thumb_text_0014) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_text_4014 == currentTest.thumb_text_4014 - calibration.thumb_text_4014) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_ewram == currentTest.thumb_ewram - calibration.thumb_ewram) {
+				++passes;
+			}
+			if (activeTest->expected.thumb_iwram == currentTest.thumb_iwram - calibration.thumb_iwram) {
+				++passes;
+			}
+			totalResults += 10;
+		}
+	}
+}
+
+static size_t listTimingSuite(const char** names, size_t size, size_t offset) {
+	size_t i;
+	for (i = 0; i < size; ++i) {
+		if (i + offset >= nTimingTests) {
+			break;
+		}
+		names[i] = timingTests[i + offset].testName;
+	}
+	return i;
+}
+
+static void showTimingSuite(size_t index) {
+	const struct TimingTest* activeTest = &timingTests[index];
+	struct TestTimings currentTest = {0};
+	size_t resultIndex = 0;
+	while (1) {
+		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
+		scanKeys();
+		u16 keys = keysDown();
+
+		if (keys & KEY_B) {
+			return;
+		}
+
+		if (keys & KEY_UP) {
+			if (resultIndex > 0) {
+				--resultIndex;
+			}
+		}
+		if (keys & KEY_DOWN) {
+			if (resultIndex < 4) {
+				++resultIndex;
+			}
+		}
+		if (activeTest->test) {
+			activeTest->test(&currentTest);
+			printResults(activeTest->testName, &currentTest, &calibration, &activeTest->expected, activeTest->modes, resultIndex);
+		} else {
+			printResults(activeTest->testName, &calibration, &currentTest, &activeTest->expected, activeTest->modes, resultIndex);
+		}
+		updateTextGrid();
+	}
+}
+
+static const struct TestSuite suite = {
+	.name = "Timing tests",
+	.run = runTimingSuite,
+	.list = listTimingSuite,
+	.show = showTimingSuite,
+	.nTests = sizeof(timingTests) / sizeof(*timingTests),
+	.passes = &passes,
+	.totalResults = &totalResults
+};
+
+const struct TestSuite* const timingTestSuite = &suite;
