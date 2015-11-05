@@ -10,6 +10,7 @@
 #include "common.h"
 #include "font.h"
 #include "timing.h"
+#include "memory.h"
 #include "suite.h"
 
 u16* textBase = (u16*) VRAM;
@@ -27,6 +28,7 @@ void updateTextGrid(void) {
 }
 
 const struct TestSuite* const suites[] = {
+	&memoryTestSuite,
 	&timingTestSuite
 };
 
@@ -128,7 +130,7 @@ int main(void) {
 		strcpy(&textGrid[GRID_STRIDE], "Select suite");
 		size_t i;
 		for (i = 0; i < nSuites && i < VIEW_SIZE; ++i) {
-			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == suiteIndex) ? '>' : ' ', suites[suiteIndex]->name);
+			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == suiteIndex) ? '>' : ' ', suites[i]->name);
 		}
 
 		updateTextGrid();
