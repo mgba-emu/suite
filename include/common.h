@@ -10,3 +10,4 @@
 extern char textGrid[GRID_STRIDE * 32];
 
 void updateTextGrid(void);
+__attribute__((format(printf, 1, 2))) int savprintf(const char* fmt, ...);

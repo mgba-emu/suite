@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "common.h"
 #include "font.h"
@@ -86,6 +87,29 @@ static void runSuite(const struct TestSuite* activeSuite) {
 	}
 }
 
+
+__attribute__((format(printf, 1, 2)))
+int savprintf(const char* fmt, ...) {
+	static u16 location = 0;
+	char tmp[128];
+	if (location >= 0x8000) {
+		return 0;
+	}
+
+	va_list args;
+	va_start(args, fmt);
+	int s = vsnprintf(tmp, sizeof(tmp), fmt, args);
+	va_end(args);
+
+	vs8* sbase = (vs8*) SRAM + location;
+	size_t i;
+	for (i = 0; i < s; ++i) {
+		sbase[i] = tmp[i];
+	}
+	location += s;
+	return s;
+}
+
 int main(void) {
 	irqInit();
 
@@ -99,6 +123,9 @@ int main(void) {
 	REG_DISPCNT = MODE_0 | BG1_ON;
 
 	irqEnable(IRQ_VBLANK);
+
+	bzero((u8*) SRAM, 0x8000);
+	savprintf("Game Boy Advance Test Suite\n\n");
 
 	int suiteIndex = 0;
 	int viewIndex = 0;

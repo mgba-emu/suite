@@ -290,10 +290,17 @@ static void printResult(int offset, int line, const char* preface, u32 value, u3
 
 	snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset)], 31, "%s:", preface);
 	if (value == expected) {
-		strncpy(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], "PASS", 10);
+		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08X PASS", value);
 	} else {
 		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08X != %08X", value, expected);
 	}
+}
+
+static void doResult(const char* preface, s32 value, s32 expected) {
+	bool passed = value == expected;
+	savprintf("%s: Got %08X, expected %08X: %s\n", preface, value, expected, passed ? "PASS" : "FAIL");
+	passes += passed;
+	++totalResults;
 }
 
 static void printResults(const char* preface, const struct TestConfigurations* values,  const struct TestConfigurations* expected, int base) {
@@ -368,139 +375,52 @@ static void runMemorySuite(void) {
 		activeTest = &memoryTests[i];
 		activeTest->test(&currentTest);
 		REG_IME = 1;
-		if (activeTest->expected._u8 == currentTest._u8) {
-			++passes;
-		}
-		if (activeTest->expected._s8 == currentTest._s8) {
-			++passes;
-		}
-		if (activeTest->expected._u16 == currentTest._u16) {
-			++passes;
-		}
-		if (activeTest->expected._u16u1 == currentTest._u16u1) {
-			++passes;
-		}
-		if (activeTest->expected._s16 == currentTest._s16) {
-			++passes;
-		}
-		if (activeTest->expected._s16u1 == currentTest._s16u1) {
-			++passes;
-		}
-		if (activeTest->expected._u32 == currentTest._u32) {
-			++passes;
-		}
-		if (activeTest->expected._u32u1 == currentTest._u32u1) {
-			++passes;
-		}
-		if (activeTest->expected._u32u2 == currentTest._u32u2) {
-			++passes;
-		}
-		if (activeTest->expected._u32u3 == currentTest._u32u3) {
-			++passes;
-		}
-		if (activeTest->expected._d0_16 == currentTest._d0_16) {
-			++passes;
-		}
-		if (activeTest->expected._d0_16u1 == currentTest._d0_16u1) {
-			++passes;
-		}
-		if (activeTest->expected._d0_32 == currentTest._d0_32) {
-			++passes;
-		}
-		if (activeTest->expected._d0_32u1 == currentTest._d0_32u1) {
-			++passes;
-		}
-		if (activeTest->expected._d0_32u2 == currentTest._d0_32u2) {
-			++passes;
-		}
-		if (activeTest->expected._d0_32u3 == currentTest._d0_32u3) {
-			++passes;
-		}
-		if (activeTest->expected._d1_16 == currentTest._d1_16) {
-			++passes;
-		}
-		if (activeTest->expected._d1_16u1 == currentTest._d1_16u1) {
-			++passes;
-		}
-		if (activeTest->expected._d1_32 == currentTest._d1_32) {
-			++passes;
-		}
-		if (activeTest->expected._d1_32u1 == currentTest._d1_32u1) {
-			++passes;
-		}
-		if (activeTest->expected._d1_32u2 == currentTest._d1_32u2) {
-			++passes;
-		}
-		if (activeTest->expected._d1_32u3 == currentTest._d1_32u3) {
-			++passes;
-		}
-		if (activeTest->expected._d2_16 == currentTest._d2_16) {
-			++passes;
-		}
-		if (activeTest->expected._d2_16u1 == currentTest._d2_16u1) {
-			++passes;
-		}
-		if (activeTest->expected._d2_32 == currentTest._d2_32) {
-			++passes;
-		}
-		if (activeTest->expected._d2_32u1 == currentTest._d2_32u1) {
-			++passes;
-		}
-		if (activeTest->expected._d2_32u2 == currentTest._d2_32u2) {
-			++passes;
-		}
-		if (activeTest->expected._d2_32u3 == currentTest._d2_32u3) {
-			++passes;
-		}
-		if (activeTest->expected._d3_16 == currentTest._d3_16) {
-			++passes;
-		}
-		if (activeTest->expected._d3_16u1 == currentTest._d3_16u1) {
-			++passes;
-		}
-		if (activeTest->expected._d3_32 == currentTest._d3_32) {
-			++passes;
-		}
-		if (activeTest->expected._d3_32u1 == currentTest._d3_32u1) {
-			++passes;
-		}
-		if (activeTest->expected._d3_32u2 == currentTest._d3_32u2) {
-			++passes;
-		}
-		if (activeTest->expected._d3_32u3 == currentTest._d3_32u3) {
-			++passes;
-		}
-		if (activeTest->expected._c16[0] == currentTest._c16[0]) {
-			++passes;
-		}
-		if (activeTest->expected._c16u1[0] == currentTest._c16u1[0]) {
-			++passes;
-		}
-		if (activeTest->expected._c32[0] == currentTest._c32[0]) {
-			++passes;
-		}
-		if (activeTest->expected._c32u1[0] == currentTest._c32u1[0]) {
-			++passes;
-		}
-		if (activeTest->expected._c32u2[0] == currentTest._c32u2[0]) {
-			++passes;
-		}
-		if (activeTest->expected._c32u3[0] == currentTest._c32u3[0]) {
-			++passes;
-		}
-		if (activeTest->expected._cf32[0] == currentTest._cf32[0]) {
-			++passes;
-		}
-		if (activeTest->expected._cf32u1[0] == currentTest._cf32u1[0]) {
-			++passes;
-		}
-		if (activeTest->expected._cf32u2[0] == currentTest._cf32u2[0]) {
-			++passes;
-		}
-		if (activeTest->expected._cf32u3[0] == currentTest._cf32u3[0]) {
-			++passes;
-		}
-		totalResults += 44;
+
+		savprintf("Memory test: %s\n", activeTest->testName);
+		doResult("U8", currentTest._u8, activeTest->expected._u8);
+		doResult("S8", currentTest._s8, activeTest->expected._s8);
+		doResult("U16", currentTest._u16, activeTest->expected._u16);
+		doResult("U16 (unaligned)", currentTest._u16u1, activeTest->expected._u16u1);
+		doResult("S16", currentTest._s16, activeTest->expected._s16);
+		doResult("S16 (unaligned)", currentTest._s16u1, activeTest->expected._s16u1);
+		doResult("32", currentTest._u32, activeTest->expected._u32);
+		doResult("32 (unaligned 1)", currentTest._u32u1, activeTest->expected._u32u1);
+		doResult("32 (unaligned 2)", currentTest._u32u2, activeTest->expected._u32u2);
+		doResult("32 (unaligned 3)", currentTest._u32u3, activeTest->expected._u32u3);
+		doResult("DMA0 16", currentTest._d0_16, activeTest->expected._d0_16);
+		doResult("DMA0 16 (unaligned 1)", currentTest._d0_16u1, activeTest->expected._d0_16u1);
+		doResult("DMA0 32", currentTest._d0_32, activeTest->expected._d0_32);
+		doResult("DMA0 32 (unaligned 1)", currentTest._d0_32u1, activeTest->expected._d0_32u1);
+		doResult("DMA0 32 (unaligned 2)", currentTest._d0_32u2, activeTest->expected._d0_32u2);
+		doResult("DMA0 32 (unaligned 3)", currentTest._d0_32u3, activeTest->expected._d0_32u3);
+		doResult("DMA1 16", currentTest._d1_16, activeTest->expected._d1_16);
+		doResult("DMA1 16 (unaligned 1)", currentTest._d1_16u1, activeTest->expected._d1_16u1);
+		doResult("DMA1 32", currentTest._d1_32, activeTest->expected._d1_32);
+		doResult("DMA1 32 (unaligned 1)", currentTest._d1_32u1, activeTest->expected._d1_32u1);
+		doResult("DMA1 32 (unaligned 2)", currentTest._d1_32u2, activeTest->expected._d1_32u2);
+		doResult("DMA1 32 (unaligned 3)", currentTest._d1_32u3, activeTest->expected._d1_32u3);
+		doResult("DMA2 16", currentTest._d2_16, activeTest->expected._d2_16);
+		doResult("DMA2 16 (unaligned 1)", currentTest._d2_16u1, activeTest->expected._d2_16u1);
+		doResult("DMA2 32", currentTest._d2_32, activeTest->expected._d2_32);
+		doResult("DMA2 32 (unaligned 1)", currentTest._d2_32u1, activeTest->expected._d2_32u1);
+		doResult("DMA2 32 (unaligned 2)", currentTest._d2_32u2, activeTest->expected._d2_32u2);
+		doResult("DMA2 32 (unaligned 3)", currentTest._d2_32u3, activeTest->expected._d2_32u3);
+		doResult("DMA3 16", currentTest._d3_16, activeTest->expected._d3_16);
+		doResult("DMA3 16 (unaligned 1)", currentTest._d3_16u1, activeTest->expected._d3_16u1);
+		doResult("DMA3 32", currentTest._d3_32, activeTest->expected._d3_32);
+		doResult("DMA3 32 (unaligned 1)", currentTest._d3_32u1, activeTest->expected._d3_32u1);
+		doResult("DMA3 32 (unaligned 2)", currentTest._d3_32u2, activeTest->expected._d3_32u2);
+		doResult("DMA3 32 (unaligned 3)", currentTest._d3_32u3, activeTest->expected._d3_32u3);
+		doResult("swi B 16", currentTest._c16[0], activeTest->expected._c16[0]);
+		doResult("swi B 16 (unaligned 1)", currentTest._c16u1[0], activeTest->expected._c16u1[0]);
+		doResult("swi B 32", currentTest._c16[0], activeTest->expected._c32[0]);
+		doResult("swi B 32 (unaligned 1)", currentTest._c32u1[0], activeTest->expected._c32u1[0]);
+		doResult("swi B 32 (unaligned 2)", currentTest._c32u2[0], activeTest->expected._c32u2[0]);
+		doResult("swi B 32 (unaligned 3)", currentTest._c32u3[0], activeTest->expected._c32u3[0]);
+		doResult("swi C 32", currentTest._cf32[0], activeTest->expected._cf32[0]);
+		doResult("swi C 32 (unaligned 1)", currentTest._cf32u1[0], activeTest->expected._cf32u1[0]);
+		doResult("swi C 32 (unaligned 2)", currentTest._cf32u2[0], activeTest->expected._cf32u2[0]);
+		doResult("swi C 32 (unaligned 3)", currentTest._cf32u3[0], activeTest->expected._cf32u3[0]);
 	}
 }
 

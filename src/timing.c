@@ -536,6 +536,13 @@ static void printResult(int offset, int line, const char* preface, s32 value, s3
 	}
 }
 
+static void doResult(const char* preface, s32 value, s32 calibration, s32 expected) {
+	bool passed = value - calibration == expected;
+	savprintf("%s: Got %5i, expected %5i: %s\n", preface, value - calibration, expected, passed ? "PASS" : "FAIL");
+	passes += passed;
+	++totalResults;
+}
+
 static void printResults(const char* preface, const struct TestTimings* values, const struct TestTimings* calibration, const struct TestTimings* expected, int mode, int base) {
 	snprintf(&textGrid[32], 31, "Timing test: %s", preface);
 
@@ -582,69 +589,30 @@ static void runTimingSuite(void) {
 			memset(&calibration, 0, sizeof(calibration));
 		}
 		REG_IME = 1;
-		if (activeTest->expected.arm_text_0000 == currentTest.arm_text_0000 - calibration.arm_text_0000) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_4000 == currentTest.arm_text_4000 - calibration.arm_text_4000) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_0004 == currentTest.arm_text_0004 - calibration.arm_text_0004) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_4004 == currentTest.arm_text_4004 - calibration.arm_text_4004) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_0010 == currentTest.arm_text_0010 - calibration.arm_text_0010) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_4010 == currentTest.arm_text_4010 - calibration.arm_text_4010) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_0014 == currentTest.arm_text_0014 - calibration.arm_text_0014) {
-			++passes;
-		}
-		if (activeTest->expected.arm_text_4014 == currentTest.arm_text_4014 - calibration.arm_text_4014) {
-			++passes;
-		}
-		if (activeTest->expected.arm_ewram == currentTest.arm_ewram - calibration.arm_ewram) {
-			++passes;
-		}
-		if (activeTest->expected.arm_iwram == currentTest.arm_iwram - calibration.arm_iwram) {
-			++passes;
-		}
-		totalResults += 10;
+
+		savprintf("Timing test: %s\n", activeTest->testName);
+		doResult("ARM/ROM ...", currentTest.arm_text_0000, calibration.arm_text_0000, activeTest->expected.arm_text_0000);
+		doResult("ARM/ROM P..", currentTest.arm_text_4000, calibration.arm_text_4000, activeTest->expected.arm_text_4000);
+		doResult("ARM/ROM .N.", currentTest.arm_text_0004, calibration.arm_text_0004, activeTest->expected.arm_text_0004);
+		doResult("ARM/ROM PN.", currentTest.arm_text_4004, calibration.arm_text_4004, activeTest->expected.arm_text_4004);
+		doResult("ARM/ROM ..S", currentTest.arm_text_0010, calibration.arm_text_0010, activeTest->expected.arm_text_0010);
+		doResult("ARM/ROM P.S", currentTest.arm_text_4010, calibration.arm_text_4010, activeTest->expected.arm_text_4010);
+		doResult("ARM/ROM .NS", currentTest.arm_text_0014, calibration.arm_text_0014, activeTest->expected.arm_text_0014);
+		doResult("ARM/ROM PNS", currentTest.arm_text_4014, calibration.arm_text_4014, activeTest->expected.arm_text_4014);
+		doResult("ARM/WRAM", currentTest.arm_ewram, calibration.arm_ewram, activeTest->expected.arm_ewram);
+		doResult("ARM/IWRAM", currentTest.arm_iwram, calibration.arm_iwram, activeTest->expected.arm_iwram);
+
 		if (activeTest->modes & TEST_THUMB) {
-			if (activeTest->expected.thumb_text_0000 == currentTest.thumb_text_0000 - calibration.thumb_text_0000) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_4000 == currentTest.thumb_text_4000 - calibration.thumb_text_4000) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_0004 == currentTest.thumb_text_0004 - calibration.thumb_text_0004) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_4004 == currentTest.thumb_text_4004 - calibration.thumb_text_4004) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_0010 == currentTest.thumb_text_0010 - calibration.thumb_text_0010) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_4010 == currentTest.thumb_text_4010 - calibration.thumb_text_4010) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_0014 == currentTest.thumb_text_0014 - calibration.thumb_text_0014) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_text_4014 == currentTest.thumb_text_4014 - calibration.thumb_text_4014) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_ewram == currentTest.thumb_ewram - calibration.thumb_ewram) {
-				++passes;
-			}
-			if (activeTest->expected.thumb_iwram == currentTest.thumb_iwram - calibration.thumb_iwram) {
-				++passes;
-			}
-			totalResults += 10;
+			doResult("Thumb/ROM ...", currentTest.thumb_text_0000, calibration.thumb_text_0000, activeTest->expected.thumb_text_0000);
+			doResult("Thumb/ROM P..", currentTest.thumb_text_4000, calibration.thumb_text_4000, activeTest->expected.thumb_text_4000);
+			doResult("Thumb/ROM .N.", currentTest.thumb_text_0004, calibration.thumb_text_0004, activeTest->expected.thumb_text_0004);
+			doResult("Thumb/ROM PN.", currentTest.thumb_text_4004, calibration.thumb_text_4004, activeTest->expected.thumb_text_4004);
+			doResult("Thumb/ROM ..S", currentTest.thumb_text_0010, calibration.thumb_text_0010, activeTest->expected.thumb_text_0010);
+			doResult("Thumb/ROM P.S", currentTest.thumb_text_4010, calibration.thumb_text_4010, activeTest->expected.thumb_text_4010);
+			doResult("Thumb/ROM .NS", currentTest.thumb_text_0014, calibration.thumb_text_0014, activeTest->expected.thumb_text_0014);
+			doResult("Thumb/ROM PNS", currentTest.thumb_text_4014, calibration.thumb_text_4014, activeTest->expected.thumb_text_4014);
+			doResult("Thumb/WRAM", currentTest.thumb_ewram, calibration.thumb_ewram, activeTest->expected.thumb_ewram);
+			doResult("Thumb/IWRAM", currentTest.thumb_iwram, calibration.thumb_iwram, activeTest->expected.thumb_iwram);
 		}
 	}
 }
