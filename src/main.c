@@ -17,8 +17,6 @@
 u16* textBase = (u16*) VRAM;
 char textGrid[32 * 32];
 
-#define REG_WAITCNT (*(vu16*) 0x4000204)
-
 EWRAM_DATA const int _anchor = 0xABAD1DEA; // There seems to be a bug in the ld script that this fixes
 
 void updateTextGrid(void) {
@@ -90,9 +88,9 @@ static void runSuite(const struct TestSuite* activeSuite) {
 
 __attribute__((format(printf, 1, 2)))
 int savprintf(const char* fmt, ...) {
-	static u16 location = 0;
+	static u32 location = 0;
 	char tmp[128];
-	if (location >= 0x8000) {
+	if (location >= 0x10000) {
 		return 0;
 	}
 
@@ -125,7 +123,7 @@ int main(void) {
 	irqEnable(IRQ_VBLANK);
 
 	bzero((u8*) SRAM, 0x8000);
-	savprintf("Game Boy Advance Test Suite\n\n");
+	savprintf("Game Boy Advance Test Suite\n===\n");
 
 	int suiteIndex = 0;
 	int viewIndex = 0;

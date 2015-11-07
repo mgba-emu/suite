@@ -6,6 +6,8 @@
 #define TEST_THUMB 2
 #define VIEW_SIZE 16
 
+#define REG_WAITCNT (*(vu16*) 0x4000204)
+
 #define GRID_STRIDE 32
 extern char textGrid[GRID_STRIDE * 32];
 

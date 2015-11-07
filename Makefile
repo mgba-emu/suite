@@ -130,6 +130,10 @@ $(OUTPUT).gba	:	$(OUTPUT).elf
 
 $(OUTPUT).elf	:	$(OFILES)
 
+%.gba: %.elf
+	@$(OBJCOPY) -O binary $< $@
+	@echo built ... $(notdir $@)
+	@gbafix -p $@
 
 #---------------------------------------------------------------------------------
 # The bin2o rule should be copied and modified
