@@ -17,6 +17,8 @@
 u16* textBase = (u16*) VRAM;
 char textGrid[32 * 32];
 
+const char savetype[] = "SRAM_V123";
+
 EWRAM_DATA const int _anchor = 0xABAD1DEA; // There seems to be a bug in the ld script that this fixes
 
 void updateTextGrid(void) {
