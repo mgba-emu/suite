@@ -47,7 +47,7 @@ static void runSuite(const struct TestSuite* activeSuite) {
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
-		u16 keys = keysDown();
+		u16 keys = keysDownRepeat();
 
 		if (keys & KEY_A) {
 			activeSuite->show(testIndex);
@@ -122,9 +122,11 @@ int main(void) {
 	updateTextGrid();
 	REG_DISPCNT = MODE_0 | BG1_ON;
 
+	setRepeat(20, 6);
+
 	irqEnable(IRQ_VBLANK);
 
-	bzero((u8*) SRAM, 0x8000);
+	bzero((u8*) SRAM, 0x10000);
 	savprintf("Game Boy Advance Test Suite\n===\n");
 
 	int suiteIndex = 0;
@@ -132,7 +134,7 @@ int main(void) {
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
-		u16 keys = keysDown();
+		u16 keys = keysDownRepeat();
 
 		if (keys & KEY_A) {
 			runSuite(suites[suiteIndex]);

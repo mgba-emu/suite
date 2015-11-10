@@ -635,7 +635,7 @@ static void showTimingSuite(size_t index) {
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
-		u16 keys = keysDown();
+		u16 keys = keysDownRepeat();
 
 		if (keys & KEY_B) {
 			return;
