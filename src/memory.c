@@ -11,15 +11,15 @@
 
 #include "suite.h"
 
-static const u32 r8[2] = {
+static const u32 r8[8] = {
 	0xDEADBEEF, 0x33333333
 };
 
-static EWRAM_DATA u32 r2[2] = {
+static EWRAM_DATA u32 r2[8] = {
 	0xFEEDFACE, 0x33333333
 };
 
-static IWRAM_DATA u32 r3[2] = {
+static IWRAM_DATA u32 r3[8] = {
 	0xCAFEBABE, 0x33333333
 };
 
