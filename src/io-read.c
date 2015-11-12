@@ -160,7 +160,7 @@ static u16 _runTest(const struct IOReadTest* test) {
 	}
 	u16 result;
 	__asm__ __volatile__ (
-			"ldr %[result], %[address] \n"
+			"ldrh %[result], %[address] \n"
 			".hword 0 \n"
 			".hword 0 \n"
 		: [result]"=r"(result)
