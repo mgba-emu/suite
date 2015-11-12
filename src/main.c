@@ -12,6 +12,7 @@
 #include "font.h"
 #include "timing.h"
 #include "memory.h"
+#include "io-read.h"
 #include "suite.h"
 
 u16* textBase = (u16*) VRAM;
@@ -30,6 +31,7 @@ void updateTextGrid(void) {
 
 const struct TestSuite* const suites[] = {
 	&memoryTestSuite,
+	&ioReadTestSuite,
 	&timingTestSuite
 };
 
