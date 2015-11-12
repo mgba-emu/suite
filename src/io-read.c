@@ -2,6 +2,7 @@
 
 #include <gba_input.h>
 #include <gba_interrupt.h>
+#include <gba_sound.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -62,24 +63,24 @@ static const struct IOReadTest ioReadTests[] = {
 	{ "INVALID (5A)", 0x400005A, true, false, 0, 0 },
 	{ "INVALID (5C)", 0x400005C, true, false, 0, 0 },
 	{ "INVALID (5E)", 0x400005E, true, false, 0, 0 },
-	{ "SOUND1CNT_LO", 0x4000060, true, true, 0, 0 },
-	{ "SOUND1CNT_HI", 0x4000062, true, true, 0, 0 },
-	{ "SOUND1CNT_X", 0x4000064, true, true, 0, 0 },
+	{ "SOUND1CNT_LO", 0x4000060, true, true, 0x007F, 0 },
+	{ "SOUND1CNT_HI", 0x4000062, true, true, 0xFFC0, 0 },
+	{ "SOUND1CNT_X", 0x4000064, true, true, 0x4000, 0 },
 	{ "INVALID (66)", 0x4000066, true, false, 0, 0 },
-	{ "SOUND2CNT_LO", 0x4000068, true, true, 0, 0 },
-	{ "SOUND2CNT_HI", 0x400006C, true, true, 0, 0 },
+	{ "SOUND2CNT_LO", 0x4000068, true, true, 0xFFC0, 0 },
+	{ "SOUND2CNT_HI", 0x400006C, true, true, 0x4000, 0 },
 	{ "INVALID (6E)", 0x400006E, true, false, 0, 0 },
-	{ "SOUND3CNT_LO", 0x4000070, true, true, 0, 0 },
-	{ "SOUND3CNT_HI", 0x4000072, true, true, 0, 0 },
-	{ "SOUND3CNT_X", 0x4000074, true, true, 0, 0 },
+	{ "SOUND3CNT_LO", 0x4000070, true, true, 0x00E0, 0 },
+	{ "SOUND3CNT_HI", 0x4000072, true, true, 0xE000, 0 },
+	{ "SOUND3CNT_X", 0x4000074, true, true, 0x4000, 0 },
 	{ "INVALID (76)", 0x4000076, true, false, 0, 0 },
-	{ "SOUND4CNT_LO", 0x4000078, true, true, 0, 0 },
+	{ "SOUND4CNT_LO", 0x4000078, true, true, 0xFF00, 0 },
 	{ "INVALID (7A)", 0x400007A, true, false, 0, 0 },
-	{ "SOUND4CNT_HI", 0x400007C, true, true, 0, 0 },
+	{ "SOUND4CNT_HI", 0x400007C, true, true, 0x40FF, 0 },
 	{ "INVALID (7E)", 0x400007E, true, false, 0, 0 },
-	{ "SOUNDCNT_LO", 0x4000080, true, true, 0, 0 },
+	{ "SOUNDCNT_LO", 0x4000080, true, true, 0xFF77, 0 },
 	{ "SOUNDCNT_HI", 0x4000082, true, true, 0x770F, 0 },
-	{ "SOUNDCNT_X", 0x4000084, true, true, 0x0080, 0 },
+	{ "SOUNDCNT_X", 0x4000084, true, true, 0x0080, 0x0080 },
 	{ "INVALID (86)", 0x4000086, true, false, 0, 0 },
 	{ "INVALID (8A)", 0x400008A, true, false, 0, 0 },
 	{ "INVALID (8C)", 0x400008C, true, false, 0, 0 },
@@ -214,16 +215,19 @@ static void runIOReadSuite(void) {
 	passes = 0;
 	totalResults = 0;
 	const struct IOReadTest* activeTest = 0;
+	REG_SOUNDCNT_X = 0x80;
 	int i;
 	for (i = 0; i < nTests; ++i) {
 		activeTest = &ioReadTests[i];
 		doResult(activeTest);
 	}
+	REG_SOUNDCNT_X = 0;
 }
 
 static void showIOReadSuite(size_t index) {
 	const struct IOReadTest* activeTest = &ioReadTests[index];
 	size_t resultIndex = 0;
+	REG_SOUNDCNT_X = 0x80;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -246,6 +250,7 @@ static void showIOReadSuite(size_t index) {
 		printResults(0, resultIndex, activeTest);
 		updateTextGrid();
 	}
+	REG_SOUNDCNT_X = 0;
 }
 
 const struct TestSuite ioReadTestSuite = {
