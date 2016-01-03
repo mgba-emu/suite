@@ -14,6 +14,7 @@
 #include "memory.h"
 #include "io-read.h"
 #include "suite.h"
+#include "video.h"
 
 u16* textBase = (u16*) VRAM;
 char textGrid[32 * 32];
@@ -32,7 +33,8 @@ void updateTextGrid(void) {
 const struct TestSuite* const suites[] = {
 	&memoryTestSuite,
 	&ioReadTestSuite,
-	&timingTestSuite
+	&timingTestSuite,
+	&videoTestSuite
 };
 
 const size_t nSuites = sizeof(suites) / sizeof(*suites);
@@ -45,7 +47,9 @@ static void runSuite(const struct TestSuite* activeSuite) {
 	strcpy(&textGrid[GRID_STRIDE * 4 + 11], "Testing...");
 	updateTextGrid();
 	activeSuite->list(testNameBuffer, sizeof(testNameBuffer) / sizeof(*testNameBuffer), 0);
-	activeSuite->run();
+	if (activeSuite->run) {
+		activeSuite->run();
+	}
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -78,7 +82,9 @@ static void runSuite(const struct TestSuite* activeSuite) {
 			viewIndex = testIndex - VIEW_SIZE + 1;
 		}
 		strcpy(&textGrid[GRID_STRIDE], activeSuite->name);
-		sprintf(&textGrid[GRID_STRIDE + 21], "%4u/%-4u", *activeSuite->passes, *activeSuite->totalResults);
+		if (*activeSuite->totalResults) {
+			sprintf(&textGrid[GRID_STRIDE + 21], "%4u/%-4u", *activeSuite->passes, *activeSuite->totalResults);
+		}
 		size_t i;
 		for (i = 0; i < activeSuite->nTests && i < VIEW_SIZE; ++i) {
 			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', testNameBuffer[i + viewIndex]);

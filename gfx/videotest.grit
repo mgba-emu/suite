@@ -1,0 +1,1 @@
+../gfx/raw/actual.bmp ../gfx/raw/expected.bmp -p! -gzl -fa
