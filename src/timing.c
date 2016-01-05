@@ -528,17 +528,17 @@ static void printResult(int offset, int line, const char* preface, s32 value, s3
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-13s: %5i", preface, value - calibration);
+	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-13s: %5li", preface, value - calibration);
 	if (value - calibration == expected) {
 		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line - offset) + 21], 10, "!= %5i", expected);
+		snprintf(&textGrid[base + 32 * (line - offset) + 21], 10, "!= %5li", expected);
 	}
 }
 
 static void doResult(const char* preface, s32 value, s32 calibration, s32 expected) {
 	bool passed = value - calibration == expected;
-	savprintf("%s: Got %5i vs %5i: %s\n", preface, value - calibration, expected, passed ? "PASS" : "FAIL");
+	savprintf("%s: Got %5li vs %5li: %s\n", preface, value - calibration, expected, passed ? "PASS" : "FAIL");
 	passes += passed;
 	++totalResults;
 }

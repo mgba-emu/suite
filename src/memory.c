@@ -1051,16 +1051,16 @@ static void printResult(int offset, int line, const char* preface, u32 value, u3
 
 	snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset)], 31, "%s:", preface);
 	if (value == expected) {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08X PASS", value);
+		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08lX PASS", value);
 	} else {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08X != %08X", value, expected);
+		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08lX != %08lX", value, expected);
 	}
 }
 
 static void doResult(const char* preface, s32 value, s32 expected) {
 	bool passed = value == expected;
 	if (!passed) {
-		savprintf("%s: Got 0x%08X vs 0x%08X: %s\n", preface, value, expected, passed ? "PASS" : "FAIL");
+		savprintf("%s: Got 0x%08lX vs 0x%08lX: %s\n", preface, value, expected, passed ? "PASS" : "FAIL");
 	}
 	passes += passed;
 	++totalResults;

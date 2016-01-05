@@ -216,9 +216,8 @@ static void showVideoSuite(size_t index) {
 	OBJ_COLORS[0] = 0x7F1C;
 	OBJ_COLORS[1] = 0x7FFF;
 	OBJ_COLORS[2] = 0x0000;
-	// Nice job libgba...TODO: file a PR
-	LZ77UnCompVram((void*) expectedTiles, (void*) 0x06014000);
-	LZ77UnCompVram((void*) actualTiles, (void*) 0x06014400);
+	LZ77UnCompVram(expectedTiles, (void*) 0x06014000);
+	LZ77UnCompVram(actualTiles, (void*) 0x06014400);
 	const struct VideoTest* activeTest = &videoTests[index];
 	bool showExpected = false;
 	bool performShow = true;
