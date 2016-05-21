@@ -9,6 +9,7 @@
 #include <stdarg.h>
 
 #include "common.h"
+#include "carry.h"
 #include "font.h"
 #include "timing.h"
 #include "memory.h"
@@ -34,6 +35,7 @@ const struct TestSuite* const suites[] = {
 	&memoryTestSuite,
 	&ioReadTestSuite,
 	&timingTestSuite,
+	&carryTestSuite,
 	&videoTestSuite
 };
 
