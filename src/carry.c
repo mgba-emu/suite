@@ -126,9 +126,11 @@ static void printResult(int offset, int line, const char* preface, s32 value, u3
 }
 
 static void doResult(const char* preface, s32 value, u32 cpsr, s32 expected, u32 expectedCpsr) {
-	bool passed = value == expected && cpsr == expectedCpsr;
-	savprintf("%s: Got %08X (CSPR %X) vs %08X (CSPR %X): %s\n", preface, value, cpsr >> 28, expected, expectedCpsr >> 28, passed ? "PASS" : "FAIL");
-	passes += passed;
+	if (value != expected || cpsr != expectedCpsr) {
+		savprintf("%s: Got %08X (CSPR %X) vs %08X (CSPR %X): FAIL\n", preface, value, cpsr >> 28, expected, expectedCpsr >> 28);
+	} else {
+		++passes;
+	}
 	++totalResults;
 }
 

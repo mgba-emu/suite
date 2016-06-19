@@ -537,9 +537,11 @@ static void printResult(int offset, int line, const char* preface, s32 value, s3
 }
 
 static void doResult(const char* preface, s32 value, s32 calibration, s32 expected) {
-	bool passed = value - calibration == expected;
-	savprintf("%s: Got %5li vs %5li: %s\n", preface, value - calibration, expected, passed ? "PASS" : "FAIL");
-	passes += passed;
+	if (value - calibration != expected) {
+		savprintf("%s: Got %5li vs %5li: FAIL\n", preface, value - calibration, expected);
+	} else {
+		++passes;
+	}
 	++totalResults;
 }
 

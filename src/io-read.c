@@ -192,11 +192,11 @@ static void printResults(int offset, int line, const struct IOReadTest* test) {
 
 static void doResult(const struct IOReadTest* test) {
 	u16 value = _runTest(test);
-	bool passed = value == test->expected;
-	if (!passed) {
-		savprintf("%s: Got 0x%04X vs 0x%04X: %s\n", test->testName, value, test->expected, passed ? "PASS" : "FAIL");
+	if (value != test->expected) {
+		savprintf("%s: Got 0x%04X vs 0x%04X: FAIL\n", test->testName, value, test->expected);
+	} else {
+		++passes;
 	}
-	passes += passed;
 	++totalResults;
 }
 

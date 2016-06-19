@@ -1058,11 +1058,11 @@ static void printResult(int offset, int line, const char* preface, u32 value, u3
 }
 
 static void doResult(const char* preface, s32 value, s32 expected) {
-	bool passed = value == expected;
-	if (!passed) {
-		savprintf("%s: Got 0x%08lX vs 0x%08lX: %s\n", preface, value, expected, passed ? "PASS" : "FAIL");
+	if (value != expected) {
+		savprintf("%s: Got 0x%08lX vs 0x%08lX: FAIL\n", preface, value, expected);
+	} else {
+		++passes;
 	}
-	passes += passed;
 	++totalResults;
 }
 
