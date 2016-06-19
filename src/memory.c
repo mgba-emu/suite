@@ -113,10 +113,11 @@ static void testLoad(struct TestConfigurations* config, u8* base) {
 		: [i]"r"(base)
 		: "r0");
 	// Clear stored DMA state
-	DMA0COPY(r2, &config->_d0_32u1, DMA32 | DMA_IMMEDIATE | 1);
-	DMA1COPY(r2, &config->_d1_32u1, DMA32 | DMA_IMMEDIATE | 1);
-	DMA2COPY(r2, &config->_d2_32u1, DMA32 | DMA_IMMEDIATE | 1);
-	DMA3COPY(r2, &config->_d3_32u1, DMA32 | DMA_IMMEDIATE | 1);
+	u32 temp;
+	DMA0COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+	DMA1COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+	DMA2COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+	DMA3COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
 
 	DMA0COPY(base, &config->_d0_16, DMA16 | DMA_IMMEDIATE | 1);
 	DMA0COPY(base + 1, &config->_d0_16u1, DMA16 | DMA_IMMEDIATE | 1);
@@ -362,6 +363,13 @@ static void testStore(struct TestConfigurations* config, u32* base) {
 			[u32u3]"=m"(config->_u32u3)
 		: [i]"r"(base), [o]"r"(fodder[0])
 		: "r0", "r1", "r2", "r3");
+	// Clear stored DMA state
+	u32 temp;
+	DMA0COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+	DMA1COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+	DMA2COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+	DMA3COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
+
 	DMA0COPY(fodder, base, DMA16 | DMA_IMMEDIATE | 1);
 	config->_d0_16 = base[0];
 	base[0] = 0;
