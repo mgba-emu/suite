@@ -1067,7 +1067,7 @@ static void printResult(int offset, int line, const char* preface, u32 value, u3
 
 static void doResult(const char* preface, s32 value, s32 expected) {
 	if (value != expected) {
-		savprintf("%s: Got 0x%08lX vs 0x%08lX: FAIL\n", preface, value, expected);
+		savprintf("%s: Got 0x%08lX vs 0x%08lX: FAIL", preface, value, expected);
 	} else {
 		++passes;
 	}
@@ -1153,7 +1153,7 @@ static void runMemorySuite(void) {
 		activeTest->test(&currentTest);
 		REG_IME = 1;
 
-		savprintf("Memory test: %s\n", activeTest->testName);
+		savprintf("Memory test: %s", activeTest->testName);
 		doResult("U8", currentTest._u8, activeTest->expected._u8);
 		if (activeTest->store) {
 			doResult("S8 (U16 load)", currentTest._s8, activeTest->expected._s8);

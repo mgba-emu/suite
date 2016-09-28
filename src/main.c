@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <mgba.h>
 
 #include "common.h"
 #include "carry.h"
@@ -111,11 +112,16 @@ int savprintf(const char* fmt, ...) {
 	int s = vsnprintf(tmp, sizeof(tmp), fmt, args);
 	va_end(args);
 
+	mgba_printf(MGBA_LOG_INFO, "%s", tmp);
+
 	vs8* sbase = (vs8*) SRAM + location;
 	size_t i;
 	for (i = 0; i < s; ++i) {
 		sbase[i] = tmp[i];
 	}
+	sbase[s] = '\n';
+	++s;
+	sbase[s] = '\0';
 	location += s;
 	return s;
 }
@@ -137,7 +143,8 @@ int main(void) {
 	irqEnable(IRQ_VBLANK);
 
 	bzero((u8*) SRAM, 0x10000);
-	savprintf("Game Boy Advance Test Suite\n===\n");
+	mgba_open();
+	savprintf("Game Boy Advance Test Suite\n===");
 
 	int suiteIndex = 0;
 	int viewIndex = 0;

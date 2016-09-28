@@ -538,7 +538,7 @@ static void printResult(int offset, int line, const char* preface, s32 value, s3
 
 static void doResult(const char* preface, s32 value, s32 calibration, s32 expected) {
 	if (value - calibration != expected) {
-		savprintf("%s: Got %5li vs %5li: FAIL\n", preface, value - calibration, expected);
+		savprintf("%s: Got %5li vs %5li: FAIL", preface, value - calibration, expected);
 	} else {
 		++passes;
 	}
@@ -592,7 +592,7 @@ static void runTimingSuite(void) {
 		}
 		REG_IME = 1;
 
-		savprintf("Timing test: %s\n", activeTest->testName);
+		savprintf("Timing test: %s", activeTest->testName);
 		doResult("ARM/ROM ...", currentTest.arm_text_0000, calibration.arm_text_0000, activeTest->expected.arm_text_0000);
 		doResult("ARM/ROM P..", currentTest.arm_text_4000, calibration.arm_text_4000, activeTest->expected.arm_text_4000);
 		doResult("ARM/ROM .N.", currentTest.arm_text_0004, calibration.arm_text_0004, activeTest->expected.arm_text_0004);
