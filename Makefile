@@ -26,12 +26,9 @@ INCLUDES	:=	include
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-mthumb -mthumb-interwork
+ARCH	:=	-mthumb -mthumb-interwork -march=armv4t -mcpu=arm7tdmi -mtune=arm7tdmi
 
-CFLAGS	:=	-g -Wall -O3\
-		-mcpu=arm7tdmi -mtune=arm7tdmi\
- 		-fomit-frame-pointer\
-		-ffast-math \
+CFLAGS	:=	-g -Wall -O3 -fomit-frame-pointer -ffast-math \
 		$(ARCH)
 
 CFLAGS	+=	$(INCLUDE)

@@ -88,6 +88,36 @@ void testMul6(struct TestTimings*);
 void testMul7(struct TestTimings*);
 void testMul8(struct TestTimings*);
 void testMul9(struct TestTimings*);
+void testMla0(struct TestTimings*);
+void testMla1(struct TestTimings*);
+void testMla2(struct TestTimings*);
+void testMla3(struct TestTimings*);
+void testMla4(struct TestTimings*);
+void testMla5(struct TestTimings*);
+void testMla6(struct TestTimings*);
+void testMla7(struct TestTimings*);
+void testMla8(struct TestTimings*);
+void testMla9(struct TestTimings*);
+void testSmull0(struct TestTimings*);
+void testSmull1(struct TestTimings*);
+void testSmull2(struct TestTimings*);
+void testSmull3(struct TestTimings*);
+void testSmull4(struct TestTimings*);
+void testSmull5(struct TestTimings*);
+void testSmull6(struct TestTimings*);
+void testSmull7(struct TestTimings*);
+void testSmull8(struct TestTimings*);
+void testSmull9(struct TestTimings*);
+void testSmlal0(struct TestTimings*);
+void testSmlal1(struct TestTimings*);
+void testSmlal2(struct TestTimings*);
+void testSmlal3(struct TestTimings*);
+void testSmlal4(struct TestTimings*);
+void testSmlal5(struct TestTimings*);
+void testSmlal6(struct TestTimings*);
+void testSmlal7(struct TestTimings*);
+void testSmlal8(struct TestTimings*);
+void testSmlal9(struct TestTimings*);
 void testB(struct TestTimings*);
 void testNopB(struct TestTimings*);
 void testBx(struct TestTimings*);
@@ -375,6 +405,126 @@ static const struct TimingTest timingTests[] = {
 		7, 2,
 		6, 3, 5, 3, 6, 2, 5, 2,
 		4, 2
+	} },
+	{ "mla #0x00000000, #0xFF", testMla0, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0x00000078, #0xFF", testMla1, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0x00005678, #0xFF", testMla2, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0x00345678, #0xFF", testMla3, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0x12345678, #0xFF", testMla4, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0xFF000000, #0xFF", testMla5, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0xFFFF0000, #0xFF", testMla6, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0xFFFFFF00, #0xFF", testMla7, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0xFFFFFFFF, #0xFF", testMla8, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "mla #0xFFFFFFFF, #0x00", testMla9, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0x00000000, #0xFF", testSmull0, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0x00000078, #0xFF", testSmull1, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0x00005678, #0xFF", testSmull2, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0x00345678, #0xFF", testSmull3, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0x12345678, #0xFF", testSmull4, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0xFF000000, #0xFF", testSmull5, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0xFFFF0000, #0xFF", testSmull6, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0xFFFFFF00, #0xFF", testSmull7, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0xFFFFFFFF, #0xFF", testSmull8, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smull #0xFFFFFFFF, #0x00", testSmull9, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "smlal #0x00000000, #0xFF", testSmlal0, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0x00000078, #0xFF", testSmlal1, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0x00005678, #0xFF", testSmlal2, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0x00345678, #0xFF", testSmlal3, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0x12345678, #0xFF", testSmlal4, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0xFF000000, #0xFF", testSmlal5, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0xFFFF0000, #0xFF", testSmlal6, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0xFFFFFF00, #0xFF", testSmlal7, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0xFFFFFFFF, #0xFF", testSmlal8, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "smlal #0xFFFFFFFF, #0x00", testSmlal9, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
 	} },
 	{ "b pc", testB, TEST_ARM | TEST_THUMB, {
 		26, 26, 25, 25, 19, 19, 18, 18,
