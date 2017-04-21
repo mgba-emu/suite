@@ -46,7 +46,7 @@ const struct TestSuite* const suites[] = {
 const size_t nSuites = sizeof(suites) / sizeof(*suites);
 
 static void runSuite(const struct TestSuite* activeSuite) {
-	const char* testNameBuffer[128];
+	const char* testNameBuffer[256];
 	int testIndex = 0;
 	int viewIndex = 0;
 	strcpy(&textGrid[GRID_STRIDE], activeSuite->name);
