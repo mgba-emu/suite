@@ -10,6 +10,8 @@
 #include <mgba.h>
 
 #include "common.h"
+
+#include "bios-math.h"
 #include "carry.h"
 #include "font.h"
 #include "timing.h"
@@ -37,6 +39,7 @@ const struct TestSuite* const suites[] = {
 	&ioReadTestSuite,
 	&timingTestSuite,
 	&carryTestSuite,
+	&biosMathTestSuite,
 	&videoTestSuite
 };
 
