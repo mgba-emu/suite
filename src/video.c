@@ -224,6 +224,12 @@ static void showVideoSuite(size_t index) {
 	bool showNav = true;
 	u16 dispcnt = REG_DISPCNT;
 	OAM[0].attr0 = ATTR0_COLOR_16 | ATTR0_WIDE | OBJ_Y(148);
+
+	REG_BG2PA = 0x100;
+	REG_BG2PB = 0;
+	REG_BG2PC = 0;
+	REG_BG2PD = 0x100;
+
 	while (1) {
 		scanKeys();
 		u16 keys = keysDownRepeat();
