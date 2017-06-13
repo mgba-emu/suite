@@ -145,6 +145,12 @@ static const struct MathTest mathTests[] = {
 	{ "ArcTan2 FFFF8000,FFFF0000", { 0xA, 0xFFFF8000, 0xFFFF0000,     0xAD1C, 0xFFFFF000, 0xEF0A0000,   0x170, 0x0000001F } },
 	{ "ArcTan2 FFFFC000,FFFF0000", { 0xA, 0xFFFFC000, 0xFFFF0000,     0xB605, 0xFFFFFC00, 0xEF0A0000,   0x170, 0x0000001F } },
 	{ "ArcTan2 FFFFFFFF,FFFF0000", { 0xA, 0xFFFFFFFF, 0xFFFF0000,     0xC000,          0, 0xEF0A0000,   0x170, 0x0000001F } },
+	{ "Div 00000000/00000000",     { 0x6, 0x00000000, 0x00000000,          1,          0, 0xEF060000,       1, 0x0000001F } },
+	{ "Div 00000001/00000000",     { 0x6, 0x00000001, 0x00000000,          1,          1, 0xEF060000,       1, 0x0000001F } },
+	{ "Div FFFFFFFF/00000000",     { 0x6, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xEF060000,       1, 0x0000001F } },
+	{ "Div 00000000/00000000",     { 0x6, 0x00000000, 0x00000000,          1,          0, 0xEF060000,       1, 0x0000001F } },
+	{ "Div 00000001/00000000",     { 0x6, 0x00000001, 0x00000000,          1,          1, 0xEF060000,       1, 0x0000001F } },
+	{ "Div 80000000/FFFFFFFF",     { 0x6, 0x80000000, 0xFFFFFFFF, 0x80000000,          0, 0xEF060000, 0x80000000, 0x0001F } },
 };
 
 static const u32 nMathTests = sizeof(mathTests) / sizeof(*mathTests);
