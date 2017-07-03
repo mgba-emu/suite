@@ -15,6 +15,7 @@
 #include "carry.h"
 #include "font.h"
 #include "timing.h"
+#include "timers.h"
 #include "memory.h"
 #include "io-read.h"
 #include "suite.h"
@@ -38,6 +39,7 @@ const struct TestSuite* const suites[] = {
 	&memoryTestSuite,
 	&ioReadTestSuite,
 	&timingTestSuite,
+	&timersTestSuite,
 	&carryTestSuite,
 	&biosMathTestSuite,
 	&videoTestSuite
