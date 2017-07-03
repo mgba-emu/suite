@@ -101,6 +101,15 @@ static void runSuite(const struct TestSuite* activeSuite) {
 	}
 }
 
+void nocash_printf(const char* str) {
+	static const char* ID = (const char*) 0x4FFFA00;
+	static volatile const char** OUT = (volatile const char**) 0x4FFFA10;
+	static volatile char* OUTC = (volatile char*) 0x4FFFA1C;
+	if (!strncmp(ID, "no$gba ", 7)) {
+		*OUT = str;
+		*OUTC = '\n';
+	}
+}
 
 __attribute__((format(printf, 1, 2)))
 int savprintf(const char* fmt, ...) {
@@ -116,6 +125,7 @@ int savprintf(const char* fmt, ...) {
 	va_end(args);
 
 	mgba_printf(MGBA_LOG_INFO, "%s", tmp);
+	nocash_printf(tmp);
 
 	vs8* sbase = (vs8*) SRAM + location;
 	size_t i;
