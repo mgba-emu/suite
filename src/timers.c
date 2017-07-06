@@ -595,7 +595,7 @@ static void runTimersSuite(void) {
 		memcpy(&currentTest, activeTest, sizeof(currentTest));
 		runTest(&currentTest);
 
-		savprintf("Math test: %s", activeTest->testName);
+		savprintf("Timer count-up test: %s", activeTest->testName);
 		doResult("1d 1i",  &currentTest.results[0][0], &activeTest->results[0][0]);
 		doResult("2d 1i",  &currentTest.results[1][0], &activeTest->results[1][0]);
 		doResult("4d 1i",  &currentTest.results[2][0], &activeTest->results[2][0]);
