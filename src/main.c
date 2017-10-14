@@ -13,6 +13,7 @@
 
 #include "bios-math.h"
 #include "carry.h"
+#include "dma.h"
 #include "font.h"
 #include "timing.h"
 #include "timers.h"
@@ -42,13 +43,14 @@ const struct TestSuite* const suites[] = {
 	&timersTestSuite,
 	&carryTestSuite,
 	&biosMathTestSuite,
+	&dmaTestSuite,
 	&videoTestSuite
 };
 
 const size_t nSuites = sizeof(suites) / sizeof(*suites);
 
 static void runSuite(const struct TestSuite* activeSuite) {
-	const char* testNameBuffer[256];
+	const char* testNameBuffer[1024];
 	int testIndex = 0;
 	int viewIndex = 0;
 	strcpy(&textGrid[GRID_STRIDE], activeSuite->name);
