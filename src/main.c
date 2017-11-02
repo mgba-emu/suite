@@ -50,13 +50,12 @@ const struct TestSuite* const suites[] = {
 const size_t nSuites = sizeof(suites) / sizeof(*suites);
 
 static void runSuite(const struct TestSuite* activeSuite) {
-	const char* testNameBuffer[1024];
+	const char* testNameBuffer[160];
 	int testIndex = 0;
 	int viewIndex = 0;
 	strcpy(&textGrid[GRID_STRIDE], activeSuite->name);
 	strcpy(&textGrid[GRID_STRIDE * 4 + 11], "Testing...");
 	updateTextGrid();
-	activeSuite->list(testNameBuffer, sizeof(testNameBuffer) / sizeof(*testNameBuffer), 0);
 	if (activeSuite->run) {
 		activeSuite->run();
 	}
@@ -96,8 +95,9 @@ static void runSuite(const struct TestSuite* activeSuite) {
 			sprintf(&textGrid[GRID_STRIDE + 21], "%4u/%-4u", *activeSuite->passes, *activeSuite->totalResults);
 		}
 		size_t i;
+		activeSuite->list(testNameBuffer, sizeof(testNameBuffer) / sizeof(*testNameBuffer), viewIndex);
 		for (i = 0; i < activeSuite->nTests && i < VIEW_SIZE; ++i) {
-			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', testNameBuffer[i + viewIndex]);
+			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', testNameBuffer[i]);
 		}
 
 		updateTextGrid();
