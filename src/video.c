@@ -191,10 +191,79 @@ static void degenerateObjTransformExpected(void) {
 	REG_DISPCNT = MODE_0 | BG2_ON;
 }
 
+static void toggleBg0(void) {
+	while (!(REG_DISPSTAT & 2));
+	REG_DISPSTAT ^= 0x2000;
+	REG_DISPCNT ^= BG0_ON;
+}
+
+static void layerToggle(void) {
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	*(u32*) 0x06008000 = 0x22221111;
+	*(u32*) 0x06008004 = 0x22221111;
+	*(u32*) 0x06008008 = 0x22221111;
+	*(u32*) 0x0600800C = 0x22221111;
+	*(u32*) 0x06008010 = 0x11112222;
+	*(u32*) 0x06008014 = 0x11112222;
+	*(u32*) 0x06008018 = 0x11112222;
+	*(u32*) 0x0600801C = 0x11112222;
+	uint32_t zero = 0;
+	CpuFastSet(&zero, (void*) 0x06000800, 0x01000400);
+	BG_PALETTE[0] = 0x3DEF;
+	BG_PALETTE[1] = 0x7FFF;
+	BG_PALETTE[2] = 0;
+	REG_DISPSTAT = 0x4528;
+	irqSet(IRQ_VCOUNT, toggleBg0);
+	irqEnable(IRQ_VCOUNT);
+	VBlankIntrWait();
+	REG_DISPCNT = MODE_0 | BG0_ON;
+}
+
+static void layerToggleExpected(void) {
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	*(u32*) 0x06008000 = 0x22221111;
+	*(u32*) 0x06008004 = 0x22221111;
+	*(u32*) 0x06008008 = 0x22221111;
+	*(u32*) 0x0600800C = 0x22221111;
+	*(u32*) 0x06008010 = 0x11112222;
+	*(u32*) 0x06008014 = 0x11112222;
+	*(u32*) 0x06008018 = 0x11112222;
+	*(u32*) 0x0600801C = 0x11112222;
+	*(u32*) 0x06008020 = 0;
+	*(u32*) 0x06008024 = 0;
+	*(u32*) 0x06008028 = 0;
+	*(u32*) 0x0600802C = 0;
+	*(u32*) 0x06008030 = 0;
+	*(u32*) 0x06008034 = 0;
+	*(u32*) 0x06008038 = 0;
+	*(u32*) 0x0600803C = 0;
+	*(u32*) 0x06008040 = 0x22221111;
+	*(u32*) 0x06008044 = 0x22221111;
+	*(u32*) 0x06008048 = 0x22221111;
+	*(u32*) 0x0600804C = 0x22221111;
+	*(u32*) 0x06008050 = 0x11112222;
+	*(u32*) 0x06008054 = 0x11112222;
+	*(u32*) 0x06008058 = 0;
+	*(u32*) 0x0600805C = 0;
+	uint32_t zero = 0;
+	CpuFastSet(&zero, (void*) 0x06000800, 0x01000400);
+	zero = 0x00020002;
+	CpuFastSet(&zero, (void*) 0x06000A00, 0x01000040);
+	zero = 0x00010001;
+	CpuFastSet(&zero, (void*) 0x06000A40, 0x01000040);
+	BG_PALETTE[0] = 0x3DEF;
+	BG_PALETTE[1] = 0x7FFF;
+	BG_PALETTE[2] = 0;
+	irqDisable(IRQ_VCOUNT);
+	VBlankIntrWait();
+	REG_DISPCNT = MODE_0 | BG0_ON;
+}
+
 static const struct VideoTest videoTests[] = {
 	{ "Basic Mode 3", basicExpected, basic3Actual },
 	{ "Basic Mode 4", basicExpected, basic4Actual },
 	{ "Degenerate OBJ transforms", degenerateObjTransformExpected, degenerateObjTransform },
+	{ "Layer toggle", layerToggleExpected, layerToggle },
 };
 
 static const u32 nTests = sizeof(videoTests) / sizeof(*videoTests);
@@ -279,6 +348,8 @@ static void showVideoSuite(size_t index) {
 	DMA3COPY(fontTiles, TILE_BASE_ADR(1), DMA16 | DMA_IMMEDIATE | (fontTilesLen >> 1));
 	memset((void*) 0x06000500, 0, 0x300);
 	REG_DISPCNT = dispcnt;
+	REG_DISPSTAT &= ~0x0030;
+	irqDisable(IRQ_VCOUNT);
 }
 
 const struct TestSuite videoTestSuite = {
