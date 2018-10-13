@@ -259,11 +259,139 @@ static void layerToggleExpected(void) {
 	REG_DISPCNT = MODE_0 | BG0_ON;
 }
 
+static char oamDelayInside = 0;
+
+static void oamDelayVcount(void) {
+	while (!(REG_DISPSTAT & LCDC_HBL_FLAG));
+
+	if (!oamDelayInside) {
+		BG_PALETTE[1] = RGB5(31, 0, 0);
+		BG_PALETTE[2] = RGB5(0, 0, 31);
+		OAM[1].attr1 = ATTR1_SIZE_64 | OBJ_X(88 + 16);
+		REG_DISPSTAT = (REG_DISPSTAT & 0x00FF) | VCOUNT(96-1);
+		oamDelayInside = 1;
+	} else {
+		BG_PALETTE[1] = RGB5(31, 31, 31);
+		BG_PALETTE[2] = RGB5(0, 0, 0);
+		OAM[1].attr1 = ATTR1_SIZE_64 | OBJ_X(88 - 16);
+		REG_DISPSTAT = (REG_DISPSTAT & 0x00FF) | VCOUNT(64-1);
+		oamDelayInside = 0;
+	}
+}
+
+static void oamDelayActual(void) {
+	REG_DISPCNT = MODE_0 | BG0_ON;
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	*(u32*) 0x06008000 = 0x22112211;
+	*(u32*) 0x06008004 = 0x22112211;
+	*(u32*) 0x06008008 = 0x11221122;
+	*(u32*) 0x0600800C = 0x11221122;
+	*(u32*) 0x06008010 = 0x22112211;
+	*(u32*) 0x06008014 = 0x22112211;
+	*(u32*) 0x06008018 = 0x11221122;
+	*(u32*) 0x0600801C = 0x11221122;
+
+	uint32_t zero = 0;
+	CpuFastSet(&zero, (void*) 0x06000800, 0x01000400);
+	BG_PALETTE[0] = RGB5(15, 15, 15);
+	BG_PALETTE[1] = RGB5(31, 31, 31);
+	BG_PALETTE[2] = RGB5(0, 0, 0);
+
+	SPRITE_PALETTE[16 + 1] = RGB5(15, 31, 15);
+	memset(SPR_VRAM(0x0), 0x11, 64*64 / 2);
+	OAM[1].attr0 = ATTR0_COLOR_16 | OBJ_Y(64 - 16);
+	OAM[1].attr1 = ATTR1_SIZE_64 | OBJ_X(88 - 8);
+	OAM[1].attr2 = OBJ_CHAR(0x0) | OBJ_PALETTE(1);
+	OAM[2].attr0 = OBJ_DISABLE;
+	OAM[2].attr1 = 0;
+	OAM[2].attr2 = 0;
+	OAM[3].attr0 = OBJ_DISABLE;
+	OAM[3].attr1 = 0;
+	OAM[3].attr2 = 0;
+
+	REG_DISPSTAT = LCDC_VBL | LCDC_VCNT | VCOUNT(64-1);
+	oamDelayInside = 0;
+	irqSet(IRQ_VCOUNT, oamDelayVcount);
+	irqEnable(IRQ_VCOUNT);
+	VBlankIntrWait();
+	REG_DISPCNT = MODE_0 | BG0_ON;
+}
+
+static void setTiles(int y, int x, int w, u16 val) {
+	for (int i = 0; i < w; ++i) {
+		MAP[1][y][x+i] = val;
+	}
+}
+
+static void oamDelayVcountBgOnly(void) {
+	while (!(REG_DISPSTAT & LCDC_HBL_FLAG));
+
+	if (!oamDelayInside) {
+		BG_PALETTE[1] = RGB5(31, 0, 0);
+		BG_PALETTE[2] = RGB5(0, 0, 31);
+		REG_DISPSTAT = (REG_DISPSTAT & 0x00FF) | VCOUNT(96-1);
+		oamDelayInside = 1;
+	} else {
+		BG_PALETTE[1] = RGB5(31, 31, 31);
+		BG_PALETTE[2] = RGB5(0, 0, 0);
+		OAM[1].attr1 = ATTR1_SIZE_64 | OBJ_X(32);
+		REG_DISPSTAT = (REG_DISPSTAT & 0x00FF) | VCOUNT(64-1);
+		oamDelayInside = 0;
+	}
+}
+
+static void oamDelayExpected(void) {
+	REG_DISPCNT = MODE_0 | BG0_ON;
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	*(u32*) 0x06008000 = 0x22112211;
+	*(u32*) 0x06008004 = 0x22112211;
+	*(u32*) 0x06008008 = 0x11221122;
+	*(u32*) 0x0600800C = 0x11221122;
+	*(u32*) 0x06008010 = 0x22112211;
+	*(u32*) 0x06008014 = 0x22112211;
+	*(u32*) 0x06008018 = 0x11221122;
+	*(u32*) 0x0600801C = 0x11221122;
+	memcpy((void*)0x06008020, (void*)0x06008000, 8*4);
+	*(u32*) 0x06008020 = 0x33333333;
+	memset((void*)0x06008040, 0x33, 8*4);
+	*(u32*) 0x06008040 = 0x22222211;
+	memset((void*)0x06008060, 0x33, 8*4);
+
+	uint32_t zero = 0;
+	CpuFastSet(&zero, (void*) 0x06000800, 0x01000400);
+	//        y,  x, w, val
+	setTiles( 6,  9, 8,   3);
+	setTiles( 7,  9, 8,   3);
+	setTiles( 8,  9, 4,   1);
+	setTiles( 8, 13, 4,   3);
+	setTiles( 8, 17, 4,   2);
+	setTiles( 9, 13, 8,   3);
+	setTiles(10, 13, 8,   3);
+	setTiles(11, 13, 8,   3);
+	setTiles(12,  9, 4,   2);
+	setTiles(12, 13, 4,   3);
+	setTiles(12, 17, 4,   1);
+	setTiles(13,  9, 8,   3);
+
+	BG_PALETTE[0] = RGB5(15, 15, 15);
+	BG_PALETTE[1] = RGB5(31, 31, 31);
+	BG_PALETTE[2] = RGB5(0, 0, 0);
+	BG_PALETTE[3] = RGB5(15, 31, 15);
+
+	REG_DISPSTAT = LCDC_VBL | LCDC_VCNT | VCOUNT(64-1);
+	oamDelayInside = 0;
+	irqSet(IRQ_VCOUNT, oamDelayVcountBgOnly);
+	irqEnable(IRQ_VCOUNT);
+	VBlankIntrWait();
+	REG_DISPCNT = MODE_0 | BG0_ON;
+}
+
 static const struct VideoTest videoTests[] = {
 	{ "Basic Mode 3", basicExpected, basic3Actual },
 	{ "Basic Mode 4", basicExpected, basic4Actual },
 	{ "Degenerate OBJ transforms", degenerateObjTransformExpected, degenerateObjTransform },
 	{ "Layer toggle", layerToggleExpected, layerToggle },
+	{ "OAM Update Delay", oamDelayExpected, oamDelayActual },
 };
 
 static const u32 nTests = sizeof(videoTests) / sizeof(*videoTests);
@@ -285,8 +413,8 @@ static void showVideoSuite(size_t index) {
 	OBJ_COLORS[0] = 0x7F1C;
 	OBJ_COLORS[1] = 0x7FFF;
 	OBJ_COLORS[2] = 0x0000;
-	LZ77UnCompVram(expectedTiles, (void*) 0x06014000);
-	LZ77UnCompVram(actualTiles, (void*) 0x06014400);
+	LZ77UnCompVram(expectedTiles, SPR_VRAM(0x200));
+	LZ77UnCompVram(actualTiles, SPR_VRAM(0x220));
 	const struct VideoTest* activeTest = &videoTests[index];
 	bool showExpected = false;
 	bool performShow = true;
