@@ -125,10 +125,12 @@ static void printResult(int offset, int line, const char* preface, s32 value, u3
 	}
 }
 
-static void doResult(const char* preface, s32 value, u32 cpsr, s32 expected, u32 expectedCpsr) {
+static void doResult(const char* preface, const char* testName, s32 value, u32 cpsr, s32 expected, u32 expectedCpsr) {
 	if (value != expected || cpsr != expectedCpsr) {
+		debugprintf("FAIL: %s %s", testName, preface);
 		savprintf("%s: Got %08X (CSPR %X) vs %08X (CSPR %X): FAIL", preface, value, cpsr >> 28, expected, expectedCpsr >> 28);
 	} else {
+		debugprintf("PASS: %s %s", testName, preface);
 		++passes;
 	}
 	++totalResults;
@@ -154,9 +156,9 @@ static void runCarrySuite(void) {
 		runTest(&currentTest);
 
 		savprintf("Carry test: %s", activeTest->testName);
-		doResult("adcs", currentTest.outAdc, currentTest.outAdcCpsr, activeTest->expected.outAdc, activeTest->expected.outAdcCpsr);
-		doResult("sbcs", currentTest.outSbc, currentTest.outSbcCpsr, activeTest->expected.outSbc, activeTest->expected.outSbcCpsr);
-		doResult("rscs", currentTest.outRsc, currentTest.outRscCpsr, activeTest->expected.outRsc, activeTest->expected.outRscCpsr);
+		doResult("adcs", activeTest->testName, currentTest.outAdc, currentTest.outAdcCpsr, activeTest->expected.outAdc, activeTest->expected.outAdcCpsr);
+		doResult("sbcs", activeTest->testName, currentTest.outSbc, currentTest.outSbcCpsr, activeTest->expected.outSbc, activeTest->expected.outSbcCpsr);
+		doResult("rscs", activeTest->testName, currentTest.outRsc, currentTest.outRscCpsr, activeTest->expected.outRsc, activeTest->expected.outRscCpsr);
 	}
 }
 

@@ -546,25 +546,33 @@ static void printResult(int offset, int line, const char* preface, const struct 
 	printResultLine(offset, line + 3, preface, "16xv", value->looseLoopValue, expected->looseLoopValue);
 }
 
-static void doResult(const char* preface, const struct TimerTestResult* value, const struct TimerTestResult* expected) {
+static void doResult(const char* preface, const char* testName, const struct TimerTestResult* value, const struct TimerTestResult* expected) {
 	if (value->tightLoopSum != expected->tightLoopSum) {
+		debugprintf("FAIL: %s 1xs %s", testName, preface);
 		savprintf("1xs %s: Got %08lX vs %08lX: FAIL", preface, value->tightLoopSum, expected->tightLoopSum);
 	} else {
+		debugprintf("PASS: %s 1xs %s", testName, preface);
 		++passes;
 	}
 	if (value->looseLoopSum != expected->looseLoopSum) {
+		debugprintf("FAIL: %s 16xs %s", testName, preface);
 		savprintf("16xs %s: Got %08lX vs %08lX: FAIL", preface, value->looseLoopSum, expected->looseLoopSum);
 	} else {
+		debugprintf("PASS: %s 16xs %s", testName, preface);
 		++passes;
 	}
 	if (value->tightLoopValue != expected->tightLoopValue) {
+		debugprintf("FAIL: %s 1xv %s", testName, preface);
 		savprintf("1xv %s: Got %04X vs %04X: FAIL", preface, value->tightLoopValue, expected->tightLoopValue);
 	} else {
+		debugprintf("PASS: %s 1xv %s", testName, preface);
 		++passes;
 	}
 	if (value->looseLoopValue != expected->looseLoopValue) {
+		debugprintf("FAIL: %s 16xv %s", testName, preface);
 		savprintf("16xv %s: Got %04X vs %04X: FAIL", preface, value->looseLoopValue, expected->looseLoopValue);
 	} else {
+		debugprintf("PASS: %s 16xv %s", testName, preface);
 		++passes;
 	}
 
@@ -596,15 +604,15 @@ static void runTimersSuite(void) {
 		runTest(&currentTest);
 
 		savprintf("Timer count-up test: %s", activeTest->testName);
-		doResult("1d 1i",  &currentTest.results[0][0], &activeTest->results[0][0]);
-		doResult("2d 1i",  &currentTest.results[1][0], &activeTest->results[1][0]);
-		doResult("4d 1i",  &currentTest.results[2][0], &activeTest->results[2][0]);
-		doResult("1d 2i",  &currentTest.results[0][1], &activeTest->results[0][1]);
-		doResult("2d 2i",  &currentTest.results[1][1], &activeTest->results[1][1]);
-		doResult("4d 2i",  &currentTest.results[2][1], &activeTest->results[2][1]);
-		doResult("1d 4i",  &currentTest.results[0][2], &activeTest->results[0][2]);
-		doResult("2d 4i",  &currentTest.results[1][2], &activeTest->results[1][2]);
-		doResult("4d 4i",  &currentTest.results[2][2], &activeTest->results[2][2]);
+		doResult("1d 1i", activeTest->testName, &currentTest.results[0][0], &activeTest->results[0][0]);
+		doResult("2d 1i", activeTest->testName, &currentTest.results[1][0], &activeTest->results[1][0]);
+		doResult("4d 1i", activeTest->testName, &currentTest.results[2][0], &activeTest->results[2][0]);
+		doResult("1d 2i", activeTest->testName, &currentTest.results[0][1], &activeTest->results[0][1]);
+		doResult("2d 2i", activeTest->testName, &currentTest.results[1][1], &activeTest->results[1][1]);
+		doResult("4d 2i", activeTest->testName, &currentTest.results[2][1], &activeTest->results[2][1]);
+		doResult("1d 4i", activeTest->testName, &currentTest.results[0][2], &activeTest->results[0][2]);
+		doResult("2d 4i", activeTest->testName, &currentTest.results[1][2], &activeTest->results[1][2]);
+		doResult("4d 4i", activeTest->testName, &currentTest.results[2][2], &activeTest->results[2][2]);
 	}
 }
 

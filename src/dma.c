@@ -864,10 +864,12 @@ static void printResult(int offset, int line, const char* preface, u32 value, u3
 	}
 }
 
-static void doResult(const char* preface, u32 value, u32 expected) {
+static void doResult(const char* preface, const char* testName, u32 value, u32 expected) {
 	if (value != expected) {
+		debugprintf("FAIL: %s %s", testName, preface);
 		savprintf("%s: Got %08lX vs %08lX: FAIL", preface, value, expected);
 	} else {
+		debugprintf("PASS: %s %s", testName, preface);
 		++passes;
 	}
 	++totalResults;
@@ -915,28 +917,28 @@ static void runDmaSuite(void) {
 
 		savprintf("DMA test: %s", activeTest->testName);
 		if ((activeTest->expected.control & 0x00600000) == 0x00200000) {
-			doResult("0", currentTest.expected[0], activeTest->expected.expected[0]);
-			doResult("1", currentTest.expected[1], activeTest->expected.expected[1]);
-			doResult("2", currentTest.expected[2], activeTest->expected.expected[2]);
+			doResult("0", activeTest->testName, currentTest.expected[0], activeTest->expected.expected[0]);
+			doResult("1", activeTest->testName, currentTest.expected[1], activeTest->expected.expected[1]);
+			doResult("2", activeTest->testName, currentTest.expected[2], activeTest->expected.expected[2]);
 		}
-		doResult("3", currentTest.expected[3], activeTest->expected.expected[3]);
+		doResult("3", activeTest->testName, currentTest.expected[3], activeTest->expected.expected[3]);
 		if ((activeTest->expected.control & 0x00600000) == 0x00000000 || (activeTest->expected.control & 0x00600000) == 0x00600000) {
-			doResult("4", currentTest.expected[4], activeTest->expected.expected[4]);
-			doResult("5", currentTest.expected[5], activeTest->expected.expected[5]);
-			doResult("6", currentTest.expected[6], activeTest->expected.expected[6]);
+			doResult("4", activeTest->testName, currentTest.expected[4], activeTest->expected.expected[4]);
+			doResult("5", activeTest->testName, currentTest.expected[5], activeTest->expected.expected[5]);
+			doResult("6", activeTest->testName, currentTest.expected[6], activeTest->expected.expected[6]);
 		}
 
 		if (currentTest.dad != dstI) {
 			if ((activeTest->expected.control & 0x00600000) == 0x00200000) {
-				doResult("Old 0", currentTest.other[0], srcI[0] + 0x100010);
-				doResult("Old 1", currentTest.other[1], srcI[1] + 0x100010);
-				doResult("Old 2", currentTest.other[2], srcI[2] + 0x100010);
+				doResult("Old 0", activeTest->testName, currentTest.other[0], srcI[0] + 0x100010);
+				doResult("Old 1", activeTest->testName, currentTest.other[1], srcI[1] + 0x100010);
+				doResult("Old 2", activeTest->testName, currentTest.other[2], srcI[2] + 0x100010);
 			}
-			doResult("Old 3", currentTest.other[3], srcI[3] + 0x100010);
+			doResult("Old 3", activeTest->testName, currentTest.other[3], srcI[3] + 0x100010);
 			if ((activeTest->expected.control & 0x00600000) == 0x00000000 || (activeTest->expected.control & 0x00600000) == 0x00600000) {
-				doResult("Old 4", currentTest.other[4], srcI[4] + 0x100010);
-				doResult("Old 5", currentTest.other[5], srcI[5] + 0x100010);
-				doResult("Old 6", currentTest.other[6], srcI[6] + 0x100010);
+				doResult("Old 4", activeTest->testName, currentTest.other[4], srcI[4] + 0x100010);
+				doResult("Old 5", activeTest->testName, currentTest.other[5], srcI[5] + 0x100010);
+				doResult("Old 6", activeTest->testName, currentTest.other[6], srcI[6] + 0x100010);
 			}
 		}
 	}

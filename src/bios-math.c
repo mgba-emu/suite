@@ -201,10 +201,12 @@ static void printResult(int offset, int line, const char* preface, s32 value, s3
 	}
 }
 
-static void doResult(const char* preface, s32 value, s32 expected) {
+static void doResult(const char* preface, const char* testName, s32 value, s32 expected) {
 	if (value != expected) {
+		debugprintf("FAIL: %s %s", testName, preface);
 		savprintf("%s: Got %08lX vs %08lX: FAIL", preface, value, expected);
 	} else {
+		debugprintf("PASS: %s %s", testName, preface);
 		++passes;
 	}
 	++totalResults;
@@ -232,11 +234,11 @@ static void runMathSuite(void) {
 		runTest(&currentTest);
 
 		savprintf("Math test: %s", activeTest->testName);
-		doResult("r0", currentTest.outR0, activeTest->expected.outR0);
-		doResult("r1", currentTest.outR1, activeTest->expected.outR1);
-		doResult("r2", currentTest.outR2, activeTest->expected.outR2);
-		doResult("r3", currentTest.outR3, activeTest->expected.outR3);
-		doResult("cpsr", currentTest.outPsr, activeTest->expected.outPsr);
+		doResult("r0", activeTest->testName, currentTest.outR0, activeTest->expected.outR0);
+		doResult("r1", activeTest->testName, currentTest.outR1, activeTest->expected.outR1);
+		doResult("r2", activeTest->testName, currentTest.outR2, activeTest->expected.outR2);
+		doResult("r3", activeTest->testName, currentTest.outR3, activeTest->expected.outR3);
+		doResult("cpsr", activeTest->testName, currentTest.outPsr, activeTest->expected.outPsr);
 	}
 }
 

@@ -1,6 +1,7 @@
 #include <gba_dma.h>
 #include <gba_input.h>
 #include <gba_interrupt.h>
+#include <gba_sio.h>
 #include <gba_systemcalls.h>
 #include <gba_video.h>
 
@@ -24,6 +25,7 @@
 
 u16* textBase = (u16*) VRAM;
 char textGrid[32 * 32];
+bool isMgba = false;
 
 const char savetype[] = "SRAM_V123";
 
@@ -57,7 +59,9 @@ static void runSuite(const struct TestSuite* activeSuite) {
 	strcpy(&textGrid[GRID_STRIDE * 4 + 11], "Testing...");
 	updateTextGrid();
 	if (activeSuite->run) {
+		debugprintf("BEGIN: %s", activeSuite->name);
 		activeSuite->run();
+		debugprintf("END: %i/%i", *activeSuite->passes, *activeSuite->totalResults);
 	}
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
@@ -143,6 +147,23 @@ int savprintf(const char* fmt, ...) {
 	return s;
 }
 
+__attribute__((format(printf, 1, 2)))
+int debugprintf(const char* fmt, ...) {
+	if (!isMgba) {
+		return 0;
+	}
+
+	char tmp[128];
+
+	va_list args;
+	va_start(args, fmt);
+	int s = vsnprintf(tmp, sizeof(tmp), fmt, args);
+	va_end(args);
+
+	mgba_printf(MGBA_LOG_DEBUG, "%s", tmp);
+	return s;
+}
+
 int main(void) {
 	irqInit();
 
@@ -154,13 +175,14 @@ int main(void) {
 	strcpy(&textGrid[2], "Game Boy Advance Test Suite");
 	updateTextGrid();
 	REG_DISPCNT = MODE_0 | BG1_ON;
+	REG_RCNT = 0;
 
 	setRepeat(20, 6);
 
 	irqEnable(IRQ_VBLANK);
 
 	bzero((u8*) SRAM, 0x10000);
-	mgba_open();
+	isMgba = mgba_open();
 	savprintf("Game Boy Advance Test Suite\n===");
 
 	int suiteIndex = 0;

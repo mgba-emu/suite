@@ -721,10 +721,12 @@ static void printResult(int offset, int line, const char* preface, s32 value, s3
 	}
 }
 
-static void doResult(const char* preface, s32 value, s32 calibration, s32 expected) {
+static void doResult(const char* preface, const char* testName, s32 value, s32 calibration, s32 expected) {
 	if (value - calibration != expected) {
+		debugprintf("FAIL: %s %s", testName, preface);
 		savprintf("%s: Got %5li vs %5li: FAIL", preface, value - calibration, expected);
 	} else {
+		debugprintf("PASS: %s %s", testName, preface);
 		++passes;
 	}
 	++totalResults;
@@ -778,28 +780,28 @@ static void runTimingSuite(void) {
 		REG_IME = 1;
 
 		savprintf("Timing test: %s", activeTest->testName);
-		doResult("ARM/ROM ...", currentTest.arm_text_0000, calibration.arm_text_0000, activeTest->expected.arm_text_0000);
-		doResult("ARM/ROM P..", currentTest.arm_text_4000, calibration.arm_text_4000, activeTest->expected.arm_text_4000);
-		doResult("ARM/ROM .N.", currentTest.arm_text_0004, calibration.arm_text_0004, activeTest->expected.arm_text_0004);
-		doResult("ARM/ROM PN.", currentTest.arm_text_4004, calibration.arm_text_4004, activeTest->expected.arm_text_4004);
-		doResult("ARM/ROM ..S", currentTest.arm_text_0010, calibration.arm_text_0010, activeTest->expected.arm_text_0010);
-		doResult("ARM/ROM P.S", currentTest.arm_text_4010, calibration.arm_text_4010, activeTest->expected.arm_text_4010);
-		doResult("ARM/ROM .NS", currentTest.arm_text_0014, calibration.arm_text_0014, activeTest->expected.arm_text_0014);
-		doResult("ARM/ROM PNS", currentTest.arm_text_4014, calibration.arm_text_4014, activeTest->expected.arm_text_4014);
-		doResult("ARM/WRAM", currentTest.arm_ewram, calibration.arm_ewram, activeTest->expected.arm_ewram);
-		doResult("ARM/IWRAM", currentTest.arm_iwram, calibration.arm_iwram, activeTest->expected.arm_iwram);
+		doResult("ARM/ROM ...", activeTest->testName, currentTest.arm_text_0000, calibration.arm_text_0000, activeTest->expected.arm_text_0000);
+		doResult("ARM/ROM P..", activeTest->testName, currentTest.arm_text_4000, calibration.arm_text_4000, activeTest->expected.arm_text_4000);
+		doResult("ARM/ROM .N.", activeTest->testName, currentTest.arm_text_0004, calibration.arm_text_0004, activeTest->expected.arm_text_0004);
+		doResult("ARM/ROM PN.", activeTest->testName, currentTest.arm_text_4004, calibration.arm_text_4004, activeTest->expected.arm_text_4004);
+		doResult("ARM/ROM ..S", activeTest->testName, currentTest.arm_text_0010, calibration.arm_text_0010, activeTest->expected.arm_text_0010);
+		doResult("ARM/ROM P.S", activeTest->testName, currentTest.arm_text_4010, calibration.arm_text_4010, activeTest->expected.arm_text_4010);
+		doResult("ARM/ROM .NS", activeTest->testName, currentTest.arm_text_0014, calibration.arm_text_0014, activeTest->expected.arm_text_0014);
+		doResult("ARM/ROM PNS", activeTest->testName, currentTest.arm_text_4014, calibration.arm_text_4014, activeTest->expected.arm_text_4014);
+		doResult("ARM/WRAM", activeTest->testName, currentTest.arm_ewram, calibration.arm_ewram, activeTest->expected.arm_ewram);
+		doResult("ARM/IWRAM", activeTest->testName, currentTest.arm_iwram, calibration.arm_iwram, activeTest->expected.arm_iwram);
 
 		if (activeTest->modes & TEST_THUMB) {
-			doResult("Thumb/ROM ...", currentTest.thumb_text_0000, calibration.thumb_text_0000, activeTest->expected.thumb_text_0000);
-			doResult("Thumb/ROM P..", currentTest.thumb_text_4000, calibration.thumb_text_4000, activeTest->expected.thumb_text_4000);
-			doResult("Thumb/ROM .N.", currentTest.thumb_text_0004, calibration.thumb_text_0004, activeTest->expected.thumb_text_0004);
-			doResult("Thumb/ROM PN.", currentTest.thumb_text_4004, calibration.thumb_text_4004, activeTest->expected.thumb_text_4004);
-			doResult("Thumb/ROM ..S", currentTest.thumb_text_0010, calibration.thumb_text_0010, activeTest->expected.thumb_text_0010);
-			doResult("Thumb/ROM P.S", currentTest.thumb_text_4010, calibration.thumb_text_4010, activeTest->expected.thumb_text_4010);
-			doResult("Thumb/ROM .NS", currentTest.thumb_text_0014, calibration.thumb_text_0014, activeTest->expected.thumb_text_0014);
-			doResult("Thumb/ROM PNS", currentTest.thumb_text_4014, calibration.thumb_text_4014, activeTest->expected.thumb_text_4014);
-			doResult("Thumb/WRAM", currentTest.thumb_ewram, calibration.thumb_ewram, activeTest->expected.thumb_ewram);
-			doResult("Thumb/IWRAM", currentTest.thumb_iwram, calibration.thumb_iwram, activeTest->expected.thumb_iwram);
+			doResult("Thumb/ROM ...", activeTest->testName, currentTest.thumb_text_0000, calibration.thumb_text_0000, activeTest->expected.thumb_text_0000);
+			doResult("Thumb/ROM P..", activeTest->testName, currentTest.thumb_text_4000, calibration.thumb_text_4000, activeTest->expected.thumb_text_4000);
+			doResult("Thumb/ROM .N.", activeTest->testName, currentTest.thumb_text_0004, calibration.thumb_text_0004, activeTest->expected.thumb_text_0004);
+			doResult("Thumb/ROM PN.", activeTest->testName, currentTest.thumb_text_4004, calibration.thumb_text_4004, activeTest->expected.thumb_text_4004);
+			doResult("Thumb/ROM ..S", activeTest->testName, currentTest.thumb_text_0010, calibration.thumb_text_0010, activeTest->expected.thumb_text_0010);
+			doResult("Thumb/ROM P.S", activeTest->testName, currentTest.thumb_text_4010, calibration.thumb_text_4010, activeTest->expected.thumb_text_4010);
+			doResult("Thumb/ROM .NS", activeTest->testName, currentTest.thumb_text_0014, calibration.thumb_text_0014, activeTest->expected.thumb_text_0014);
+			doResult("Thumb/ROM PNS", activeTest->testName, currentTest.thumb_text_4014, calibration.thumb_text_4014, activeTest->expected.thumb_text_4014);
+			doResult("Thumb/WRAM", activeTest->testName, currentTest.thumb_ewram, calibration.thumb_ewram, activeTest->expected.thumb_ewram);
+			doResult("Thumb/IWRAM", activeTest->testName, currentTest.thumb_iwram, calibration.thumb_iwram, activeTest->expected.thumb_iwram);
 		}
 	}
 }

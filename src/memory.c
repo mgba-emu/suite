@@ -1065,10 +1065,12 @@ static void printResult(int offset, int line, const char* preface, u32 value, u3
 	}
 }
 
-static void doResult(const char* preface, s32 value, s32 expected) {
+static void doResult(const char* preface, const char* testName, s32 value, s32 expected) {
 	if (value != expected) {
+		debugprintf("FAIL: %s %s", testName, preface);
 		savprintf("%s: Got 0x%08lX vs 0x%08lX: FAIL", preface, value, expected);
 	} else {
+		debugprintf("PASS: %s %s", testName, preface);
 		++passes;
 	}
 	++totalResults;
@@ -1154,56 +1156,56 @@ static void runMemorySuite(void) {
 		REG_IME = 1;
 
 		savprintf("Memory test: %s", activeTest->testName);
-		doResult("U8", currentTest._u8, activeTest->expected._u8);
+		doResult("U8", activeTest->testName, currentTest._u8, activeTest->expected._u8);
 		if (activeTest->store) {
-			doResult("S8 (U16 load)", currentTest._s8, activeTest->expected._s8);
+			doResult("S8 (U16 load)", activeTest->testName, currentTest._s8, activeTest->expected._s8);
 		} else {
-			doResult("S8", currentTest._s8, activeTest->expected._s8);
+			doResult("S8", activeTest->testName, currentTest._s8, activeTest->expected._s8);
 		}
-		doResult("U16", currentTest._u16, activeTest->expected._u16);
-		doResult("U16 (unaligned)", currentTest._u16u1, activeTest->expected._u16u1);
+		doResult("U16", activeTest->testName, currentTest._u16, activeTest->expected._u16);
+		doResult("U16 (unaligned)", activeTest->testName, currentTest._u16u1, activeTest->expected._u16u1);
 		if (!activeTest->store) {
-			doResult("S16", currentTest._s16, activeTest->expected._s16);
-			doResult("S16 (unaligned)", currentTest._s16u1, activeTest->expected._s16u1);
+			doResult("S16", activeTest->testName, currentTest._s16, activeTest->expected._s16);
+			doResult("S16 (unaligned)", activeTest->testName, currentTest._s16u1, activeTest->expected._s16u1);
 		}
-		doResult("32", currentTest._u32, activeTest->expected._u32);
-		doResult("32 (unaligned 1)", currentTest._u32u1, activeTest->expected._u32u1);
-		doResult("32 (unaligned 2)", currentTest._u32u2, activeTest->expected._u32u2);
-		doResult("32 (unaligned 3)", currentTest._u32u3, activeTest->expected._u32u3);
-		doResult("DMA0 16", currentTest._d0_16, activeTest->expected._d0_16);
-		doResult("DMA0 16 (unaligned)", currentTest._d0_16u1, activeTest->expected._d0_16u1);
-		doResult("DMA0 32", currentTest._d0_32, activeTest->expected._d0_32);
-		doResult("DMA0 32 (unaligned 1)", currentTest._d0_32u1, activeTest->expected._d0_32u1);
-		doResult("DMA0 32 (unaligned 2)", currentTest._d0_32u2, activeTest->expected._d0_32u2);
-		doResult("DMA0 32 (unaligned 3)", currentTest._d0_32u3, activeTest->expected._d0_32u3);
-		doResult("DMA1 16", currentTest._d1_16, activeTest->expected._d1_16);
-		doResult("DMA1 16 (unaligned)", currentTest._d1_16u1, activeTest->expected._d1_16u1);
-		doResult("DMA1 32", currentTest._d1_32, activeTest->expected._d1_32);
-		doResult("DMA1 32 (unaligned 1)", currentTest._d1_32u1, activeTest->expected._d1_32u1);
-		doResult("DMA1 32 (unaligned 2)", currentTest._d1_32u2, activeTest->expected._d1_32u2);
-		doResult("DMA1 32 (unaligned 3)", currentTest._d1_32u3, activeTest->expected._d1_32u3);
-		doResult("DMA2 16", currentTest._d2_16, activeTest->expected._d2_16);
-		doResult("DMA2 16 (unaligned)", currentTest._d2_16u1, activeTest->expected._d2_16u1);
-		doResult("DMA2 32", currentTest._d2_32, activeTest->expected._d2_32);
-		doResult("DMA2 32 (unaligned 1)", currentTest._d2_32u1, activeTest->expected._d2_32u1);
-		doResult("DMA2 32 (unaligned 2)", currentTest._d2_32u2, activeTest->expected._d2_32u2);
-		doResult("DMA2 32 (unaligned 3)", currentTest._d2_32u3, activeTest->expected._d2_32u3);
-		doResult("DMA3 16", currentTest._d3_16, activeTest->expected._d3_16);
-		doResult("DMA3 16 (unaligned)", currentTest._d3_16u1, activeTest->expected._d3_16u1);
-		doResult("DMA3 32", currentTest._d3_32, activeTest->expected._d3_32);
-		doResult("DMA3 32 (unaligned 1)", currentTest._d3_32u1, activeTest->expected._d3_32u1);
-		doResult("DMA3 32 (unaligned 2)", currentTest._d3_32u2, activeTest->expected._d3_32u2);
-		doResult("DMA3 32 (unaligned 3)", currentTest._d3_32u3, activeTest->expected._d3_32u3);
-		doResult("swi B 16", currentTest._c16[0], activeTest->expected._c16[0]);
-		doResult("swi B 16 (unaligned)", currentTest._c16u1[0], activeTest->expected._c16u1[0]);
-		doResult("swi B 32", currentTest._c16[0], activeTest->expected._c32[0]);
-		doResult("swi B 32 (unaligned 1)", currentTest._c32u1[0], activeTest->expected._c32u1[0]);
-		doResult("swi B 32 (unaligned 2)", currentTest._c32u2[0], activeTest->expected._c32u2[0]);
-		doResult("swi B 32 (unaligned 3)", currentTest._c32u3[0], activeTest->expected._c32u3[0]);
-		doResult("swi C 32", currentTest._cf32[0], activeTest->expected._cf32[0]);
-		doResult("swi C 32 (unaligned 1)", currentTest._cf32u1[0], activeTest->expected._cf32u1[0]);
-		doResult("swi C 32 (unaligned 2)", currentTest._cf32u2[0], activeTest->expected._cf32u2[0]);
-		doResult("swi C 32 (unaligned 3)", currentTest._cf32u3[0], activeTest->expected._cf32u3[0]);
+		doResult("32", activeTest->testName, currentTest._u32, activeTest->expected._u32);
+		doResult("32 (unaligned 1)", activeTest->testName, currentTest._u32u1, activeTest->expected._u32u1);
+		doResult("32 (unaligned 2)", activeTest->testName, currentTest._u32u2, activeTest->expected._u32u2);
+		doResult("32 (unaligned 3)", activeTest->testName, currentTest._u32u3, activeTest->expected._u32u3);
+		doResult("DMA0 16", activeTest->testName, currentTest._d0_16, activeTest->expected._d0_16);
+		doResult("DMA0 16 (unaligned)", activeTest->testName, currentTest._d0_16u1, activeTest->expected._d0_16u1);
+		doResult("DMA0 32", activeTest->testName, currentTest._d0_32, activeTest->expected._d0_32);
+		doResult("DMA0 32 (unaligned 1)", activeTest->testName, currentTest._d0_32u1, activeTest->expected._d0_32u1);
+		doResult("DMA0 32 (unaligned 2)", activeTest->testName, currentTest._d0_32u2, activeTest->expected._d0_32u2);
+		doResult("DMA0 32 (unaligned 3)", activeTest->testName, currentTest._d0_32u3, activeTest->expected._d0_32u3);
+		doResult("DMA1 16", activeTest->testName, currentTest._d1_16, activeTest->expected._d1_16);
+		doResult("DMA1 16 (unaligned)", activeTest->testName, currentTest._d1_16u1, activeTest->expected._d1_16u1);
+		doResult("DMA1 32", activeTest->testName, currentTest._d1_32, activeTest->expected._d1_32);
+		doResult("DMA1 32 (unaligned 1)", activeTest->testName, currentTest._d1_32u1, activeTest->expected._d1_32u1);
+		doResult("DMA1 32 (unaligned 2)", activeTest->testName, currentTest._d1_32u2, activeTest->expected._d1_32u2);
+		doResult("DMA1 32 (unaligned 3)", activeTest->testName, currentTest._d1_32u3, activeTest->expected._d1_32u3);
+		doResult("DMA2 16", activeTest->testName, currentTest._d2_16, activeTest->expected._d2_16);
+		doResult("DMA2 16 (unaligned)", activeTest->testName, currentTest._d2_16u1, activeTest->expected._d2_16u1);
+		doResult("DMA2 32", activeTest->testName, currentTest._d2_32, activeTest->expected._d2_32);
+		doResult("DMA2 32 (unaligned 1)", activeTest->testName, currentTest._d2_32u1, activeTest->expected._d2_32u1);
+		doResult("DMA2 32 (unaligned 2)", activeTest->testName, currentTest._d2_32u2, activeTest->expected._d2_32u2);
+		doResult("DMA2 32 (unaligned 3)", activeTest->testName, currentTest._d2_32u3, activeTest->expected._d2_32u3);
+		doResult("DMA3 16", activeTest->testName, currentTest._d3_16, activeTest->expected._d3_16);
+		doResult("DMA3 16 (unaligned)", activeTest->testName, currentTest._d3_16u1, activeTest->expected._d3_16u1);
+		doResult("DMA3 32", activeTest->testName, currentTest._d3_32, activeTest->expected._d3_32);
+		doResult("DMA3 32 (unaligned 1)", activeTest->testName, currentTest._d3_32u1, activeTest->expected._d3_32u1);
+		doResult("DMA3 32 (unaligned 2)", activeTest->testName, currentTest._d3_32u2, activeTest->expected._d3_32u2);
+		doResult("DMA3 32 (unaligned 3)", activeTest->testName, currentTest._d3_32u3, activeTest->expected._d3_32u3);
+		doResult("swi B 16", activeTest->testName, currentTest._c16[0], activeTest->expected._c16[0]);
+		doResult("swi B 16 (unaligned)", activeTest->testName, currentTest._c16u1[0], activeTest->expected._c16u1[0]);
+		doResult("swi B 32", activeTest->testName, currentTest._c16[0], activeTest->expected._c32[0]);
+		doResult("swi B 32 (unaligned 1)", activeTest->testName, currentTest._c32u1[0], activeTest->expected._c32u1[0]);
+		doResult("swi B 32 (unaligned 2)", activeTest->testName, currentTest._c32u2[0], activeTest->expected._c32u2[0]);
+		doResult("swi B 32 (unaligned 3)", activeTest->testName, currentTest._c32u3[0], activeTest->expected._c32u3[0]);
+		doResult("swi C 32", activeTest->testName, currentTest._cf32[0], activeTest->expected._cf32[0]);
+		doResult("swi C 32 (unaligned 1)", activeTest->testName, currentTest._cf32u1[0], activeTest->expected._cf32u1[0]);
+		doResult("swi C 32 (unaligned 2)", activeTest->testName, currentTest._cf32u2[0], activeTest->expected._cf32u2[0]);
+		doResult("swi C 32 (unaligned 3)", activeTest->testName, currentTest._cf32u3[0], activeTest->expected._cf32u3[0]);
 	}
 }
 
