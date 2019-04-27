@@ -124,6 +124,11 @@ void testBx(struct TestTimings*);
 void testTrivialLoop(struct TestTimings*);
 void testCLoop(struct TestTimings*);
 void testDiv(struct TestTimings*);
+void testDiv2(struct TestTimings*);
+void testSqrt(struct TestTimings*);
+void testSqrt2(struct TestTimings*);
+void testSqrt3(struct TestTimings*);
+void testAtan(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
 void testTrivialDma(struct TestTimings*);
 void testTrivialDmaRom(struct TestTimings*);
@@ -556,11 +561,41 @@ static const struct TimingTest timingTests[] = {
 		325, 210, 288, 206, 295, 147, 258, 143,
 		319, 292
 	} },
-	{ "Division", testDiv, TEST_ARM | TEST_THUMB, {
+	{ "BIOS Division", testDiv, TEST_ARM | TEST_THUMB, {
 		398, 398, 394, 394, 381, 381, 377, 377,
 		390, 338,
 		371, 371, 367, 367, 363, 363, 359, 359,
 		363, 338
+	} },
+	{ "BIOS Division 2", testDiv2, TEST_ARM | TEST_THUMB, {
+		138, 138, 134, 134, 121, 121, 117, 117,
+		130, 78,
+		111, 111, 107, 107, 103, 103, 99, 99,
+		103, 78
+	} },
+	{ "BIOS Sqrt", testSqrt, TEST_ARM | TEST_THUMB, {
+		150, 150, 148, 148, 135, 135, 133, 133,
+		146, 104,
+		126, 126, 124, 124, 119, 119, 117, 117,
+		122, 104
+	} },
+	{ "BIOS Sqrt 2", testSqrt2, TEST_ARM | TEST_THUMB, {
+		265, 265, 263, 263, 250, 250, 248, 248,
+		261, 219,
+		241, 241, 239, 239, 234, 234, 232, 232,
+		237, 219
+	} },
+	{ "BIOS Sqrt 3", testSqrt3, TEST_ARM | TEST_THUMB, {
+		1192, 1192, 1188, 1188, 1177, 1177, 1173, 1173,
+		1184, 1137,
+		1168, 1168, 1164, 1164, 1161, 1161, 1157, 1157,
+		1160, 1137
+	} },
+	{ "BIOS ArcTan", testAtan, TEST_ARM | TEST_THUMB, {
+		150, 150, 148, 148, 135, 135, 133, 133,
+		146, 104,
+		126, 126, 124, 124, 119, 119, 117, 117,
+		122, 104
 	} },
 	{ "CpuSet", testCpuSet, TEST_ARM | TEST_THUMB, {
 		3453, 3453, 3451, 3451, 3434, 3434, 3432, 3432,
