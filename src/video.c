@@ -309,7 +309,7 @@ static void oamDelayActual(void) {
 	OAM[3].attr1 = 0;
 	OAM[3].attr2 = 0;
 
-	REG_DISPSTAT = LCDC_VBL | LCDC_VCNT | VCOUNT(64-1);
+	REG_DISPSTAT = LCDC_VBL | LCDC_VCNT | VCOUNT(64 - 1);
 	oamDelayInside = 0;
 	irqSet(IRQ_VCOUNT, oamDelayVcount);
 	irqEnable(IRQ_VCOUNT);
@@ -319,7 +319,7 @@ static void oamDelayActual(void) {
 
 static void setTiles(int y, int x, int w, u16 val) {
 	for (int i = 0; i < w; ++i) {
-		MAP[1][y][x+i] = val;
+		MAP[1][y][x + i] = val;
 	}
 }
 
@@ -351,11 +351,11 @@ static void oamDelayExpected(void) {
 	*(u32*) 0x06008014 = 0x22112211;
 	*(u32*) 0x06008018 = 0x11221122;
 	*(u32*) 0x0600801C = 0x11221122;
-	memcpy((void*)0x06008020, (void*)0x06008000, 8*4);
+	memcpy((void*) 0x06008020, (void*) 0x06008000, 8 * 4);
 	*(u32*) 0x06008020 = 0x33333333;
-	memset((void*)0x06008040, 0x33, 8*4);
-	*(u32*) 0x06008040 = 0x22222211;
-	memset((void*)0x06008060, 0x33, 8*4);
+	memset((void*) 0x06008040, 0x33, 8*4);
+	*(u32*) 0x06008040 = 0x22112211;
+	memset((void*) 0x06008060, 0x33, 8*4);
 
 	uint32_t zero = 0;
 	CpuFastSet(&zero, (void*) 0x06000800, 0x01000400);
@@ -378,7 +378,7 @@ static void oamDelayExpected(void) {
 	BG_PALETTE[2] = RGB5(0, 0, 0);
 	BG_PALETTE[3] = RGB5(15, 31, 15);
 
-	REG_DISPSTAT = LCDC_VBL | LCDC_VCNT | VCOUNT(64-1);
+	REG_DISPSTAT = LCDC_VBL | LCDC_VCNT | VCOUNT(64 - 1);
 	oamDelayInside = 0;
 	irqSet(IRQ_VCOUNT, oamDelayVcountBgOnly);
 	irqEnable(IRQ_VCOUNT);
