@@ -123,7 +123,7 @@ __attribute__((format(printf, 1, 2)))
 int savprintf(const char* fmt, ...) {
 	static u32 location = 0;
 	char tmp[128];
-	if (location >= 0x10000) {
+	if (location >= 0x8000) {
 		return 0;
 	}
 
