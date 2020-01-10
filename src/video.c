@@ -188,6 +188,8 @@ static void degenerateObjTransformExpected(void) {
 	LZ77UnCompVram((void*) degenerateObjTransformTiles, (void*) 0x06008000);
 	LZ77UnCompVram((void*) degenerateObjTransformMap, (void*) 0x06000800);
 	CpuFastSet(degenerateObjTransformPal, BG_PALETTE, 8);
+	uint32_t zero = 0;
+	CpuFastSet(&zero, (void*) 0x06000c00, 0x01000100);
 	REG_DISPCNT = MODE_0 | BG2_ON;
 }
 
