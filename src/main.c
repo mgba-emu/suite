@@ -17,6 +17,7 @@
 #include "dma.h"
 #include "font.h"
 #include "timing.h"
+#include "timer-irq.h"
 #include "timers.h"
 #include "memory.h"
 #include "io-read.h"
@@ -43,6 +44,7 @@ const struct TestSuite* const suites[] = {
 	&ioReadTestSuite,
 	&timingTestSuite,
 	&timersTestSuite,
+	&timerIRQTestSuite,
 	&carryTestSuite,
 	&biosMathTestSuite,
 	&dmaTestSuite,
