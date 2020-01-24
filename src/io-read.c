@@ -151,6 +151,7 @@ static unsigned totalResults;
 
 static u16 _runTest(const struct IOReadTest* test) {
 	REG_IME = 0;
+	activeTestInfo.subtestId = 0;
 	vu16* address = (vu16*) test->address;
 	u16 original;
 	if (test->restoreAfter) {
@@ -173,6 +174,7 @@ static u16 _runTest(const struct IOReadTest* test) {
 	} else {
 		*address = test->restore;
 	}
+	activeTestInfo.subtestId = -1;
 	REG_IME = 1;
 	return result;
 }
@@ -222,9 +224,11 @@ static void runIOReadSuite(void) {
 	REG_SOUNDCNT_X = 0x80;
 	int i;
 	for (i = 0; i < nTests; ++i) {
+		activeTestInfo.testId = i;
 		activeTest = &ioReadTests[i];
 		doResult(activeTest);
 	}
+	activeTestInfo.testId = -1;
 	REG_SOUNDCNT_X = 0;
 }
 
@@ -232,6 +236,7 @@ static void showIOReadSuite(size_t index) {
 	const struct IOReadTest* activeTest = &ioReadTests[index];
 	size_t resultIndex = 0;
 	REG_SOUNDCNT_X = 0x80;
+	activeTestInfo.testId = index;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -254,6 +259,7 @@ static void showIOReadSuite(size_t index) {
 		printResults(0, resultIndex, activeTest);
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 	REG_SOUNDCNT_X = 0;
 }
 

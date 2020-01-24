@@ -769,6 +769,7 @@ static void runTimingSuite(void) {
 		struct TestTimings currentTest = {0};
 		VBlankIntrWait();
 		REG_IME = 0;
+		activeTestInfo.testId = i;
 		calibrate(&calibration);
 		activeTest = &timingTests[i];
 		if (activeTest->test) {
@@ -777,6 +778,7 @@ static void runTimingSuite(void) {
 			currentTest = calibration;
 			memset(&calibration, 0, sizeof(calibration));
 		}
+		activeTestInfo.testId = -1;
 		REG_IME = 1;
 
 		savprintf("Timing test: %s", activeTest->testName);
@@ -821,6 +823,7 @@ static void showTimingSuite(size_t index) {
 	const struct TimingTest* activeTest = &timingTests[index];
 	struct TestTimings currentTest = {0};
 	size_t resultIndex = 0;
+	activeTestInfo.testId = index;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -848,6 +851,7 @@ static void showTimingSuite(size_t index) {
 		}
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 }
 
 const struct TestSuite timingTestSuite = {

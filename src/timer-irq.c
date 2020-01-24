@@ -52,7 +52,10 @@ static void runTest(struct TimerIRQTest* test) {
 		"ldr r1, =0x4000100 \n"
 		"mov r2, #0xC00000 \n"
 		"orr r3, r2, %[timer] \n"
-
+		"ldr r4, =activeTestInfo+4 \n"
+	
+		"mov r5, #0 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"ldrh r0, [r1] \n"
@@ -66,6 +69,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -80,6 +85,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -95,6 +102,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -111,6 +120,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -128,6 +139,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -146,6 +159,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -165,6 +180,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -185,6 +202,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -206,6 +225,8 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"add r5, #1 \n"
+		"strh r5, [r4] \n"
 		"str r3, [r1] \n"
 		"strh r2, [r1] \n"
 		"nop \n"
@@ -228,6 +249,9 @@ static void runTest(struct TimerIRQTest* test) {
 		"nop \n"
 		"nop \n"
 
+		"ldr r5, =0xFFFF \n"
+		"strh r5, [r4] \n"
+
 		"ldr r0, =1f \n"
 		"add r0, #1 \n"
 		"bx r0 \n"
@@ -235,7 +259,7 @@ static void runTest(struct TimerIRQTest* test) {
 		".thumb; 1:"
 		:
 		: [result]"r"(test->results), [timer]"r"(test->timer)
-		: "r0", "r1", "r2", "r3", "memory");
+		: "r0", "r1", "r2", "r3", "r4", "r5", "memory");
 	irqDisable(IRQ_TIMER0);
 	irqEnable(IRQ_VBLANK);
 }
@@ -287,6 +311,7 @@ static void runTimerIRQSuite(void) {
 	int i;
 	for (i = 0; i < nTimerIRQTests; ++i) {
 		struct TimerIRQTest currentTest = {0};
+		activeTestInfo.testId = i;
 		activeTest = &timerIRQTests[i];
 		memcpy(&currentTest, activeTest, sizeof(currentTest));
 		runTest(&currentTest);
@@ -303,6 +328,7 @@ static void runTimerIRQSuite(void) {
 		doResult("8 nops", activeTest->testName, currentTest.results[8], activeTest->results[8]);
 		doResult("9 nops", activeTest->testName, currentTest.results[9], activeTest->results[9]);
 	}
+	activeTestInfo.testId = -1;
 }
 
 static size_t listTimerIRQSuite(const char** names, size_t size, size_t offset) {
@@ -322,6 +348,7 @@ static void showTimerIRQSuite(size_t index) {
 	size_t resultIndex = 0;
 	memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 	memcpy(&currentTest, activeTest, sizeof(currentTest));
+	activeTestInfo.testId = index;
 	runTest(&currentTest);
 	updateTextGrid();
 
@@ -347,6 +374,7 @@ static void showTimerIRQSuite(size_t index) {
 		printResults(activeTest->testName, &currentTest, activeTest, resultIndex);
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 }
 
 const struct TestSuite timerIRQTestSuite = {

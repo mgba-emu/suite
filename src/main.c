@@ -31,6 +31,7 @@ bool isMgba = false;
 const char savetype[] = "SRAM_V123";
 
 EWRAM_DATA const int _anchor = 0xABAD1DEA; // There seems to be a bug in the ld script that this fixes
+IWRAM_DATA struct ActiveInfo activeTestInfo = { {'I', 'n', 'f', 'o'}, -1, -1, -1 };
 
 void updateTextGrid(void) {
 	int i;
@@ -195,7 +196,9 @@ int main(void) {
 		u16 keys = keysDownRepeat();
 
 		if (keys & KEY_A) {
+			activeTestInfo.suiteId = suiteIndex;
 			runSuite(suites[suiteIndex]);
+			activeTestInfo.suiteId = -1;
 			continue;
 		}
 

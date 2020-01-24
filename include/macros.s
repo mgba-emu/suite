@@ -44,6 +44,8 @@
 	.ltorg
 
 #define RUN_TEST(NAME, MODE, SECTION, WAIT) \
+	strh r6, [r7] ;\
+	add r6, #1 ;\
 	ldr r0, =0x ## WAIT ; \
 	ldr r1, =WAITCNT ;\
 	str r0, [r1] ;\
@@ -72,8 +74,10 @@
 	.global NAME ;\
 	.type NAME, %function ;\
 	NAME: ;\
-	push {r4-r5, lr} ;\
+	push {r4-r7, lr} ;\
 	mov r4, r0 ;\
+	ldr r7, =activeTestInfo+4 ;\
+	mov r6, #0 ;\
 	RUN_TEST(NAME, arm, text, 0000) ;\
 	RUN_TEST(NAME, arm, text, 4000) ;\
 	RUN_TEST(NAME, arm, text, 0004) ;\
@@ -94,7 +98,9 @@
 	RUN_TEST(NAME, thumb, text, 4014) ;\
 	RUN_TEST(NAME, thumb, iwram, 0000) ;\
 	RUN_TEST(NAME, thumb, ewram, 0000) ;\
-	pop {r4-r5} ;\
+	ldr r6, =0xFFFF ;\
+	strh r6, [r7] ;\
+	pop {r4-r7} ;\
 	pop {r0} ;\
 	bx r0
 
@@ -107,8 +113,10 @@
 	.global NAME ;\
 	.type NAME, %function ;\
 	NAME: ;\
-	push {r4-r5, lr} ;\
+	push {r4-r7, lr} ;\
 	mov r4, r0 ;\
+	ldr r7, =activeTestInfo+4 ;\
+	mov r6, #0 ;\
 	RUN_TEST(NAME, arm, text, 0000) ;\
 	RUN_TEST(NAME, arm, text, 4000) ;\
 	RUN_TEST(NAME, arm, text, 0004) ;\
@@ -119,7 +127,9 @@
 	RUN_TEST(NAME, arm, text, 4014) ;\
 	RUN_TEST(NAME, arm, iwram, 0000) ;\
 	RUN_TEST(NAME, arm, ewram, 0000) ;\
-	pop {r4-r5} ;\
+	ldr r6, =0xFFFF ;\
+	strh r6, [r7] ;\
+	pop {r4-r7} ;\
 	pop {r0} ;\
 	bx r0
 
@@ -132,8 +142,10 @@
 	.global NAME ;\
 	.type NAME, %function ;\
 	NAME: ;\
-	push {r4-r5, lr} ;\
+	push {r4-r7, lr} ;\
 	mov r4, r0 ;\
+	ldr r7, =activeTestInfo+4 ;\
+	mov r6, #0 ;\
 	RUN_TEST(NAME, thumb, text, 0000) ;\
 	RUN_TEST(NAME, thumb, text, 4000) ;\
 	RUN_TEST(NAME, thumb, text, 0004) ;\
@@ -144,7 +156,9 @@
 	RUN_TEST(NAME, thumb, text, 4014) ;\
 	RUN_TEST(NAME, thumb, iwram, 0000) ;\
 	RUN_TEST(NAME, thumb, ewram, 0000) ;\
-	pop {r4-r5} ;\
+	ldr r6, =0xFFFF ;\
+	strh r6, [r7] ;\
+	pop {r4-r7} ;\
 	pop {r0} ;\
 	bx r0
 
@@ -154,12 +168,19 @@
 	.global NAME ;\
 	.type NAME, %function ;\
 	NAME: ;\
-	push {r4, lr} ;\
+	push {r4-r6, lr} ;\
+	ldr r6, =activeTestInfo+4 ;\
+	mov r5, #0 ;\
+	strh r5, [r6] ;\
 	mov r4, r0 ;\
 	bl ARM ;\
+	mov r5, #1 ;\
+	strh r5, [r6] ;\
 	mov r0, r4 ;\
 	bl THUMB ;\
-	pop {r4} ;\
+	ldr r5, =0xFFFF ;\
+	strh r5, [r6] ;\
+	pop {r4-r6} ;\
 	pop {r0} ;\
 	bx r0
 

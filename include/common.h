@@ -14,3 +14,10 @@ extern char textGrid[GRID_STRIDE * 32];
 void updateTextGrid(void);
 __attribute__((format(printf, 1, 2))) void savprintf(const char* fmt, ...);
 __attribute__((format(printf, 1, 2))) int debugprintf(const char* fmt, ...);
+
+extern struct ActiveInfo {
+	const char magic[4];
+	uint16_t subtestId;
+	uint8_t testId;
+	uint8_t suiteId;
+} activeTestInfo;

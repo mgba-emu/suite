@@ -161,6 +161,7 @@ static unsigned totalResults;
 IWRAM_CODE
 __attribute__((noinline))
 static void runTest(struct TestMath* test) {
+	activeTestInfo.subtestId = 0;
 	__asm__("ldr r0, =enterM \n"
 		"bx r0 \n"
 		".arm; enterM:\n"
@@ -185,6 +186,7 @@ static void runTest(struct TestMath* test) {
 		: [R0]"=m"(test->outR0), [R1]"=m"(test->outR1), [R2]"=m"(test->outR2), [R3]"=m"(test->outR3), [psr]"=r"(test->outPsr)
 		: [in0]"m"(test->in0), [in1]"m"(test->in1), [syscall]"r"(test->syscall)
 		: "r0", "r1", "r2", "r3");
+	activeTestInfo.subtestId = -1;
 }
 
 static void printResult(int offset, int line, const char* preface, s32 value, s32 expected) {
@@ -231,6 +233,7 @@ static void runMathSuite(void) {
 		VBlankIntrWait();
 		activeTest = &mathTests[i];
 		memcpy(&currentTest, &activeTest->expected, sizeof(currentTest));
+		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
 		savprintf("Math test: %s", activeTest->testName);
@@ -240,6 +243,7 @@ static void runMathSuite(void) {
 		doResult("r3", activeTest->testName, currentTest.outR3, activeTest->expected.outR3);
 		doResult("cpsr", activeTest->testName, currentTest.outPsr, activeTest->expected.outPsr);
 	}
+	activeTestInfo.testId = -1;
 }
 
 static size_t listMathSuite(const char** names, size_t size, size_t offset) {
@@ -257,6 +261,7 @@ static void showMathSuite(size_t index) {
 	const struct MathTest* activeTest = &mathTests[index];
 	struct TestMath currentTest = {0};
 	size_t resultIndex = 0;
+	activeTestInfo.testId = index;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -281,6 +286,7 @@ static void showMathSuite(size_t index) {
 		printResults(activeTest->testName, &currentTest, &activeTest->expected, resultIndex);
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 }
 
 const struct TestSuite biosMathTestSuite = {

@@ -796,6 +796,7 @@ static unsigned totalResults;
 
 static void runTest(struct TestDma* test) {
 	int i;
+	activeTestInfo.subtestId = 0;
 	vu32* dma = &REG_DMA0SAD + test->dma * 3;
 	dma[0] = (u32) &test->sad0[3];
 	dma[1] = (u32) &test->dad0[3];
@@ -848,6 +849,7 @@ static void runTest(struct TestDma* test) {
 	irqDisable(IRQ_HBLANK);
 
 	memcpy(test->expected, test->dad, sizeof(test->expected));
+	activeTestInfo.subtestId = -1;
 }
 
 static void printResult(int offset, int line, const char* preface, u32 value, u32 expected) {
@@ -913,6 +915,7 @@ static void runDmaSuite(void) {
 		struct TestDma currentTest = {0};
 		activeTest = &dmaTests[i];
 		memcpy(&currentTest, &activeTest->expected, sizeof(currentTest));
+		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
 		savprintf("DMA test: %s", activeTest->testName);
@@ -942,6 +945,7 @@ static void runDmaSuite(void) {
 			}
 		}
 	}
+	activeTestInfo.testId = -1;
 }
 
 static size_t listDmaSuite(const char** names, size_t size, size_t offset) {
@@ -959,6 +963,7 @@ static void showDmaSuite(size_t index) {
 	const struct DmaTest* activeTest = &dmaTests[index];
 	struct TestDma currentTest = {0};
 	size_t resultIndex = 0;
+	activeTestInfo.testId = index;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -972,6 +977,7 @@ static void showDmaSuite(size_t index) {
 		printResults(activeTest->testName, &currentTest, &activeTest->expected, resultIndex);
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 }
 
 const struct TestSuite dmaTestSuite = {

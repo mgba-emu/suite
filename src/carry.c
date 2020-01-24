@@ -67,6 +67,7 @@ static unsigned totalResults;
 
 __attribute__((noinline))
 static void runTest(struct TestCarry* test) {
+	activeTestInfo.subtestId = 0;
 	__asm__ __volatile__("ldr r0, =enterA \n"
 		"bx r0 \n"
 		".arm; enterA:\n"
@@ -81,6 +82,7 @@ static void runTest(struct TestCarry* test) {
 		: [out]"=r"(test->outAdc), [psrOut]"=r"(test->outAdcCpsr)
 		: [in0]"r"(test->in0), [in1]"r"(test->in1), [psrIn]"r"(test->inCpsr)
 		: "r0");
+	activeTestInfo.subtestId = 1;
 	__asm__ __volatile__("ldr r0, =enterS \n"
 		"bx r0 \n"
 		".arm; enterS:\n"
@@ -95,6 +97,7 @@ static void runTest(struct TestCarry* test) {
 		: [out]"=r"(test->outSbc), [psrOut]"=r"(test->outSbcCpsr)
 		: [in0]"r"(test->in0), [in1]"r"(test->in1), [psrIn]"r"(test->inCpsr)
 		: "r0");
+	activeTestInfo.subtestId = 2;
 	__asm__ __volatile__("ldr r0, =enterR \n"
 		"bx r0 \n"
 		".arm; enterR:\n"
@@ -109,6 +112,7 @@ static void runTest(struct TestCarry* test) {
 		: [out]"=r"(test->outRsc), [psrOut]"=r"(test->outRscCpsr)
 		: [in0]"r"(test->in0), [in1]"r"(test->in1), [psrIn]"r"(test->inCpsr)
 		: "r0");
+	activeTestInfo.subtestId = -1;
 }
 
 static void printResult(int offset, int line, const char* preface, s32 value, u32 cpsr, s32 expected, u32 expectedCpsr) {
@@ -153,6 +157,7 @@ static void runCarrySuite(void) {
 		VBlankIntrWait();
 		activeTest = &carryTests[i];
 		memcpy(&currentTest, &activeTest->expected, sizeof(currentTest));
+		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
 		savprintf("Carry test: %s", activeTest->testName);
@@ -160,6 +165,7 @@ static void runCarrySuite(void) {
 		doResult("sbcs", activeTest->testName, currentTest.outSbc, currentTest.outSbcCpsr, activeTest->expected.outSbc, activeTest->expected.outSbcCpsr);
 		doResult("rscs", activeTest->testName, currentTest.outRsc, currentTest.outRscCpsr, activeTest->expected.outRsc, activeTest->expected.outRscCpsr);
 	}
+	activeTestInfo.testId = -1;
 }
 
 static size_t listCarrySuite(const char** names, size_t size, size_t offset) {
@@ -177,6 +183,7 @@ static void showCarrySuite(size_t index) {
 	const struct CarryTest* activeTest = &carryTests[index];
 	struct TestCarry currentTest = {0};
 	size_t resultIndex = 0;
+	activeTestInfo.testId = index;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -201,6 +208,7 @@ static void showCarrySuite(size_t index) {
 		printResults(activeTest->testName, &currentTest, &activeTest->expected, resultIndex);
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 }
 
 const struct TestSuite carryTestSuite = {
