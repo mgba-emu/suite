@@ -21,6 +21,7 @@
 #include "timers.h"
 #include "memory.h"
 #include "io-read.h"
+#include "shifter.h"
 #include "suite.h"
 #include "video.h"
 
@@ -46,6 +47,7 @@ const struct TestSuite* const suites[] = {
 	&timingTestSuite,
 	&timersTestSuite,
 	&timerIRQTestSuite,
+	&shifterTestSuite,
 	&carryTestSuite,
 	&biosMathTestSuite,
 	&dmaTestSuite,
