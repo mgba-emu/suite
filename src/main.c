@@ -122,12 +122,9 @@ void nocash_printf(const char* str) {
 }
 
 __attribute__((format(printf, 1, 2)))
-int savprintf(const char* fmt, ...) {
+void savprintf(const char* fmt, ...) {
 	static u32 location = 0;
 	char tmp[128];
-	if (location >= 0x8000) {
-		return 0;
-	}
 
 	va_list args;
 	va_start(args, fmt);
@@ -140,13 +137,16 @@ int savprintf(const char* fmt, ...) {
 	vs8* sbase = (vs8*) SRAM + location;
 	size_t i;
 	for (i = 0; i < s; ++i) {
+		if (location + i >= 0x8000) {
+			return;
+		}
 		sbase[i] = tmp[i];
 	}
 	sbase[s] = '\n';
 	++s;
 	sbase[s] = '\0';
 	location += s;
-	return s;
+	return;
 }
 
 __attribute__((format(printf, 1, 2)))
