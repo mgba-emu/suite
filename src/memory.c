@@ -81,37 +81,79 @@ __attribute__((noinline))
 static void testLoad(struct TestConfigurations* config, u8* base) {
 	__asm__ __volatile__(
 			"ldr r0, =enterL \n"
+			"ldr r1, =activeTestInfo+4 \n"
 			"bx r0 \n"
 			".arm; enterL:\n"
 			"mov r0, %[i] \n"
-			"ldrb   %[u8],    [r0] \n"
-			"ldrsb  %[s8],    [r0] \n"
-			"ldrh   %[u16],   [r0] \n"
-			"ldrh   %[u16u1], [r0, #1] \n"
-			"ldrsh  %[s16],   [r0] \n"
-			"ldrsh  %[s16u1], [r0, #1] \n"
-			"ldr    %[u32],   [r0] \n"
-			"ldr    %[u32u1], [r0, #1] \n"
-			"ldr    %[u32u2], [r0, #2] \n"
-			"ldr    %[u32u3], [r0, #3] \n"
+
+			"mov   r2, #0 \n"
+			"strh  r2, [r1] \n"
+			"ldrb  r3, [r0] \n"
+			"str   r3, %[u8] \n"
+
+			"mov   r2, #1 \n"
+			"strh  r2, [r1] \n"
+			"ldrsb r3, [r0] \n"
+			"str   r3, %[s8] \n"
+
+			"mov   r2, #2 \n"
+			"strh  r2, [r1] \n"
+			"ldrh  r3, [r0] \n"
+			"str   r3, %[u16] \n"
+
+			"mov   r2, #3 \n"
+			"strh  r2, [r1] \n"
+			"ldrh  r3, [r0, #1] \n"
+			"str   r3, %[u16u1] \n"
+
+			"mov   r2, #4 \n"
+			"strh  r2, [r1] \n"
+			"ldrsh r3, [r0] \n"
+			"str   r3, %[s16] \n"
+
+			"mov   r2, #5 \n"
+			"strh  r2, [r1] \n"
+			"ldrsh r3, [r0, #1] \n"
+			"str   r3, %[s16u1] \n"
+
+			"mov   r2, #6 \n"
+			"strh  r2, [r1] \n"
+			"ldr   r3, [r0] \n"
+			"str   r3, %[u32] \n"
+
+			"mov   r2, #7 \n"
+			"strh  r2, [r1] \n"
+			"ldr   r3, [r0, #1] \n"
+			"str   r3, %[u32u1] \n"
+
+			"mov   r2, #8 \n"
+			"strh  r2, [r1] \n"
+			"ldr   r3, [r0, #2] \n"
+			"str   r3, %[u32u2] \n"
+
+			"mov   r2, #9 \n"
+			"strh  r2, [r1] \n"
+			"ldr   r3, [r0, #3] \n"
+			"str   r3, %[u32u3] \n"
+
 			"ldr r0, =exitL \n"
 			"add r0, #1 \n"
 			"bx r0 \n"
 			".ltorg \n"
 			".thumb; exitL:"
 		:
-			[u8]"=r"(config->_u8),
-			[s8]"=r"(config->_s8),
-			[u16]"=r"(config->_u16),
-			[u16u1]"=r"(config->_u16u1),
-			[s16]"=r"(config->_s16),
-			[s16u1]"=r"(config->_s16u1),
-			[u32]"=r"(config->_u32),
-			[u32u1]"=r"(config->_u32u1),
-			[u32u2]"=r"(config->_u32u2),
-			[u32u3]"=r"(config->_u32u3)
+			[u8]"=m"(config->_u8),
+			[s8]"=m"(config->_s8),
+			[u16]"=m"(config->_u16),
+			[u16u1]"=m"(config->_u16u1),
+			[s16]"=m"(config->_s16),
+			[s16u1]"=m"(config->_s16u1),
+			[u32]"=m"(config->_u32),
+			[u32u1]"=m"(config->_u32u1),
+			[u32u2]"=m"(config->_u32u2),
+			[u32u3]"=m"(config->_u32u3)
 		: [i]"r"(base)
-		: "r0");
+		: "r0", "r1", "r2", "r3", "memory");
 	// Clear stored DMA state
 	u32 temp;
 	DMA0COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
@@ -119,40 +161,75 @@ static void testLoad(struct TestConfigurations* config, u8* base) {
 	DMA2COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
 	DMA3COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
 
+	activeTestInfo.subtestId = 10;
 	DMA0COPY(base, &config->_d0_16, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 11;
 	DMA0COPY(base + 1, &config->_d0_16u1, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 12;
 	DMA0COPY(base, &config->_d0_32, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 13;
 	DMA0COPY(base + 1, &config->_d0_32u1, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 14;
 	DMA0COPY(base + 2, &config->_d0_32u2, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 15;
 	DMA0COPY(base + 3, &config->_d0_32u3, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 16;
 	DMA1COPY(base, &config->_d1_16, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 17;
 	DMA1COPY(base + 1, &config->_d1_16u1, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 18;
 	DMA1COPY(base, &config->_d1_32, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 19;
 	DMA1COPY(base + 1, &config->_d1_32u1, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 20;
 	DMA1COPY(base + 2, &config->_d1_32u2, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 21;
 	DMA1COPY(base + 3, &config->_d1_32u3, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 22;
 	DMA2COPY(base, &config->_d2_16, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 23;
 	DMA2COPY(base + 1, &config->_d2_16u1, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 24;
 	DMA2COPY(base, &config->_d2_32, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 25;
 	DMA2COPY(base + 1, &config->_d2_32u1, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 26;
 	DMA2COPY(base + 2, &config->_d2_32u2, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 27;
 	DMA2COPY(base + 3, &config->_d2_32u3, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 28;
 	DMA3COPY(base, &config->_d3_16, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 29;
 	DMA3COPY(base + 1, &config->_d3_16u1, DMA16 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 30;
 	DMA3COPY(base, &config->_d3_32, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 31;
 	DMA3COPY(base + 1, &config->_d3_32u1, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 32;
 	DMA3COPY(base + 2, &config->_d3_32u2, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 33;
 	DMA3COPY(base + 3, &config->_d3_32u3, DMA32 | DMA_IMMEDIATE | 1);
+	activeTestInfo.subtestId = 34;
 	CpuSet(base, config->_c16, 8);
+	activeTestInfo.subtestId = 35;
 	CpuSet(base + 1, config->_c16u1, 8);
+	activeTestInfo.subtestId = 36;
 	CpuSet(base, config->_c32, 8 | BIT(26));
+	activeTestInfo.subtestId = 37;
 	CpuSet(base + 1, config->_c32u1, 8 | BIT(26));
+	activeTestInfo.subtestId = 38;
 	CpuSet(base + 2, config->_c32u2, 8 | BIT(26));
+	activeTestInfo.subtestId = 39;
 	CpuSet(base + 3, config->_c32u3, 8 | BIT(26));
+	activeTestInfo.subtestId = 40;
 	CpuFastSet(base, config->_cf32, 8);
+	activeTestInfo.subtestId = 41;
 	CpuFastSet(base + 1, config->_cf32u1, 8);
+	activeTestInfo.subtestId = 42;
 	CpuFastSet(base + 2, config->_cf32u2, 8);
+	activeTestInfo.subtestId = 43;
 	CpuFastSet(base + 3, config->_cf32u3, 8);
+	activeTestInfo.subtestId = -1;
 }
 
 static void testLoadEWRAM(struct TestConfigurations* config) {
@@ -306,47 +383,73 @@ static void testLoadBad(struct TestConfigurations* config) {
 }
 
 __attribute__((noinline))
-static void testStore(struct TestConfigurations* config, u32* base) {
-	const u32 fodder[2] = { base[0], base[1] };
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
+static void testStore(struct TestConfigurations* config, u32* write, u32* read) {
+	const u32 original[2] = { read[0], read[1] };
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	const u32 test[2] = { 0xA5B6C7D8, 0x94837261 };
 
 	__asm__ __volatile__(
 			"ldr r0, =enterS \n"
 			"bx r0 \n"
 			".arm; enterS:\n"
-			"mov  r1, %[i] \n"
-			"mov  r0, %[o] \n"
-			"mov  r3, #0 \n"
-			"strb r0, [r1] \n"
-			"ldrb r2, [r1] \n"
-			"str  r2, %[u8] \n"
-			"ldrh r2, [r1] \n"
-			"str  r2, %[s8] \n"
-			"str  r3, [r1] \n"
-			"strh r0, [r1] \n"
-			"ldrh r2, [r1] \n"
-			"str  r2, %[u16] \n"
-			"strh r0, [r1, #1] \n"
-			"ldrh r2, [r1] \n"
-			"str  r3, [r1] \n"
-			"str  r2, %[u16u1] \n"
-			"str  r0, [r1] \n"
-			"ldr  r2, [r1] \n"
-			"str  r3, [r1] \n"
-			"str  r2, %[u32] \n"
-			"str  r0, [r1, #1] \n"
-			"ldr  r2, [r1] \n"
-			"str  r3, [r1] \n"
-			"str  r2, %[u32u1] \n"
-			"str  r0, [r1, #2] \n"
-			"ldr  r2, [r1] \n"
-			"str  r3, [r1] \n"
-			"str  r2, %[u32u2] \n"
-			"str  r0, [r1, #3] \n"
-			"ldr  r2, [r1] \n"
-			"str  r3, [r1] \n"
-			"str  r2, %[u32u3] \n"
+			"ldr  r3, =activeTestInfo+4 \n"
+			"mov  r1, #0 \n"
+			"strh r1, [r4] \n"
+			"ldr  r2, =0xAA55BB66 \n"
+
+			"str  r2,   [%[w]] \n"
+			"strb %[o], [%[w]] \n"
+			"ldrb r1,   [%[r]] \n"
+			"str  r1,   %[u8] \n"
+
+			"mov  r1,   #1 \n"
+			"strh r1,   [r3] \n"
+			"ldrh r1,   [%[r]] \n"
+			"str  r1,   %[u8l16] \n"
+
+			"mov  r1,    #2 \n"
+			"strh r1,   [r3] \n"
+			"str  r2,   [%[w]] \n"
+			"strh %[o], [%[w]] \n"
+			"ldrh r1,   [%[r]] \n"
+			"str  r1,   %[u16] \n"
+
+			"mov  r1, #3 \n"
+			"strh r1, [r3] \n"
+			"str  r2, [%[w]] \n"
+			"strh %[o], [%[w], #1] \n"
+			"ldrh r1, [%[r]] \n"
+			"str  r1, %[u16u1] \n"
+
+			"mov  r1, #6 \n"
+			"strh r1, [r3] \n"
+			"str  r2, [%[w]] \n"
+			"str  %[o], [%[w]] \n"
+			"ldr  r1, [%[r]] \n"
+			"str  r1, %[u32] \n"
+
+			"mov  r1, #7 \n"
+			"strh r1, [r3] \n"
+			"str  r2, [%[w]] \n"
+			"str  %[o], [%[w], #1] \n"
+			"ldr  r1, [%[r]] \n"
+			"str  r1, %[u32u1] \n"
+
+			"mov  r1, #8 \n"
+			"strh r1, [r3] \n"
+			"str  r2, [%[w]] \n"
+			"str  %[o], [%[w], #2] \n"
+			"ldr  r1, [%[r]] \n"
+			"str  r1, %[u32u2] \n"
+
+			"mov  r1, #9 \n"
+			"strh r1, [r3] \n"
+			"str  r2, [%[w]] \n"
+			"str  %[o], [%[w], #3] \n"
+			"ldr  r1, [%[r]] \n"
+			"str  r1, %[u32u3] \n"
+
 			"ldr  r0, =exitS \n"
 			"add  r0, #1 \n"
 			"bx r0 \n"
@@ -354,15 +457,15 @@ static void testStore(struct TestConfigurations* config, u32* base) {
 			".thumb; exitS:"
 		:
 			[u8]"=m"(config->_u8),
-			[s8]"=m"(config->_s8),
+			[u8l16]"=m"(config->_s8),
 			[u16]"=m"(config->_u16),
 			[u16u1]"=m"(config->_u16u1),
 			[u32]"=m"(config->_u32),
 			[u32u1]"=m"(config->_u32u1),
 			[u32u2]"=m"(config->_u32u2),
 			[u32u3]"=m"(config->_u32u3)
-		: [i]"r"(base), [o]"r"(fodder[0])
-		: "r0", "r1", "r2", "r3");
+		: [r]"r"(read), [w]"r"(write),[o]"r"(test[0])
+		: "r0", "r1", "r2", "r3", "memory");
 	// Clear stored DMA state
 	u32 temp;
 	DMA0COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
@@ -370,167 +473,212 @@ static void testStore(struct TestConfigurations* config, u32* base) {
 	DMA2COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
 	DMA3COPY(r2, &temp, DMA32 | DMA_IMMEDIATE | 1);
 
-	DMA0COPY(fodder, base, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d0_16 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA0COPY(fodder, (u8*) base + 1, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d0_16u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA0COPY(fodder, base, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d0_32 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA0COPY(fodder, (u8*) base + 1, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d0_32u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA0COPY(fodder, (u8*) base + 2, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d0_32u2 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA0COPY(fodder, (u8*) base + 3, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d0_32u3 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA1COPY(fodder, base, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d1_16 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA1COPY(fodder, (u8*) base + 1, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d1_16u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA1COPY(fodder, base, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d1_32 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA1COPY(fodder, (u8*) base + 1, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d1_32u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA1COPY(fodder, (u8*) base + 2, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d1_32u2 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA1COPY(fodder, (u8*) base + 3, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d1_32u3 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA2COPY(fodder, base, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d2_16 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA2COPY(fodder, (u8*) base + 1, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d2_16u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA2COPY(fodder, base, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d2_32 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA2COPY(fodder, (u8*) base + 1, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d2_32u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA2COPY(fodder, (u8*) base + 2, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d2_32u2 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA2COPY(fodder, (u8*) base + 3, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d2_32u3 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA3COPY(fodder, base, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d3_16 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA3COPY(fodder, (u8*) base + 1, DMA16 | DMA_IMMEDIATE | 1);
-	config->_d3_16u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA3COPY(fodder, base, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d3_32 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA3COPY(fodder, (u8*) base + 1, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d3_32u1 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA3COPY(fodder, (u8*) base + 2, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d3_32u2 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	DMA3COPY(fodder, (u8*) base + 3, DMA32 | DMA_IMMEDIATE | 1);
-	config->_d3_32u3 = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuSet(fodder, base, 8);
-	config->_c16[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuSet(fodder, base + 1, 8);
-	config->_c16u1[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuSet(fodder, base, 8 | BIT(26));
-	config->_c32[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuSet(fodder, (u8*) base + 1, 8 | BIT(26));
-	config->_c32u1[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuSet(fodder, (u8*) base + 2, 8 | BIT(26));
-	config->_c32u2[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuSet(fodder, (u8*) base + 3, 8 | BIT(26));
-	config->_c32u3[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuFastSet(fodder, base, 8);
-	config->_cf32[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuFastSet(fodder, (u8*) base + 1, 8);
-	config->_cf32u1[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuFastSet(fodder, (u8*) base + 2, 8);
-	config->_cf32u2[0] = base[0];
-	base[0] = 0;
-	base[1] = 0xBBBBBBBB;
-	CpuFastSet(fodder, (u8*) base + 3, 8);
-	config->_cf32u3[0] = base[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 10;
+	DMA0COPY(test, write, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d0_16 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 11;
+	DMA0COPY(test, (u8*) write + 1, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d0_16u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 12;
+	DMA0COPY(test, write, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d0_32 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 13;
+	DMA0COPY(test, (u8*) write + 1, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d0_32u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 14;
+	DMA0COPY(test, (u8*) write + 2, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d0_32u2 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 15;
+	DMA0COPY(test, (u8*) write + 3, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d0_32u3 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 16;
+	DMA1COPY(test, write, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d1_16 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 17;
+	DMA1COPY(test, (u8*) write + 1, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d1_16u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 18;
+	DMA1COPY(test, write, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d1_32 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 19;
+	DMA1COPY(test, (u8*) write + 1, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d1_32u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 20;
+	DMA1COPY(test, (u8*) write + 2, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d1_32u2 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 21;
+	DMA1COPY(test, (u8*) write + 3, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d1_32u3 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 22;
+	DMA2COPY(test, write, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d2_16 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 23;
+	DMA2COPY(test, (u8*) write + 1, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d2_16u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 24;
+	DMA2COPY(test, write, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d2_32 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 25;
+	DMA2COPY(test, (u8*) write + 1, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d2_32u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 26;
+	DMA2COPY(test, (u8*) write + 2, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d2_32u2 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 27;
+	DMA2COPY(test, (u8*) write + 3, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d2_32u3 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 28;
+	DMA3COPY(test, write, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d3_16 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 29;
+	DMA3COPY(test, (u8*) write + 1, DMA16 | DMA_IMMEDIATE | 1);
+	config->_d3_16u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 30;
+	DMA3COPY(test, write, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d3_32 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 31;
+	DMA3COPY(test, (u8*) write + 1, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d3_32u1 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 32;
+	DMA3COPY(test, (u8*) write + 2, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d3_32u2 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 33;
+	DMA3COPY(test, (u8*) write + 3, DMA32 | DMA_IMMEDIATE | 1);
+	config->_d3_32u3 = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 34;
+	CpuSet(test, write, 8);
+	config->_c16[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 35;
+	CpuSet(test, write + 1, 8);
+	config->_c16u1[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 36;
+	CpuSet(test, write, 8 | BIT(26));
+	config->_c32[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 37;
+	CpuSet(test, (u8*) write + 1, 8 | BIT(26));
+	config->_c32u1[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 38;
+	CpuSet(test, (u8*) write + 2, 8 | BIT(26));
+	config->_c32u2[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 39;
+	CpuSet(test, (u8*) write + 3, 8 | BIT(26));
+	config->_c32u3[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 40;
+	CpuFastSet(test, write, 8);
+	config->_cf32[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 41;
+	CpuFastSet(test, (u8*) write + 1, 8);
+	config->_cf32u1[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 42;
+	CpuFastSet(test, (u8*) write + 2, 8);
+	config->_cf32u2[0] = read[0];
+	write[0] = 0xAA55BB66;
+	write[1] = 0x88339944;
+	activeTestInfo.subtestId = 43;
+	CpuFastSet(test, (u8*) write + 3, 8);
+	config->_cf32u3[0] = read[0];
 
-	base[0] = fodder[0];
-	base[1] = fodder[1];
+	write[0] = original[0];
+	write[1] = original[1];
+	activeTestInfo.subtestId = -1;
 }
 
 static void testStoreEWRAM(struct TestConfigurations* config) {
-	testStore(config, (u32*) r2);
+	testStore(config, (u32*) r2, (u32*) r2);
 }
 
 static void testStoreEWRAMMirror(struct TestConfigurations* config) {
-	testStore(config, (u32*) ((u32) r2 | 0x00800000));
+	testStore(config, (u32*) ((u32) r2 | 0x00800000), (u32*) r2);
 }
 
 static void testStoreIWRAM(struct TestConfigurations* config) {
-	testStore(config, (u32*) r3);
+	testStore(config, (u32*) r3, (u32*) r3);
 }
 
 static void testStoreIWRAMMirror(struct TestConfigurations* config) {
-	testStore(config, (u32*) ((u32) r3 | 0x00800000));
+	testStore(config, (u32*) ((u32) r3 | 0x00800000), (u32*) r3);
 }
 
 static void testStoreROM(struct TestConfigurations* config) {
-	testStore(config, (u32*) r8);
+	testStore(config, (u32*) r8, (u32*) r8);
 }
 
 static void testStoreSRAM(struct TestConfigurations* config) {
-	testStore(config, (u32*) SRAM);
+	((u8*) SRAM)[ 0] = 0x66;
+	((u8*) SRAM)[ 1] = 0xBB;
+	((u8*) SRAM)[ 2] = 0x55;
+	((u8*) SRAM)[ 3] = 0xAA;
+	((u8*) SRAM)[ 4] = 0x44;
+	((u8*) SRAM)[ 5] = 0x99;
+	((u8*) SRAM)[ 6] = 0x33;
+	((u8*) SRAM)[ 7] = 0x88;
+	testStore(config, (u32*) SRAM, (u32*) SRAM);
 	((u8*) SRAM)[ 0] = 'G';
 	((u8*) SRAM)[ 1] = 'a';
 	((u8*) SRAM)[ 2] = 'm';
@@ -566,7 +714,15 @@ static void testStoreSRAM(struct TestConfigurations* config) {
 }
 
 static void testStoreSRAMMirror(struct TestConfigurations* config) {
-	testStore(config, (u32*) (SRAM | 0x01000000));
+	((u8*) SRAM)[ 0] = 0x66;
+	((u8*) SRAM)[ 1] = 0xBB;
+	((u8*) SRAM)[ 2] = 0x55;
+	((u8*) SRAM)[ 3] = 0xAA;
+	((u8*) SRAM)[ 4] = 0x44;
+	((u8*) SRAM)[ 5] = 0x99;
+	((u8*) SRAM)[ 6] = 0x33;
+	((u8*) SRAM)[ 7] = 0x88;
+	testStore(config, (u32*) (SRAM | 0x01000000), (u32*) SRAM);
 	((u8*) SRAM)[ 0] = 'G';
 	((u8*) SRAM)[ 1] = 'a';
 	((u8*) SRAM)[ 2] = 'm';
@@ -605,12 +761,8 @@ static void testStoreVRAM(struct TestConfigurations* config) {
 	VBlankIntrWait();
 	u16 dispcnt = REG_DISPCNT;
 	REG_DISPCNT = LCDC_OFF;
-	u16* base = (u16*) 0x0600FFE0;
-	base[0] = 0xF00D;
-	base[1] = 0x900D;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	testStore(config, (u32*) base);
+	u32* base = (u32*) 0x0600FFE0;
+	testStore(config, base, base);
 	REG_DISPCNT = dispcnt;
 }
 
@@ -618,13 +770,7 @@ static void testStoreVRAMMirror(struct TestConfigurations* config) {
 	VBlankIntrWait();
 	u16 dispcnt = REG_DISPCNT;
 	REG_DISPCNT = LCDC_OFF;
-	u16* base = (u16*) 0x0600FFE0;
-	base[0] = 0xF00D;
-	base[1] = 0x900D;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	base = (u16*) 0x0602FFE0;
-	testStore(config, (u32*) base);
+	testStore(config, (u32*) 0x0602FFE0, (u32*) 0x0600FFE0);
 	REG_DISPCNT = dispcnt;
 }
 
@@ -632,12 +778,8 @@ static void testStoreVRAM2(struct TestConfigurations* config) {
 	VBlankIntrWait();
 	u16 dispcnt = REG_DISPCNT;
 	REG_DISPCNT = LCDC_OFF;
-	u16* base = (u16*) 0x06017FE0;
-	base[0] = 0xF00D;
-	base[1] = 0x900D;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	testStore(config, (u32*) base);
+	u32* base = (u32*) 0x06017FE0;
+	testStore(config, base, base);
 	REG_DISPCNT = dispcnt;
 }
 
@@ -645,13 +787,7 @@ static void testStoreVRAM2Mirror(struct TestConfigurations* config) {
 	VBlankIntrWait();
 	u16 dispcnt = REG_DISPCNT;
 	REG_DISPCNT = LCDC_OFF;
-	u16* base = (u16*) 0x06017FE0;
-	base[0] = 0xF00D;
-	base[1] = 0x900D;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	base = (u16*) 0x0601FFE0;
-	testStore(config, (u32*) base);
+	testStore(config, (u32*) 0x0601FFE0, (u32*) 0x06017FE0);
 	REG_DISPCNT = dispcnt;
 }
 
@@ -659,64 +795,35 @@ static void testStoreVRAM2Mirror2(struct TestConfigurations* config) {
 	VBlankIntrWait();
 	u16 dispcnt = REG_DISPCNT;
 	REG_DISPCNT = LCDC_OFF;
-	u16* base = (u16*) 0x06017FE0;
-	base[0] = 0xF00D;
-	base[1] = 0x900D;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	base = (u16*) 0x06037FE0;
-	testStore(config, (u32*) base);
+	testStore(config, (u32*) 0x06037FE0, (u32*) 0x06017FE0);
 	REG_DISPCNT = dispcnt;
 }
 
 static void testStorePalette(struct TestConfigurations* config) {
 	VBlankIntrWait();
-	u16* base = (u16*) 0x050003E0;
-	base[0] = 0x1DEA;
-	base[1] = 0xABAD;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	testStore(config, (u32*) base);
+	u32* base = (u32*) 0x050003E0;
+	testStore(config, base, base);
 }
 
 static void testStorePaletteMirror(struct TestConfigurations* config) {
 	VBlankIntrWait();
-	u16* base = (u16*) 0x050003E0;
-	base[0] = 0x1DEA;
-	base[1] = 0xABAD;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	base = (u16*) 0x050007E0;
-	testStore(config, (u32*) base);
+	testStore(config, (u32*) 0x050007E0, (u32*) 0x050003E0);
 }
 
 static void testStoreOAM(struct TestConfigurations* config) {
 	VBlankIntrWait();
-	u16* base = (u16*) 0x070003E0;
-	base[0] = 0xA5ED;
-	base[1] = 0xDECE;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	testStore(config, (u32*) base);
-	base[0] = 0x0200;
-	base[1] = 0x0000;
-	base[2] = 0x0000;
-	base[3] = 0x0000;
+	u32* base = (u32*) 0x070003E0;
+	testStore(config, base, base);
+	base[0] = 0x00000200;
+	base[1] = 0x00000000;
 }
 
 static void testStoreOAMMirror(struct TestConfigurations* config) {
 	VBlankIntrWait();
-	u16* base = (u16*) 0x070003E0;
-	base[0] = 0xA5ED;
-	base[1] = 0xDECE;
-	base[2] = 0xCCCC;
-	base[3] = 0xCCCC;
-	base = (u16*) 0x070007E0;
-	testStore(config, (u32*) base);
-	base[0] = 0x0200;
-	base[1] = 0x0000;
-	base[2] = 0x0000;
-	base[3] = 0x0000;
+	u32* base = (u32*) 0x070003E0;
+	testStore(config, (u32*) 0x070007E0, base);
+	base[0] = 0x00000200;
+	base[1] = 0x00000000;
 }
 
 static const struct MemoryTest memoryTests[] = {
@@ -766,22 +873,22 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }
 	}},
 	{ "IWRAM store", testStoreIWRAM, true, {
-		0xBE, 0xBE, 0xBABE, 0xBABE, 0, 0, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		{ 0xCAFEBABE }, { 0 }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE },
-		{ 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }
+		0xD8, 0xBBD8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "IWRAM mirror store", testStoreIWRAMMirror, true, {
-		0xBE, 0xBE, 0xBABE, 0xBABE, 0, 0, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		0xBABE, 0xBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE, 0xCAFEBABE,
-		{ 0xCAFEBABE }, { 0 }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE },
-		{ 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }, { 0xCAFEBABE }
+		0xD8, 0xBBD8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "EWRAM load", testLoadEWRAM, false, {
 		0xCE, 0xFFFFFFCE, 0xFACE, 0xCE0000FA, 0xFFFFFACE, 0xFFFFFFFA, 0xFEEDFACE, 0xCEFEEDFA, 0xFACEFEED, 0xEDFACEFE,
@@ -802,22 +909,22 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }
 	}},
 	{ "EWRAM store", testStoreEWRAM, true, {
-		0xCE, 0xCE, 0xFACE, 0xFACE, 0, 0, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		{ 0xFEEDFACE }, { 0 }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE },
-		{ 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }
+		0xD8, 0xBBD8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "EWRAM mirror store", testStoreEWRAMMirror, true, {
-		0xCE, 0xCE, 0xFACE, 0xFACE, 0, 0, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
-		{ 0xFEEDFACE }, { 0 }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE },
-		{ 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }, { 0xFEEDFACE }
+		0xD8, 0xBBD8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "Palette load", testLoadPalette, false, {
 		0xEA, 0xFFFFFFEA, 0x1DEA, 0xEA00001D, 0x1DEA, 0x1D, 0xABAD1DEA, 0xEAABAD1D, 0x1DEAABAD, 0xAD1DEAAB,
@@ -838,22 +945,22 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }
 	}},
 	{ "Palette store", testStorePalette, true, {
-		0xEA, 0xEAEA, 0x1DEA, 0x1DEA, 0, 0, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		{ 0xABAD1DEA }, { 0 }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA },
-		{ 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }
+		0xD8, 0xD8D8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "Palette mirror store", testStorePaletteMirror, true, {
-		0xEA, 0xEAEA, 0x1DEA, 0x1DEA, 0, 0, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		0x1DEA, 0x1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA, 0xABAD1DEA,
-		{ 0xABAD1DEA }, { 0 }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA },
-		{ 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }, { 0xABAD1DEA }
+		0xD8, 0xD8D8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "VRAM load", testLoadVRAM, false, {
 		0xD, 0xD, 0xF00D, 0xD0000F0, 0xFFFFF00D, 0xFFFFFFF0, 0x900DF00D, 0x0D900DF0, 0xF00D900D, 0xDF00D90,
@@ -901,49 +1008,49 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }
 	}},
 	{ "VRAM store", testStoreVRAM, true, {
-		0xD, 0xD0D, 0xF00D, 0xF00D, 0, 0, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		{ 0x900DF00D }, { 0 }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D },
-		{ 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }
+		0xD8, 0xD8D8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "VRAM mirror store", testStoreVRAMMirror, true, {
-		0xD, 0xD0D, 0xF00D, 0xF00D, 0, 0, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		{ 0x900DF00D }, { 0 }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D },
-		{ 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }
+		0xD8, 0xD8D8, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "VRAM OBJ store", testStoreVRAM2, true, {
-		0, 0, 0xF00D, 0xF00D, 0, 0, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		{ 0x900DF00D }, { 0 }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D },
-		{ 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }
+		0x66, 0xBB66, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "VRAM OBJ mirror store", testStoreVRAM2Mirror, true, {
-		0, 0, 0xF00D, 0xF00D, 0, 0, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		{ 0x900DF00D }, { 0 }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D },
-		{ 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }
+		0x66, 0xBB66, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "VRAM OBJ mirror 2 store", testStoreVRAM2Mirror2, true, {
-		0, 0, 0xF00D, 0xF00D, 0, 0, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		0xF00D, 0xF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D, 0x900DF00D,
-		{ 0x900DF00D }, { 0 }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D },
-		{ 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }, { 0x900DF00D }
+		0x66, 0xBB66, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "OAM load", testLoadOAM, false, {
 		0xED, 0xFFFFFFED, 0xA5ED, 0xED0000A5, 0xFFFFA5ED, 0xFFFFFFA5, 0xDECEA5ED, 0xEDDECEA5, 0xA5EDDECE, 0xCEA5EDDE,
@@ -964,22 +1071,22 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }
 	}},
 	{ "OAM store", testStoreOAM, true, {
-		0, 0, 0xA5ED, 0xA5ED, 0, 0, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		{ 0xDECEA5ED }, { 0 }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED },
-		{ 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }
+		0x66, 0xBB66, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "OAM mirror store", testStoreOAMMirror, true, {
-		0, 0, 0xA5ED, 0xA5ED, 0, 0, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		0xA5ED, 0xA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED, 0xDECEA5ED,
-		{ 0xDECEA5ED }, { 0 }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED },
-		{ 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }, { 0xDECEA5ED }
+		0x66, 0xBB66, 0xC7D8, 0xC7D8, 0, 0, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		0xAA55C7D8, 0xAA55C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8, 0xA5B6C7D8,
+		{ 0xA5B6C7D8 }, { 0xAA55BB66 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 },
+		{ 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }, { 0xA5B6C7D8 }
 	}},
 	{ "SRAM load", testLoadSRAM, false, {
 		0x47, 0x47, 0x4747, 0x61000061, 0x4747, 0x61, 0x47474747, 0x61616161, 0x6D6D6D6D, 0x65656565,
@@ -1000,22 +1107,22 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0x47474747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 }
 	}},
 	{ "SRAM store", testStoreSRAM, true, {
-		0x47, 0x4747, 0x4747, 0x4747, 0, 0, 0x47474747, 0, 0, 0,
-		0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0,
-		0x47474747, 0x47474747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
-		{ 0x47474747 }, { 0 }, { 0x47474747 }, { 0 }, { 0 }, { 0 },
-		{ 0x47474747 }, { 0 }, { 0 }, { 0 }
+		0xD8, 0xD8D8, 0xD8D8, 0x6666, 0x66666666, 0x66666666, 0xD8D8D8D8, 0x66666666, 0x66666666, 0x66666666,
+		0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666,
+		0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666,
+		0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666,
+		0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8,
+		{ 0xD8D8D8D8 }, { 0x66666666 }, { 0xD8D8D8D8 }, { 0x66666666 }, { 0x66666666 }, { 0x66666666 },
+		{ 0xD8D8D8D8 }, { 0x66666666 }, { 0x66666666 }, { 0x66666666 }
 	}},
 	{ "SRAM mirror store", testStoreSRAMMirror, true, {
-		0x47, 0x4747, 0x4747, 0x4747, 0, 0, 0x47474747, 0, 0, 0,
-		0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0,
-		0x47474747, 0x47474747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
-		{ 0x47474747 }, { 0 }, { 0x47474747 }, { 0 }, { 0 }, { 0 },
-		{ 0x47474747 }, { 0 }, { 0 }, { 0 }
+		0xD8, 0xD8D8, 0xD8D8, 0x6666, 0x66666666, 0x66666666, 0xD8D8D8D8, 0x66666666, 0x66666666, 0x66666666,
+		0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666,
+		0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666,
+		0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666, 0x66666666,
+		0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8, 0xD8D8D8D8,
+		{ 0xD8D8D8D8 }, { 0x66666666 }, { 0xD8D8D8D8 }, { 0x66666666 }, { 0x66666666 }, { 0x66666666 },
+		{ 0xD8D8D8D8 }, { 0x66666666 }, { 0x66666666 }, { 0x66666666 }
 	}},
 	{ "BIOS load", testLoadBIOS, false, {
 		0x4, 0x4, 0x2004, 0x04000020, 0x2004, 0x20, 0xE3A02004, 0x4E3A020, 0x2004E3A0, 0xA02004E3,
@@ -1027,7 +1134,7 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0 }, { 0 }, { 0 }, { 0 }
 	}},
 	{ "BIOS out-of-bounds load", testLoadBIOSBad, false, {
-		0xB0, 0xFFFFFFB1, 0xC0F0, 0xF1000070, 0x6000, 0x10, 0xE5902002, 0x3E59030, 0x8E59F, 0x800001E2,
+		0x01, 0x02, 0x2003, 0x04000020, 0x2005, 0x20, 0xE3A02007, 0x08E3A020, 0x2009E3A0, 0x9F000CE5,
 		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
 		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
 		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
@@ -1036,7 +1143,7 @@ static const struct MemoryTest memoryTests[] = {
 		{ 0 }, { 0 }, { 0 }, { 0 }
 	}},
 	{ "Out-of-bounds load", testLoadBad, false, {
-		0xB0, 0xFFFFFFB1, 0xC0F0, 0xF1000070, 0x6000, 0x10, 0xE5902002, 0x3E59030, 0x8E59F, 0x800001E2,
+		0x01, 0x02, 0x2003, 0x04000020, 0x2005, 0x20, 0xE3A02007, 0x08E3A020, 0x2009E3A0, 0x9F000CE5,
 		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
 		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
 		0xFACE, 0xFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE, 0xFEEDFACE,
@@ -1151,6 +1258,7 @@ static void runMemorySuite(void) {
 		struct TestConfigurations currentTest = {0};
 		REG_IME = 0;
 		VBlankIntrWait();
+		activeTestInfo.testId = i;
 		activeTest = &memoryTests[i];
 		activeTest->test(&currentTest);
 		REG_IME = 1;
@@ -1207,12 +1315,14 @@ static void runMemorySuite(void) {
 		doResult("swi C 32 (unaligned 2)", activeTest->testName, currentTest._cf32u2[0], activeTest->expected._cf32u2[0]);
 		doResult("swi C 32 (unaligned 3)", activeTest->testName, currentTest._cf32u3[0], activeTest->expected._cf32u3[0]);
 	}
+	activeTestInfo.testId = -1;
 }
 
 static void showMemorySuite(size_t index) {
 	const struct MemoryTest* activeTest = &memoryTests[index];
 	struct TestConfigurations currentTest = {0};
 	size_t resultIndex = 0;
+	activeTestInfo.testId = index;
 	while (1) {
 		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
@@ -1236,6 +1346,7 @@ static void showMemorySuite(size_t index) {
 		printResults(activeTest->testName, &currentTest, &activeTest->expected, resultIndex, activeTest->store);
 		updateTextGrid();
 	}
+	activeTestInfo.testId = -1;
 }
 
 const struct TestSuite memoryTestSuite = {
