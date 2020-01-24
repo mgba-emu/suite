@@ -117,18 +117,18 @@ static void printResult(int offset, int line, const char* preface, s32 value, u3
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s: %08X (%X)", preface, value, cpsr >> 28);
+	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s: %08lX (%lX)", preface, value, cpsr >> 28);
 	if (value == expected && cpsr == expectedCpsr) {
 		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line + 1 - offset) + 3], 16, "!= %08X (%X)", expected, expectedCpsr >> 28);
+		snprintf(&textGrid[base + 32 * (line + 1 - offset) + 3], 16, "!= %08lX (%lX)", expected, expectedCpsr >> 28);
 	}
 }
 
 static void doResult(const char* preface, const char* testName, s32 value, u32 cpsr, s32 expected, u32 expectedCpsr) {
 	if (value != expected || cpsr != expectedCpsr) {
 		debugprintf("FAIL: %s %s", testName, preface);
-		savprintf("%s: Got %08X (CSPR %X) vs %08X (CSPR %X): FAIL", preface, value, cpsr >> 28, expected, expectedCpsr >> 28);
+		savprintf("%s: Got %08lX (CSPR %lX) vs %08lX (CSPR %lX): FAIL", preface, value, cpsr >> 28, expected, expectedCpsr >> 28);
 	} else {
 		debugprintf("PASS: %s %s", testName, preface);
 		++passes;
