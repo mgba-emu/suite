@@ -42,9 +42,12 @@ static void testIrq(void) {
 IWRAM_CODE
 __attribute__((noinline))
 static void runTest(struct TimerIRQTest* test) {
+	REG_IME = 0;
+	irqInit();
 	irqSet(IRQ_TIMER0, testIrq);
-	irqDisable(IRQ_VBLANK);
-	irqEnable(IRQ_TIMER0);
+	int ie = REG_IE;
+	REG_IE = IRQ_TIMER0;
+	REG_IME = 1;
 
 	__asm__ volatile("ldr r0, =0f \n"
 		"bx r0 \n"
@@ -260,8 +263,9 @@ static void runTest(struct TimerIRQTest* test) {
 		:
 		: [result]"r"(test->results), [timer]"r"(test->timer)
 		: "r0", "r1", "r2", "r3", "r4", "r5", "memory");
-	irqDisable(IRQ_TIMER0);
-	irqEnable(IRQ_VBLANK);
+	REG_IME = 0;
+	REG_IE = ie;
+	REG_IME = 1;
 }
 
 static void printResult(int offset, int line, const char* preface, uint16_t value, uint16_t expected) {

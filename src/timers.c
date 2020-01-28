@@ -437,9 +437,12 @@ static void testIrq(void) {
 IWRAM_CODE
 __attribute__((noinline))
 static void runTest(struct TimerTest* test) {
+	REG_IME = 0;
+	irqInit();
 	irqSet(IRQ_TIMER0, testIrq);
-	irqDisable(IRQ_VBLANK);
-	irqEnable(IRQ_TIMER0);
+	int ie = REG_IE;
+	REG_IE = IRQ_TIMER0;
+	REG_IME = 1;
 
 	int d, i;
 	for (d = 0; d < DELAYS; ++d) {
@@ -530,8 +533,9 @@ static void runTest(struct TimerTest* test) {
 		}
 	}
 
-	irqDisable(IRQ_TIMER0);
-	irqEnable(IRQ_VBLANK);
+	REG_IME = 0;
+	REG_IE = ie;
+	REG_IME = 1;
 }
 
 static void printResultLine(int offset, int line, const char* preface, const char* p2, u32 value, u32 expected) {
