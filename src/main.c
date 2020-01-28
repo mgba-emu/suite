@@ -16,13 +16,14 @@
 #include "carry.h"
 #include "dma.h"
 #include "font.h"
+#include "io-read.h"
+#include "memory.h"
+#include "misc-edge.h"
+#include "shifter.h"
+#include "suite.h"
 #include "timing.h"
 #include "timer-irq.h"
 #include "timers.h"
-#include "memory.h"
-#include "io-read.h"
-#include "shifter.h"
-#include "suite.h"
 #include "video.h"
 
 u16* textBase = (u16*) VRAM;
@@ -51,6 +52,7 @@ const struct TestSuite* const suites[] = {
 	&carryTestSuite,
 	&biosMathTestSuite,
 	&dmaTestSuite,
+	&miscEdgeTestSuite,
 	&videoTestSuite
 };
 
