@@ -230,7 +230,6 @@ static void runMathSuite(void) {
 	int i;
 	for (i = 0; i < nMathTests; ++i) {
 		struct TestMath currentTest = {0};
-		VBlankIntrWait();
 		activeTest = &mathTests[i];
 		memcpy(&currentTest, &activeTest->expected, sizeof(currentTest));
 		activeTestInfo.testId = i;

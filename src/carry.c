@@ -154,7 +154,6 @@ static void runCarrySuite(void) {
 	int i;
 	for (i = 0; i < nCarryTests; ++i) {
 		struct TestCarry currentTest = {0};
-		VBlankIntrWait();
 		activeTest = &carryTests[i];
 		memcpy(&currentTest, &activeTest->expected, sizeof(currentTest));
 		activeTestInfo.testId = i;
