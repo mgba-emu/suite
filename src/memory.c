@@ -77,6 +77,41 @@ struct MemoryTest {
 	struct TestConfigurations expected;
 };
 
+static void fixSRAM(void) {
+	((u8*) SRAM)[ 0] = 'G';
+	((u8*) SRAM)[ 1] = 'a';
+	((u8*) SRAM)[ 2] = 'm';
+	((u8*) SRAM)[ 3] = 'e';
+	((u8*) SRAM)[ 4] = ' ';
+	((u8*) SRAM)[ 5] = 'B';
+	((u8*) SRAM)[ 6] = 'o';
+	((u8*) SRAM)[ 7] = 'y';
+	((u8*) SRAM)[ 8] = ' ';
+	((u8*) SRAM)[ 9] = 'A';
+	((u8*) SRAM)[10] = 'd';
+	((u8*) SRAM)[11] = 'v';
+	((u8*) SRAM)[12] = 'a';
+	((u8*) SRAM)[13] = 'n';
+	((u8*) SRAM)[14] = 'c';
+	((u8*) SRAM)[15] = 'e';
+	((u8*) SRAM)[16] = ' ';
+	((u8*) SRAM)[17] = 'T';
+	((u8*) SRAM)[18] = 'e';
+	((u8*) SRAM)[19] = 's';
+	((u8*) SRAM)[20] = 't';
+	((u8*) SRAM)[21] = ' ';
+	((u8*) SRAM)[22] = 'S';
+	((u8*) SRAM)[23] = 'u';
+	((u8*) SRAM)[24] = 'i';
+	((u8*) SRAM)[25] = 't';
+	((u8*) SRAM)[26] = 'e';
+	((u8*) SRAM)[27] = '\n';
+	((u8*) SRAM)[28] = '=';
+	((u8*) SRAM)[29] = '=';
+	((u8*) SRAM)[30] = '=';
+	((u8*) SRAM)[31] = '\n';
+}
+
 __attribute__((noinline))
 static void testLoad(struct TestConfigurations* config, u8* base) {
 	__asm__ __volatile__(
@@ -253,10 +288,12 @@ static void testLoadROM(struct TestConfigurations* config) {
 }
 
 static void testLoadSRAM(struct TestConfigurations* config) {
+	fixSRAM();
 	testLoad(config, (u8*) SRAM);
 }
 
 static void testLoadSRAMMirror(struct TestConfigurations* config) {
+	fixSRAM();
 	testLoad(config, (u8*) (SRAM | 0x01000000));
 }
 
@@ -679,38 +716,7 @@ static void testStoreSRAM(struct TestConfigurations* config) {
 	((u8*) SRAM)[ 6] = 0x33;
 	((u8*) SRAM)[ 7] = 0x88;
 	testStore(config, (u32*) SRAM, (u32*) SRAM);
-	((u8*) SRAM)[ 0] = 'G';
-	((u8*) SRAM)[ 1] = 'a';
-	((u8*) SRAM)[ 2] = 'm';
-	((u8*) SRAM)[ 3] = 'e';
-	((u8*) SRAM)[ 4] = ' ';
-	((u8*) SRAM)[ 5] = 'B';
-	((u8*) SRAM)[ 6] = 'o';
-	((u8*) SRAM)[ 7] = 'y';
-	((u8*) SRAM)[ 8] = ' ';
-	((u8*) SRAM)[ 9] = 'A';
-	((u8*) SRAM)[10] = 'd';
-	((u8*) SRAM)[11] = 'v';
-	((u8*) SRAM)[12] = 'a';
-	((u8*) SRAM)[13] = 'n';
-	((u8*) SRAM)[14] = 'c';
-	((u8*) SRAM)[15] = 'e';
-	((u8*) SRAM)[16] = ' ';
-	((u8*) SRAM)[17] = 'T';
-	((u8*) SRAM)[18] = 'e';
-	((u8*) SRAM)[19] = 's';
-	((u8*) SRAM)[20] = 't';
-	((u8*) SRAM)[21] = ' ';
-	((u8*) SRAM)[22] = 'S';
-	((u8*) SRAM)[23] = 'u';
-	((u8*) SRAM)[24] = 'i';
-	((u8*) SRAM)[25] = 't';
-	((u8*) SRAM)[26] = 'e';
-	((u8*) SRAM)[27] = '\n';
-	((u8*) SRAM)[28] = '=';
-	((u8*) SRAM)[29] = '=';
-	((u8*) SRAM)[30] = '=';
-	((u8*) SRAM)[31] = '\n';
+	fixSRAM();
 }
 
 static void testStoreSRAMMirror(struct TestConfigurations* config) {
@@ -723,38 +729,7 @@ static void testStoreSRAMMirror(struct TestConfigurations* config) {
 	((u8*) SRAM)[ 6] = 0x33;
 	((u8*) SRAM)[ 7] = 0x88;
 	testStore(config, (u32*) (SRAM | 0x01000000), (u32*) SRAM);
-	((u8*) SRAM)[ 0] = 'G';
-	((u8*) SRAM)[ 1] = 'a';
-	((u8*) SRAM)[ 2] = 'm';
-	((u8*) SRAM)[ 3] = 'e';
-	((u8*) SRAM)[ 4] = ' ';
-	((u8*) SRAM)[ 5] = 'B';
-	((u8*) SRAM)[ 6] = 'o';
-	((u8*) SRAM)[ 7] = 'y';
-	((u8*) SRAM)[ 8] = ' ';
-	((u8*) SRAM)[ 9] = 'A';
-	((u8*) SRAM)[10] = 'd';
-	((u8*) SRAM)[11] = 'v';
-	((u8*) SRAM)[12] = 'a';
-	((u8*) SRAM)[13] = 'n';
-	((u8*) SRAM)[14] = 'c';
-	((u8*) SRAM)[15] = 'e';
-	((u8*) SRAM)[16] = ' ';
-	((u8*) SRAM)[17] = 'T';
-	((u8*) SRAM)[18] = 'e';
-	((u8*) SRAM)[19] = 's';
-	((u8*) SRAM)[20] = 't';
-	((u8*) SRAM)[21] = ' ';
-	((u8*) SRAM)[22] = 'S';
-	((u8*) SRAM)[23] = 'u';
-	((u8*) SRAM)[24] = 'i';
-	((u8*) SRAM)[25] = 't';
-	((u8*) SRAM)[26] = 'e';
-	((u8*) SRAM)[27] = '\n';
-	((u8*) SRAM)[28] = '=';
-	((u8*) SRAM)[29] = '=';
-	((u8*) SRAM)[30] = '=';
-	((u8*) SRAM)[31] = '\n';
+	fixSRAM();
 }
 
 static void testStoreVRAM(struct TestConfigurations* config) {
