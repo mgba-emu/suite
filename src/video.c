@@ -473,6 +473,8 @@ static void showVideoSuite(size_t index) {
 		}
 	}
 	// Clean up
+	uint32_t zero = 0;
+	CpuFastSet(&zero, (u32*) VRAM, FILL | COPY32 | 0x6000);
 	BG_PALETTE[0] = 0x7FFF;
 	BG_PALETTE[1] = 0;
 	DMA3COPY(fontTiles, TILE_BASE_ADR(1), DMA16 | DMA_IMMEDIATE | (fontTilesLen >> 1));
@@ -480,6 +482,7 @@ static void showVideoSuite(size_t index) {
 	REG_DISPCNT = dispcnt;
 	REG_DISPSTAT &= ~0x0030;
 	irqDisable(IRQ_VCOUNT);
+	irqInit();
 }
 
 const struct TestSuite videoTestSuite = {
