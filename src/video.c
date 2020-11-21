@@ -14,8 +14,9 @@
 #include "font.h"
 #include "suite.h"
 
-#include "videotest.h"
+#include "actual.h"
 #include "degenerateObjTransform.h"
+#include "expected.h"
 
 struct VideoTest {
 	const char* testName;
