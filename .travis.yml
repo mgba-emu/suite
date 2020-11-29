@@ -1,0 +1,21 @@
+language: c
+services:
+- docker
+install:
+- docker pull devkitpro/devkitarm
+script:
+- ./docker-build.sh
+deploy:
+  provider: s3
+  access_key_id: AKIAUKXOZ2TTAU6PMLUU
+  secret_access_key:
+    secure: B4H3XmOjUT8SW2CoK6ixqbX5P0iLIq4KmJwj0mlK0XwrMH+7Y4kaXoBtv991g5gRxgH9SN8svPTu91EW3cRDgCOUr1g3XKQxCOiw3DU7V+66pwZFQUjZIYHfkKwJLHJN5YCB/1V5zdEah8DOlgkk5NG8ZjYdm6Qloqy1dqfFNlejAziUcHc+20dRDqaU3O4CcOUI4dy6AY1uOhZgIXbyGQPVbjdiB5lKJS8CbzOwWt6zDbh+3sJMnSK1qznX+M0IIGw5mwrC8F0ql8ilAN6qdR3yOFgbSwukrgdyA0Zt1F75rq4dmjbC0hhKK9IJTOkXD69BCdsdVtMjBHPDGOCu+QO0WuYWoHsexpZMjhG1fmgDvwW/Bh9Pf2baPxj4M1aP37K251WxmsZLeB2+ij/yWudUaUsNXw24PfEFaos50Ip3YeOxoBmOOe0PtqYQlBwDelgPNE6raC+0FOYPUlWdf+XSMKsiALMCpOD9C/IJ/ZaYP2yh9QLQGIxWhbw0tiIYOiyDqFYr1XyrvkwroGu6cic8PiBygUE1hLSihLFTo0q4bNR/EqsQhMnsso+rJb5CK6zk7JDHA0s5gt6arwLxJq/z9UbUwcZJlKM4lti22cGocLPYa3ZWV3JeqYV7HSTvs4M/T/ECiwFFonWQTEQWbjEqrnSkQg8OEua+pRX6cdM=
+  bucket: mgba
+  local_dir: deploy
+  upload_dir: tests
+  detect_encoding: true
+  acl: public_read
+  skip_cleanup: true
+  cleanup: false
+  on:
+    branch: master

@@ -1,4 +1,6 @@
 build
+deploy
 *.elf
 *.gba
 *.sav
+*.zip
