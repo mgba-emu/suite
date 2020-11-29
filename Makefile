@@ -163,6 +163,9 @@ $(OUTPUT).elf	:	$(OFILES)
 #---------------------------------------------------------------------------------
 	grit -ff $< -fts -o$*
 
+# This is needed to keep gmake from deleting the output of grit
+.PRECIOUS: %.s %.h
+
 -include $(DEPENDS)
 
 #---------------------------------------------------------------------------------
