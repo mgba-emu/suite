@@ -19,6 +19,7 @@
 #include "io-read.h"
 #include "memory.h"
 #include "misc-edge.h"
+#include "multiply-long.h"
 #include "shifter.h"
 #include "suite.h"
 #include "timing.h"
@@ -50,6 +51,7 @@ const struct TestSuite* const suites[] = {
 	&timerIRQTestSuite,
 	&shifterTestSuite,
 	&carryTestSuite,
+	&multiplyLongTestSuite,
 	&biosMathTestSuite,
 	&dmaTestSuite,
 	&miscEdgeTestSuite,
