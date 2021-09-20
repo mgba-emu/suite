@@ -457,7 +457,6 @@ static void runTest(struct TimerTest* test) {
 				"ldr r5, =0x0C3FFFE \n"
 				"ldr r6, =irqCounter \n"
 				"ldr r3, =activeTestInfo+4 \n"
-				"mov r8, r3 \n"
 
 				"mov r0, #0 \n"
 				"strh r0, [r3] \n"
@@ -482,7 +481,6 @@ static void runTest(struct TimerTest* test) {
 				"str r0, [%[result], #0] \n"
 				"strh r2, [%[result], #8] \n"
 
-				"mov r3, r8 \n"
 				"mov r0, #1 \n"
 				"strh r0, [r3] \n"
 				"str r5, [r4] \n"
@@ -521,7 +519,7 @@ static void runTest(struct TimerTest* test) {
 				"str r0, [%[result], #4] \n"
 				"strh r2, [%[result], #10] \n"
 				"ldr r0, =0xFFFF \n"
-				"strh r0, [r7] \n"
+				"strh r0, [r3] \n"
 				"ldr r0, =2f \n"
 				"add r0, #1 \n"
 				"bx r0 \n"
@@ -529,7 +527,7 @@ static void runTest(struct TimerTest* test) {
 				".thumb; 2:"
 				:
 				: [result]"r"(result), [timer]"r"(test->timer), [delay]"r"(dd), [irqs]"r"(ii)
-				: "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r8", "memory");
+				: "r0", "r1", "r2", "r3", "r4", "r5", "r6", "memory");
 		}
 	}
 
