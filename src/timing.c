@@ -118,6 +118,26 @@ void testSmlal6(struct TestTimings*);
 void testSmlal7(struct TestTimings*);
 void testSmlal8(struct TestTimings*);
 void testSmlal9(struct TestTimings*);
+void testUmull0(struct TestTimings*);
+void testUmull1(struct TestTimings*);
+void testUmull2(struct TestTimings*);
+void testUmull3(struct TestTimings*);
+void testUmull4(struct TestTimings*);
+void testUmull5(struct TestTimings*);
+void testUmull6(struct TestTimings*);
+void testUmull7(struct TestTimings*);
+void testUmull8(struct TestTimings*);
+void testUmull9(struct TestTimings*);
+void testUmlal0(struct TestTimings*);
+void testUmlal1(struct TestTimings*);
+void testUmlal2(struct TestTimings*);
+void testUmlal3(struct TestTimings*);
+void testUmlal4(struct TestTimings*);
+void testUmlal5(struct TestTimings*);
+void testUmlal6(struct TestTimings*);
+void testUmlal7(struct TestTimings*);
+void testUmlal8(struct TestTimings*);
+void testUmlal9(struct TestTimings*);
 void testB(struct TestTimings*);
 void testNopB(struct TestTimings*);
 void testBx(struct TestTimings*);
@@ -478,24 +498,24 @@ static const struct TimingTest timingTests[] = {
 		8, 3,
 	} },
 	{ "smull #0x00005678, #0xFF", testSmull2, TEST_ARM, {
-		10, 6, 9, 6, 9, 4, 8, 4,
-		8, 3,
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
 	} },
 	{ "smull #0x00345678, #0xFF", testSmull3, TEST_ARM, {
-		10, 6, 9, 6, 9, 4, 8, 4,
-		8, 3,
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
 	} },
 	{ "smull #0x12345678, #0xFF", testSmull4, TEST_ARM, {
-		10, 6, 9, 6, 9, 4, 8, 4,
-		8, 3,
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
 	} },
 	{ "smull #0xFF000000, #0xFF", testSmull5, TEST_ARM, {
-		10, 6, 9, 6, 9, 4, 8, 4,
-		8, 3,
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
 	} },
 	{ "smull #0xFFFF0000, #0xFF", testSmull6, TEST_ARM, {
-		10, 6, 9, 6, 9, 4, 8, 4,
-		8, 3,
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
 	} },
 	{ "smull #0xFFFFFF00, #0xFF", testSmull7, TEST_ARM, {
 		10, 6, 9, 6, 9, 4, 8, 4,
@@ -518,24 +538,24 @@ static const struct TimingTest timingTests[] = {
 		9, 4,
 	} },
 	{ "smlal #0x00005678, #0xFF", testSmlal2, TEST_ARM, {
-		11, 6, 10, 6, 10, 4, 9, 4,
-		9, 4,
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
 	} },
 	{ "smlal #0x00345678, #0xFF", testSmlal3, TEST_ARM, {
-		11, 6, 10, 6, 10, 4, 9, 4,
-		9, 4,
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
 	} },
 	{ "smlal #0x12345678, #0xFF", testSmlal4, TEST_ARM, {
-		11, 6, 10, 6, 10, 4, 9, 4,
-		9, 4,
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
 	} },
 	{ "smlal #0xFF000000, #0xFF", testSmlal5, TEST_ARM, {
-		11, 6, 10, 6, 10, 4, 9, 4,
-		9, 4,
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
 	} },
 	{ "smlal #0xFFFF0000, #0xFF", testSmlal6, TEST_ARM, {
-		11, 6, 10, 6, 10, 4, 9, 4,
-		9, 4,
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
 	} },
 	{ "smlal #0xFFFFFF00, #0xFF", testSmlal7, TEST_ARM, {
 		11, 6, 10, 6, 10, 4, 9, 4,
@@ -548,6 +568,86 @@ static const struct TimingTest timingTests[] = {
 	{ "smlal #0xFFFFFFFF, #0x00", testSmlal9, TEST_ARM, {
 		11, 6, 10, 6, 10, 4, 9, 4,
 		9, 4,
+	} },
+	{ "umull #0x00000000, #0xFF", testUmull0, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "umull #0x00000078, #0xFF", testUmull1, TEST_ARM, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+	} },
+	{ "umull #0x00005678, #0xFF", testUmull2, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "umull #0x00345678, #0xFF", testUmull3, TEST_ARM, {
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
+	} },
+	{ "umull #0x12345678, #0xFF", testUmull4, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umull #0xFF000000, #0xFF", testUmull5, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umull #0xFFFF0000, #0xFF", testUmull6, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umull #0xFFFFFF00, #0xFF", testUmull7, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umull #0xFFFFFFFF, #0xFF", testUmull8, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umull #0xFFFFFFFF, #0x00", testUmull9, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umlal #0x00000000, #0xFF", testUmlal0, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "umlal #0x00000078, #0xFF", testUmlal1, TEST_ARM, {
+		11, 6, 10, 6, 10, 4, 9, 4,
+		9, 4,
+	} },
+	{ "umlal #0x00005678, #0xFF", testUmlal2, TEST_ARM, {
+		12, 6, 11, 6, 11, 5, 10, 5,
+		10, 5,
+	} },
+	{ "umlal #0x00345678, #0xFF", testUmlal3, TEST_ARM, {
+		13, 6, 12, 6, 12, 6, 11, 6,
+		11, 6,
+	} },
+	{ "umlal #0x12345678, #0xFF", testUmlal4, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
+	} },
+	{ "umlal #0xFF000000, #0xFF", testUmlal5, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
+	} },
+	{ "umlal #0xFFFF0000, #0xFF", testUmlal6, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
+	} },
+	{ "umlal #0xFFFFFF00, #0xFF", testUmlal7, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
+	} },
+	{ "umlal #0xFFFFFFFF, #0xFF", testUmlal8, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
+	} },
+	{ "umlal #0xFFFFFFFF, #0x00", testUmlal9, TEST_ARM, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
 	} },
 	{ "b pc", testB, TEST_ARM | TEST_THUMB, {
 		26, 26, 25, 25, 19, 19, 18, 18,
