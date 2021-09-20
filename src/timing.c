@@ -52,9 +52,9 @@ void testNopLdrhRom(struct TestTimings*);
 void testLdrRom(struct TestTimings*);
 void testLdrRomNop(struct TestTimings*);
 void testNopLdrRom(struct TestTimings*);
-void testLdrh(struct TestTimings*);
-void testLdrhNop(struct TestTimings*);
-void testNopLdrh(struct TestTimings*);
+void testLdr(struct TestTimings*);
+void testLdrNop(struct TestTimings*);
+void testNopLdr(struct TestTimings*);
 void testStrh(struct TestTimings*);
 void testStrhNop(struct TestTimings*);
 void testNopStrhNop(struct TestTimings*);
@@ -218,6 +218,24 @@ static const struct TimingTest timingTests[] = {
 		18, 8,
 		14, 14, 12, 12, 13, 13, 11, 11,
 		12, 8
+	} },
+		{ "ldr r2, [sp]", testLdr, TEST_ARM | TEST_THUMB, {
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 3,
+		7, 3, 6, 3, 7, 3, 6, 3,
+		5, 3
+	} },
+	{ "ldr r2, [sp] / nop", testLdrNop, TEST_ARM | TEST_THUMB, {
+		16, 12, 15, 12, 13, 8, 12, 8,
+		14, 4,
+		10, 6, 9, 6, 9, 4, 8, 4,
+		8, 4
+	} },
+	{ "nop / ldr r2, [sp]", testNopLdr, TEST_ARM | TEST_THUMB, {
+		16, 12, 15, 12, 13, 8, 12, 8,
+		14, 4,
+		10, 6, 9, 6, 9, 5, 8, 5,
+		8, 4
 	} },
 	{ "ldr r2, [#0x08000000]", testLdrRom, TEST_ARM | TEST_THUMB, {
 		17, 17, 15, 15, 15, 15, 13, 13,
