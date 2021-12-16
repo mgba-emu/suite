@@ -72,6 +72,11 @@ void testLdmia6(struct TestTimings*);
 void testLdmia1x2(struct TestTimings*);
 void testLdmia2x2(struct TestTimings*);
 void testLdmia6x2(struct TestTimings*);
+void testLdmiaOverflow1OamToRom(struct TestTimings*);
+void testLdmiaOverflow2OamToRom(struct TestTimings*);
+void testLdmiaOverflow3OamToRom(struct TestTimings*);
+void testLdmiaOverflow4OamToRom(struct TestTimings*);
+void testLdmiaOverflow5OamToRom(struct TestTimings*);
 void testStmia1(struct TestTimings*);
 void testStmia2(struct TestTimings*);
 void testStmia6(struct TestTimings*);
@@ -388,6 +393,36 @@ static const struct TimingTest timingTests[] = {
 	{ "stmia sp, {r2-r7} x2", testStmia6x2, TEST_ARM, {
 		28, 14, 26, 14, 26, 14, 24, 14,
 		24, 14
+	} },
+	{ "ldmia [#0x07FFFFFC], {r2-r7}", testLdmiaOverflow1OamToRom, TEST_ARM | TEST_THUMB, {
+		36, 36, 34, 34, 28, 29, 26, 27,
+		34, 29,
+		33, 33, 31, 31, 26, 27, 24, 25,
+		31, 29
+	} },
+	{ "ldmia [#0x07FFFFF8], {r2-r7}", testLdmiaOverflow2OamToRom, TEST_ARM | TEST_THUMB, {
+		31, 32, 29, 30, 25, 25, 23, 23,
+		29, 24,
+		28, 29, 26, 27, 23, 23, 21, 21,
+		26, 24
+	} },
+	{ "ldmia [#0x07FFFFF4], {r2-r7}", testLdmiaOverflow3OamToRom, TEST_ARM | TEST_THUMB, {
+		26, 26, 24, 24, 22, 23, 20, 21,
+		24, 19,
+		23, 23, 21, 21, 20, 21, 18, 19,
+		21, 19
+	} },
+	{ "ldmia [#0x07FFFFF0], {r2-r7}", testLdmiaOverflow4OamToRom, TEST_ARM | TEST_THUMB, {
+		21, 21, 19, 19, 19, 19, 17, 17,
+		19, 14,
+		18, 18, 16, 16, 17, 17, 15, 15,
+		16, 14
+	} },
+	{ "ldmia [#0x07FFFFEC], {r2-r7}", testLdmiaOverflow5OamToRom, TEST_ARM | TEST_THUMB, {
+		14, 7, 13, 7, 13, 7, 12, 7,
+		12, 7,
+		11, 7, 10, 7, 11, 7, 10, 7,
+		9, 7
 	} },
 	{ "mul #0x00000000, #0xFF", testMul0, TEST_ARM | TEST_THUMB, {
 		9, 6, 8, 6, 8, 4, 7, 4,
