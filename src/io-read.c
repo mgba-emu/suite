@@ -68,6 +68,7 @@ static const struct IOReadTest ioReadTests[] = {
 	{ "SOUND1CNT_X", 0x4000064, true, true, 0x4000, 0 },
 	{ "INVALID (66)", 0x4000066, true, false, 0, 0 },
 	{ "SOUND2CNT_LO", 0x4000068, true, true, 0xFFC0, 0 },
+	{ "INVALID (6A)", 0x400006A, true, false, 0, 0 },
 	{ "SOUND2CNT_HI", 0x400006C, true, true, 0x4000, 0 },
 	{ "INVALID (6E)", 0x400006E, true, false, 0, 0 },
 	{ "SOUND3CNT_LO", 0x4000070, true, true, 0x00E0, 0 },
@@ -141,6 +142,12 @@ static const struct IOReadTest ioReadTests[] = {
 	{ "INVALID (FA)", 0x40000FA, true, false, 0xDEAD, 0 },
 	{ "INVALID (FC)", 0x40000FC, true, false, 0xDEAD, 0 },
 	{ "INVALID (FE)", 0x40000FE, true, false, 0xDEAD, 0 },
+	{ "INVALID (136)", 0x4000136, true, false, 0, 0 },
+	{ "INVALID (142)", 0x4000142, true, false, 0, 0 },
+	{ "INVALID (15A)", 0x400015A, true, false, 0, 0 },
+	{ "INVALID (206)", 0x4000206, true, false, 0, 0 },
+	{ "INVALID (20A)", 0x400020A, true, false, 0, 0 },
+	{ "INVALID (302)", 0x4000302, true, false, 0, 0 },
 	{ "INVALID (100C)", 0x400100C, true, false, 0xDEAD, 0 },
 };
 
