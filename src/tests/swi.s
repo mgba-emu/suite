@@ -147,3 +147,171 @@ TEST_ARM(testCpuSetArm, _(
 ), _(push {r4, r5}), _(pop {r4, r5}))
 
 TEST_VARIANT(testCpuSet, testCpuSetArm, testCpuSetThumb)
+
+TEST_THUMB(testBiosChecksumThumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	swi $0xD ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testBiosChecksumArm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	swi $0xD0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testBiosChecksum, testBiosChecksumArm, testBiosChecksumThumb)
+
+TEST_THUMB(testBgAffineSetThumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x0 ;
+	swi $0xE ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testBgAffineSetArm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x0 ;
+	swi $0xE0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testBgAffineSet, testBgAffineSetArm, testBgAffineSetThumb)
+
+TEST_THUMB(testBgAffineSet2Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x1 ;
+	swi $0xE ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testBgAffineSet2Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x1 ;
+	swi $0xE0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testBgAffineSet2, testBgAffineSet2Arm, testBgAffineSet2Thumb)
+
+TEST_THUMB(testBgAffineSet3Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x2 ;
+	swi $0xE ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testBgAffineSet3Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x2 ;
+	swi $0xE0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testBgAffineSet3, testBgAffineSet3Arm, testBgAffineSet3Thumb)
+
+TEST_THUMB(testObjAffineSetThumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x0 ;
+	mov r3, #0x0 ;
+	swi $0xF ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testObjAffineSetArm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x0 ;
+	mov r3, #0x0 ;
+	swi $0xF0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testObjAffineSet, testObjAffineSetArm, testObjAffineSetThumb)
+
+TEST_THUMB(testObjAffineSet2Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x1 ;
+	mov r3, #0x0 ;
+	swi $0xF ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testObjAffineSet2Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x1 ;
+	mov r3, #0x0 ;
+	swi $0xF0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testObjAffineSet2, testObjAffineSet2Arm, testObjAffineSet2Thumb)
+
+TEST_THUMB(testObjAffineSet3Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x2 ;
+	mov r3, #0x0 ;
+	swi $0xF ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_ARM(testObjAffineSet3Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x0 ;
+	mov r2, #0x2 ;
+	mov r3, #0x0 ;
+	swi $0xF0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testObjAffineSet3, testObjAffineSet3Arm, testObjAffineSet3Thumb)

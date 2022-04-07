@@ -155,6 +155,13 @@ void testSqrt2(struct TestTimings*);
 void testSqrt3(struct TestTimings*);
 void testAtan(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
+void testBiosChecksum(struct TestTimings*);
+void testBgAffineSet(struct TestTimings*);
+void testBgAffineSet2(struct TestTimings*);
+void testBgAffineSet3(struct TestTimings*);
+void testObjAffineSet(struct TestTimings*);
+void testObjAffineSet2(struct TestTimings*);
+void testObjAffineSet3(struct TestTimings*);
 void testTrivialDma(struct TestTimings*);
 void testTrivialDmaRom(struct TestTimings*);
 void testTrivialDmaToRom(struct TestTimings*);
@@ -755,6 +762,48 @@ static const struct TimingTest timingTests[] = {
 		3449, 3397,
 		3456, 3456, 3448, 3448, 3447, 3447, 3439, 3439,
 		3440, 3403
+	} },
+	{ "BIOS Checksum", testBiosChecksum, TEST_ARM | TEST_THUMB, {
+		41056, 41056, 41054, 41054, 41043, 41043, 41041, 41041,
+		41052, 41015,
+		41035, 41035, 41033, 41033, 41029, 41029, 41027, 41027,
+		41031, 41015
+	} },
+	{ "BgAffineSet", testBgAffineSet, TEST_ARM | TEST_THUMB, {
+		137, 137, 135, 135, 118, 118, 116, 116,
+		133, 81,
+		107, 107, 105, 105, 98, 98, 96, 96,
+		103, 81
+	} },
+	{ "BgAffineSet 2", testBgAffineSet2, TEST_ARM | TEST_THUMB, {
+		217, 217, 215, 215, 198, 198, 196, 196,
+		213, 161,
+		187, 187, 185, 185, 178, 178, 176, 176,
+		183, 161
+	} },
+	{ "BgAffineSet 3", testBgAffineSet3, TEST_ARM | TEST_THUMB, {
+		301, 301, 299, 299, 282, 282, 280, 280,
+		297, 245,
+		271, 271, 269, 269, 262, 262, 260, 260,
+		267, 245
+	} },
+	{ "ObjAffineSet", testObjAffineSet, TEST_ARM | TEST_THUMB, {
+		135, 135, 133, 133, 114, 114, 112, 112,
+		131, 74,
+		102, 102, 100, 100, 92, 92, 90, 90,
+		98, 74
+	} },
+	{ "ObjAffineSet 2", testObjAffineSet2, TEST_ARM | TEST_THUMB, {
+		185, 185, 183, 183, 164, 164, 162, 162,
+		181, 124,
+		152, 152, 150, 150, 142, 142, 140, 140,
+		148, 124
+	} },
+	{ "ObjAffineSet 3", testObjAffineSet3, TEST_ARM | TEST_THUMB, {
+		235, 235, 233, 233, 214, 214, 212, 212,
+		231, 174,
+		202, 202, 200, 200, 192, 192, 190, 190,
+		198, 174
 	} },
 	{ "Trivial DMA (16)", testTrivialDma, TEST_ARM | TEST_THUMB, {
 		13, 10, 12, 10, 12, 8, 11, 8,
