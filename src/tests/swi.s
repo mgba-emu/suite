@@ -130,7 +130,7 @@ TEST_THUMB(testCpuSetThumb, _(
 	ldr r0, =0x02000000 ;
 	ldr r1, =0x02000000 ;
 	ldr r2, =0x100 ;
-	swi $0xC ;
+	swi $0xB ;
 	mov r0, r4 ;
 	mov r1, r5 ;
 ), _(push {r4-r5}), _(pop {r4-r5}))
@@ -141,12 +141,108 @@ TEST_ARM(testCpuSetArm, _(
 	mov r0, #0x02000000 ;
 	mov r1, #0x02000000 ;
 	mov r2, #0x100 ;
-	swi $0xC0000 ;
+	swi $0xB0000 ;
 	mov r0, r4 ;
 	mov r1, r5 ;
 ), _(push {r4, r5}), _(pop {r4, r5}))
 
 TEST_VARIANT(testCpuSet, testCpuSetArm, testCpuSetThumb)
+
+TEST_THUMB(testCpuFastSetThumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	ldr r0, =0x02000000 ;
+	ldr r1, =0x02000000 ;
+	ldr r2, =0x100 ;
+	swi $0xC ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4-r5}), _(pop {r4-r5}))
+
+TEST_ARM(testCpuFastSetArm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x02000000 ;
+	mov r1, #0x02000000 ;
+	mov r2, #0x100 ;
+	swi $0xC0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testCpuFastSet, testCpuFastSetArm, testCpuFastSetThumb)
+
+TEST_THUMB(testCpuFastSet2Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	ldr r0, =0x02000000 ;
+	ldr r1, =0x02002000 ; // Hopefully unused
+	ldr r2, =0x01000100 ;
+	swi $0xC ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4-r5}), _(pop {r4-r5}))
+
+TEST_ARM(testCpuFastSet2Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x02000000 ;
+	ldr r1, =0x02002000 ;
+	ldr r2, =0x01000100 ;
+	swi $0xC0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testCpuFastSet2, testCpuFastSet2Arm, testCpuFastSet2Thumb)
+
+TEST_THUMB(testCpuFastSet3Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	ldr r0, =0x02000000 ;
+	ldr r1, =0x02000000 ;
+	mov r2, #0x0 ;
+	swi $0xC ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4-r5}), _(pop {r4-r5}))
+
+TEST_ARM(testCpuFastSet3Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x02000000 ;
+	mov r1, #0x02000000 ;
+	mov r2, #0x0 ;
+	swi $0xC0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testCpuFastSet3, testCpuFastSet3Arm, testCpuFastSet3Thumb)
+
+TEST_THUMB(testCpuFastSet4Thumb, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	ldr r1, =0x02000000 ;
+	ldr r2, =0x100 ;
+	swi $0xC ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4-r5}), _(pop {r4-r5}))
+
+TEST_ARM(testCpuFastSet4Arm, _(
+	mov r4, r0 ;
+	mov r5, r1 ;
+	mov r0, #0x0 ;
+	mov r1, #0x02000000 ;
+	mov r2, #0x100 ;
+	swi $0xC0000 ;
+	mov r0, r4 ;
+	mov r1, r5 ;
+), _(push {r4, r5}), _(pop {r4, r5}))
+
+TEST_VARIANT(testCpuFastSet4, testCpuFastSet4Arm, testCpuFastSet4Thumb)
 
 TEST_THUMB(testBiosChecksumThumb, _(
 	mov r4, r0 ;

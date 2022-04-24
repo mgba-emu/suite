@@ -155,6 +155,10 @@ void testSqrt2(struct TestTimings*);
 void testSqrt3(struct TestTimings*);
 void testAtan(struct TestTimings*);
 void testCpuSet(struct TestTimings*);
+void testCpuFastSet(struct TestTimings*);
+void testCpuFastSet2(struct TestTimings*);
+void testCpuFastSet3(struct TestTimings*);
+void testCpuFastSet4(struct TestTimings*);
 void testBiosChecksum(struct TestTimings*);
 void testBgAffineSet(struct TestTimings*);
 void testBgAffineSet2(struct TestTimings*);
@@ -758,10 +762,34 @@ static const struct TimingTest timingTests[] = {
 		122, 104
 	} },
 	{ "CpuSet", testCpuSet, TEST_ARM | TEST_THUMB, {
+		4000, 4000, 3998, 3998, 3981, 3981, 3979, 3979,
+		3996, 3944,
+		4003, 4003, 3995, 3995, 3994, 3994, 3986, 3986,
+		3987, 3950
+	} },
+	{ "CpuFastSet", testCpuFastSet, TEST_ARM | TEST_THUMB, {
 		3453, 3453, 3451, 3451, 3434, 3434, 3432, 3432,
 		3449, 3397,
 		3456, 3456, 3448, 3448, 3447, 3447, 3439, 3439,
 		3440, 3403
+	} },
+	{ "CpuFastSet 2", testCpuFastSet2, TEST_ARM | TEST_THUMB, {
+		1890, 1890, 1884, 1884, 1871, 1871, 1865, 1865,
+		1878, 1816,
+		1871, 1871, 1863, 1863, 1862, 1862, 1854, 1854,
+		1855, 1818
+	} },
+	{ "CpuFastSet 3", testCpuFastSet3, TEST_ARM | TEST_THUMB, {
+		148, 148, 146, 146, 129, 129, 127, 127,
+		144, 92,
+		140, 140, 134, 134, 131, 131, 125, 125,
+		128, 96
+	} },
+	{ "CpuFastSet 4", testCpuFastSet4, TEST_ARM | TEST_THUMB, {
+		150, 150, 148, 148, 131, 131, 129, 129,
+		146, 94,
+		142, 142, 136, 136, 133, 133, 127, 127,
+		130, 98
 	} },
 	{ "BIOS Checksum", testBiosChecksum, TEST_ARM | TEST_THUMB, {
 		41056, 41056, 41054, 41054, 41043, 41043, 41041, 41041,
