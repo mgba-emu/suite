@@ -32,13 +32,13 @@ void movR1Lsl0(struct TestOutput*);
 void movR1Lsl1(struct TestOutput*);
 void movR1Lsl31(struct TestOutput*);
 void movR1LslR0(struct TestOutput*);
-void movR1Lsr0(struct TestOutput*);
 void movR1Lsr1(struct TestOutput*);
 void movR1Lsr31(struct TestOutput*);
+void movR1Lsr32(struct TestOutput*);
 void movR1LsrR0(struct TestOutput*);
-void movR1Asr0(struct TestOutput*);
 void movR1Asr1(struct TestOutput*);
 void movR1Asr31(struct TestOutput*);
+void movR1Asr32(struct TestOutput*);
 void movR1AsrR0(struct TestOutput*);
 void movR1Ror1(struct TestOutput*);
 void movR1Ror31(struct TestOutput*);
@@ -49,13 +49,13 @@ void movPCLsl0(struct TestOutput*);
 void movPCLsl1(struct TestOutput*);
 void movPCLsl31(struct TestOutput*);
 void movPCLslR0(struct TestOutput*);
-void movPCLsr0(struct TestOutput*);
 void movPCLsr1(struct TestOutput*);
 void movPCLsr31(struct TestOutput*);
+void movPCLsr32(struct TestOutput*);
 void movPCLsrR0(struct TestOutput*);
-void movPCAsr0(struct TestOutput*);
 void movPCAsr1(struct TestOutput*);
 void movPCAsr31(struct TestOutput*);
+void movPCAsr32(struct TestOutput*);
 void movPCAsrR0(struct TestOutput*);
 void movPCRor1(struct TestOutput*);
 void movPCRor31(struct TestOutput*);
@@ -66,13 +66,13 @@ void addR0PCR1Lsl0(struct TestOutput*);
 void addR0PCR1Lsl1(struct TestOutput*);
 void addR0PCR1Lsl31(struct TestOutput*);
 void addR0PCR1LslR0(struct TestOutput*);
-void addR0PCR1Lsr0(struct TestOutput*);
 void addR0PCR1Lsr1(struct TestOutput*);
 void addR0PCR1Lsr31(struct TestOutput*);
+void addR0PCR1Lsr32(struct TestOutput*);
 void addR0PCR1LsrR0(struct TestOutput*);
-void addR0PCR1Asr0(struct TestOutput*);
 void addR0PCR1Asr1(struct TestOutput*);
 void addR0PCR1Asr31(struct TestOutput*);
+void addR0PCR1Asr32(struct TestOutput*);
 void addR0PCR1AsrR0(struct TestOutput*);
 void addR0PCR1Ror1(struct TestOutput*);
 void addR0PCR1Ror31(struct TestOutput*);
@@ -95,18 +95,18 @@ static const struct ShifterTest shifterTests[] = {
 	{ "r1, lsl r0 (32)", movR1LslR0, 0, 32, 0x3, { 0, 0x6000001F } },
 	{ "r1, lsl r0 (33)", movR1LslR0, 0, 33, 0x3, { 0, 0x4000001F } },
 	{ "r1, lsl r0 (-1)", movR1LslR0, 0, -1, 0x3, { 0, 0x4000001F } },
-	{ "r1, lsr #0", movR1Lsr0, 0, 0, 0xFFF, { 0xFFF, 0x1F } },
 	{ "r1, lsr #1", movR1Lsr1, 0, 0, 0xFFF, { 0x7FF, 0x2000001F } },
 	{ "r1, lsr #31", movR1Lsr31, 0, 0, 0xC0000000, { 0x1, 0x2000001F } },
+	{ "r1, lsr #32", movR1Lsr32, 0, 0, 0x80000FFF, { 0, 0x6000001F } },
 	{ "r1, lsr r0 (0)", movR1LsrR0, 0, 0, 0xFFF, { 0xFFF, 0x1F } },
 	{ "r1, lsr r0 (1)", movR1LsrR0, 0, 1, 0xFFF, { 0x7FF, 0x2000001F } },
 	{ "r1, lsr r0 (31)", movR1LsrR0, 0, 31, 0xC0000000, { 0x1, 0x2000001F } },
 	{ "r1, lsr r0 (32)", movR1LsrR0, 0, 32, 0xC0000000, { 0, 0x6000001F } },
 	{ "r1, lsr r0 (33)", movR1LsrR0, 0, 33, 0xC0000000, { 0, 0x4000001F } },
 	{ "r1, lsr r0 (-1)", movR1LsrR0, 0, -1, 0xC0000000, { 0, 0x4000001F } },
-	{ "r1, asr #0", movR1Asr0, 0, 0, 0x80000FFF, { 0x80000FFF, 0x8000001F } },
 	{ "r1, asr #1", movR1Asr1, 0, 0, 0x80000FFF, { 0xC00007FF, 0xA000001F } },
 	{ "r1, asr #31", movR1Asr31, 0, 0, 0xC0000000, { 0xFFFFFFFF, 0xA000001F } },
+	{ "r1, asr #32", movR1Asr32, 0, 0, 0x80000FFF, { 0xFFFFFFFF, 0xA000001F } },
 	{ "r1, asr r0 (0)", movR1AsrR0, 0, 0, 0x80000FFF, { 0x80000FFF, 0x8000001F } },
 	{ "r1, asr r0 (1)", movR1AsrR0, 0, 1, 0x80000FFF, { 0xC00007FF, 0xA000001F } },
 	{ "r1, asr r0 (31)", movR1AsrR0, 0, 31, 0xC0000000, { 0xFFFFFFFF, 0xA000001F } },
@@ -127,12 +127,12 @@ static const struct ShifterTest shifterTests[] = {
 	{ "pc, lsl #0", movPCLsl0, 0, 0, 0, { ADDR(movPCLsl0), 0x1F } },
 	{ "pc, lsl #31", movPCLsl31, 0, 0, 0, { 0, 0x4000001F } },
 	{ "pc, lsl r0 (0)", movPCLslR0, 0, 0, 0, { ADDR(movPCLslR0) + 4, 0x1F } },
-	{ "pc, lsr #0", movPCLsr0, 0, 0, 0, { ADDR(movPCLsr0), 0x1F } },
 	{ "pc, lsr #31", movPCLsr31, 0, 0, 0, { 0, 0x4000001F } },
+	{ "pc, lsr #32", movPCLsr32, 0, 0, 0, { 0, 0x4000001F } },
 	{ "pc, lsr r0 (0)", movPCLsrR0, 0, 0, 0, { ADDR(movPCLsrR0) + 4, 0x1F } },
 	{ "pc, lsr r0 (24)", movPCLsrR0, 0, 24, 0, { 0x8, 0x1F } },
-	{ "pc, asr #0", movPCAsr0, 0, 0, 0, { ADDR(movPCAsr0), 0x1F } },
 	{ "pc, asr #31", movPCAsr31, 0, 0, 0, { 0, 0x4000001F } },
+	{ "pc, asr #32", movPCAsr32, 0, 0, 0, { 0, 0x4000001F } },
 	{ "pc, asr r0 (0)", movPCAsrR0, 0, 0, 0, { ADDR(movPCAsrR0) + 4, 0x1F } },
 	{ "pc, asr r0 (24)", movPCAsrR0, 0, 24, 0, { 0x8, 0x1F } },
 	{ "add r0, pc, r1", addR0PCR1, 0, 0, 0, { ADDR(addR0PCR1), 0x1F } },
@@ -140,12 +140,12 @@ static const struct ShifterTest shifterTests[] = {
 	{ "add r0, pc, r1, lsl #1", addR0PCR1Lsl1, 0, 0, 1, { ADDR(addR0PCR1Lsl1) + 2, 0x1F } },
 	{ "add r0, pc, r1, lsl r0 (0)", addR0PCR1LslR0, 0, 0, 1, { ADDR(addR0PCR1LslR0) + 5, 0x1F } },
 	{ "add r0, pc, r1, lsl r0 (1)", addR0PCR1LslR0, 0, 1, 1, { ADDR(addR0PCR1LslR0) + 6, 0x1F } },
-	{ "add r0, pc, r1, lsr #0", addR0PCR1Lsr0, 0, 0, 1, { ADDR(addR0PCR1Lsr0) + 1, 0x1F } },
 	{ "add r0, pc, r1, lsr #1", addR0PCR1Lsr1, 0, 0, 1, { ADDR(addR0PCR1Lsr1), 0x1F } },
+	{ "add r0, pc, r1, lsr #32", addR0PCR1Lsr32, 0, 0, 1, { ADDR(addR0PCR1Lsr32), 0x1F } },
 	{ "add r0, pc, r1, lsr r0 (0)", addR0PCR1LsrR0, 0, 0, 1, { ADDR(addR0PCR1LsrR0) + 5, 0x1F } },
 	{ "add r0, pc, r1, lsr r0 (1)", addR0PCR1LsrR0, 0, 1, 1, { ADDR(addR0PCR1LsrR0) + 4, 0x1F } },
-	{ "add r0, pc, r1, asr #0", addR0PCR1Asr0, 0, 0, 0x80000000, { ADDR(addR0PCR1Asr0) + 0x80000000, 0x8000001F } },
 	{ "add r0, pc, r1, asr #1", addR0PCR1Asr1, 0, 0, 0x80000000, { ADDR(addR0PCR1Asr1) + 0xC0000000, 0x8000001F } },
+	{ "add r0, pc, r1, asr #32", addR0PCR1Asr32, 0, 0, 0x80000000, { ADDR(addR0PCR1Asr32) - 1, 0x2000001F } },
 	{ "add r0, pc, r1, asr r0 (0)", addR0PCR1AsrR0, 0, 0, 0x80000000, { ADDR(addR0PCR1AsrR0) + 0x80000004, 0x8000001F } },
 	{ "add r0, pc, r1, asr r0 (1)", addR0PCR1AsrR0, 0, 1, 0x80000000, { ADDR(addR0PCR1AsrR0) + 0xC0000004, 0x8000001F } },
 	{ "add r0, pc, r1, ror #1", addR0PCR1Ror1, 0, 0, 0xA0000005, { ADDR(addR0PCR1Ror1) + 0xD0000002, 0x8000001F } },
