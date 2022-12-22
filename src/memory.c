@@ -1069,7 +1069,7 @@ static const struct MemoryTest memoryTests[] = {
 		0x4747, 0x4747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
 		0x4747, 0x4747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
 		0x4747, 0x4747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
-		{ 0x6D6D4747 }, { 0x650061 }, { 0x6D6D4747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 },
+		{ 0x6D6D4747 }, { 0x650061 }, { 0x47474747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 },
 		{ 0x47474747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 }
 	}},
 	{ "SRAM mirror load", testLoadSRAMMirror, false, {
@@ -1078,7 +1078,7 @@ static const struct MemoryTest memoryTests[] = {
 		0x4747, 0x4747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
 		0x4747, 0x4747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
 		0x4747, 0x4747, 0x47474747, 0x47474747, 0x47474747, 0x47474747,
-		{ 0x6D6D4747 }, { 0x650061 }, { 0x6D6D4747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 },
+		{ 0x6D6D4747 }, { 0x650061 }, { 0x47474747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 },
 		{ 0x47474747 }, { 0x61616161 }, { 0x6D6D6D6D }, { 0x65656565 }
 	}},
 	{ "SRAM store", testStoreSRAM, true, {
@@ -1203,7 +1203,7 @@ static void printResults(const char* preface, const struct TestConfigurations* v
 	printResult(base, 33, "DMA3 32 (unaligned 3)", values->_d3_32u3, expected->_d3_32u3);
 	printResult(base, 34, "swi B 16", values->_c16[0], expected->_c16[0]);
 	printResult(base, 35, "swi B 16 (unaligned)", values->_c16u1[0], expected->_c16u1[0]);
-	printResult(base, 36, "swi B 32", values->_c16[0], expected->_c32[0]);
+	printResult(base, 36, "swi B 32", values->_c32[0], expected->_c32[0]);
 	printResult(base, 37, "swi B 32 (unaligned 1)", values->_c32u1[0], expected->_c32u1[0]);
 	printResult(base, 38, "swi B 32 (unaligned 2)", values->_c32u2[0], expected->_c32u2[0]);
 	printResult(base, 39, "swi B 32 (unaligned 3)", values->_c32u3[0], expected->_c32u3[0]);
@@ -1281,7 +1281,7 @@ static void runMemorySuite(void) {
 		doResult("DMA3 32 (unaligned 3)", activeTest->testName, currentTest._d3_32u3, activeTest->expected._d3_32u3);
 		doResult("swi B 16", activeTest->testName, currentTest._c16[0], activeTest->expected._c16[0]);
 		doResult("swi B 16 (unaligned)", activeTest->testName, currentTest._c16u1[0], activeTest->expected._c16u1[0]);
-		doResult("swi B 32", activeTest->testName, currentTest._c16[0], activeTest->expected._c32[0]);
+		doResult("swi B 32", activeTest->testName, currentTest._c32[0], activeTest->expected._c32[0]);
 		doResult("swi B 32 (unaligned 1)", activeTest->testName, currentTest._c32u1[0], activeTest->expected._c32u1[0]);
 		doResult("swi B 32 (unaligned 2)", activeTest->testName, currentTest._c32u2[0], activeTest->expected._c32u2[0]);
 		doResult("swi B 32 (unaligned 3)", activeTest->testName, currentTest._c32u3[0], activeTest->expected._c32u3[0]);
