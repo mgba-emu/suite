@@ -423,6 +423,7 @@ static const u32 nTimerTests = sizeof(timerTests) / sizeof(*timerTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(timerTests) / sizeof(*timerTests)];
 
 static u32 irqCounter;
 
@@ -537,16 +538,19 @@ static void runTest(struct TimerTest* test) {
 }
 
 static void printResultLine(int offset, int line, const char* preface, const char* p2, u32 value, u32 expected) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || base + line - offset > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s %-4s: %06lX", p2, preface, value);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-4s %-4s: %06lX", p2, preface, value);
 	if (value == expected) {
-		strncpy(&textGrid[base + 32 * (line - offset) + 19], "PASS", 10);
+		markLinePass(line);
+		strncpy(TEXT_LOC(line, 19), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line - offset) + 19], 16, "!= %06lX", expected);
+		markLineFail(line);
+		snprintf(TEXT_LOC(line, 19), 16, "!= %06lX", expected);
 	}
 }
 
@@ -615,6 +619,7 @@ static void runTimersSuite(void) {
 		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
+		unsigned failed = totalResults - passes;
 		savprintf("Timer count-up test: %s", activeTest->testName);
 		doResult("1d 1i", activeTest->testName, &currentTest.results[0][0], &activeTest->results[0][0]);
 		doResult("2d 1i", activeTest->testName, &currentTest.results[1][0], &activeTest->results[1][0]);
@@ -625,17 +630,19 @@ static void runTimersSuite(void) {
 		doResult("1d 4i", activeTest->testName, &currentTest.results[0][2], &activeTest->results[0][2]);
 		doResult("2d 4i", activeTest->testName, &currentTest.results[1][2], &activeTest->results[1][2]);
 		doResult("4d 4i", activeTest->testName, &currentTest.results[2][2], &activeTest->results[2][2]);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
 
-static size_t listTimersSuite(const char** names, size_t size, size_t offset) {
+static size_t listTimersSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTimerTests) {
 			break;
 		}
 		names[i] = timerTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

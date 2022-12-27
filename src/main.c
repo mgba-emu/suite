@@ -39,7 +39,11 @@ IWRAM_DATA struct ActiveInfo activeTestInfo = { {'I', 'n', 'f', 'o'}, -1, -1, -1
 void updateTextGrid(void) {
 	int i;
 	for (i = 0; i < 20 * 32; ++i) {
-		textBase[i] = textGrid[i] ? textGrid[i] - ' ' : 0;
+		u16 text = textBase[i] & ~0x3FF;
+		if (textGrid[i]) {
+			text |= textGrid[i] - ' ';
+		}
+		textBase[i] = text;
 	}
 }
 
@@ -62,6 +66,7 @@ const size_t nSuites = sizeof(suites) / sizeof(*suites);
 
 static void runSuite(const struct TestSuite* activeSuite) {
 	const char* testNameBuffer[160];
+	bool results[160];
 	int testIndex = 0;
 	int viewIndex = 0;
 	strcpy(&textGrid[GRID_STRIDE], activeSuite->name);
@@ -105,12 +110,17 @@ static void runSuite(const struct TestSuite* activeSuite) {
 		}
 		strcpy(&textGrid[GRID_STRIDE], activeSuite->name);
 		if (*activeSuite->totalResults) {
-			sprintf(&textGrid[GRID_STRIDE + 21], "%4u/%-4u", *activeSuite->passes, *activeSuite->totalResults);
+			sprintf(TEXT_LOC(1, 21), "%4u/%-4u", *activeSuite->passes, *activeSuite->totalResults);
 		}
 		size_t i;
-		activeSuite->list(testNameBuffer, sizeof(testNameBuffer) / sizeof(*testNameBuffer), viewIndex);
+		activeSuite->list(testNameBuffer, results, sizeof(testNameBuffer) / sizeof(*testNameBuffer), viewIndex);
 		for (i = 0; i < activeSuite->nTests && i < VIEW_SIZE; ++i) {
-			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', testNameBuffer[i]);
+			if (results[i]) {
+				markLinePass(i + 3);
+			} else {
+				markLineFail(i + 3);
+			}
+			snprintf(TEXT_LOC(i + 3, 0), 31, "%c%s", (i + viewIndex == testIndex) ? '>' : ' ', testNameBuffer[i]);
 		}
 
 		updateTextGrid();
@@ -177,6 +187,8 @@ int main(void) {
 	irqInit();
 
 	BG_PALETTE[0] = 0x7FFF;
+	BG_PALETTE[16] = 0x7FFF;
+	BG_PALETTE[17] = 0x1F;
 	DMA3COPY(fontTiles, TILE_BASE_ADR(1), DMA16 | DMA_IMMEDIATE | (fontTilesLen >> 1));
 	REG_BG1CNT = CHAR_BASE(1) | SCREEN_BASE(0);
 	REG_BG1VOFS = -4;
@@ -197,7 +209,7 @@ int main(void) {
 	int suiteIndex = 0;
 	int viewIndex = 0;
 	while (1) {
-		memset(&textGrid[GRID_STRIDE], 0, sizeof(textGrid) - GRID_STRIDE);
+		memset(TEXT_LOC(1, 0), 0, sizeof(textGrid) - GRID_STRIDE);
 		scanKeys();
 		u16 keys = keysDownRepeat();
 
@@ -223,10 +235,11 @@ int main(void) {
 		} else if (suiteIndex >= viewIndex + VIEW_SIZE) {
 			viewIndex = suiteIndex - VIEW_SIZE + 1;
 		}
-		strcpy(&textGrid[GRID_STRIDE], "Select suite");
+		clearAll();
+		strcpy(TEXT_LOC(1, 0), "Select suite");
 		size_t i;
 		for (i = 0; i < nSuites && i < VIEW_SIZE; ++i) {
-			snprintf(&textGrid[(3 + i) * GRID_STRIDE], 31, "%c%s", (i + viewIndex == suiteIndex) ? '>' : ' ', suites[i]->name);
+			snprintf(TEXT_LOC(i + 3, 0), 31, "%c%s", (i + viewIndex == suiteIndex) ? '>' : ' ', suites[i]->name);
 		}
 
 		updateTextGrid();

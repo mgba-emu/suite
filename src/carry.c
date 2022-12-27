@@ -64,6 +64,7 @@ static const u32 nCarryTests = sizeof(carryTests) / sizeof(*carryTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(carryTests) / sizeof(*carryTests)];
 
 __attribute__((noinline))
 static void runTest(struct TestCarry* test) {
@@ -116,16 +117,19 @@ static void runTest(struct TestCarry* test) {
 }
 
 static void printResult(int offset, int line, const char* preface, s32 value, u32 cpsr, s32 expected, u32 expectedCpsr) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || base + line - offset > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s: %08lX (%lX)", preface, value, cpsr >> 28);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-4s: %08lX (%lX)", preface, value, cpsr >> 28);
 	if (value == expected && cpsr == expectedCpsr) {
-		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
+		markLinePass(line);
+		strncpy(TEXT_LOC(line, 21), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line + 1 - offset) + 3], 16, "!= %08lX (%lX)", expected, expectedCpsr >> 28);
+		markLineFail(line);
+		snprintf(TEXT_LOC(line, 16), 16, "!= %08lX (%lX)", expected, expectedCpsr >> 28);
 	}
 }
 
@@ -159,21 +163,24 @@ static void runCarrySuite(void) {
 		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
+		unsigned failed = totalResults - passes;
 		savprintf("Carry test: %s", activeTest->testName);
 		doResult("adcs", activeTest->testName, currentTest.outAdc, currentTest.outAdcCpsr, activeTest->expected.outAdc, activeTest->expected.outAdcCpsr);
 		doResult("sbcs", activeTest->testName, currentTest.outSbc, currentTest.outSbcCpsr, activeTest->expected.outSbc, activeTest->expected.outSbcCpsr);
 		doResult("rscs", activeTest->testName, currentTest.outRsc, currentTest.outRscCpsr, activeTest->expected.outRsc, activeTest->expected.outRscCpsr);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
 
-static size_t listCarrySuite(const char** names, size_t size, size_t offset) {
+static size_t listCarrySuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nCarryTests) {
 			break;
 		}
 		names[i] = carryTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

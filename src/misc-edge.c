@@ -31,6 +31,7 @@ static const u32 nTests = sizeof(miscEdgeTests) / sizeof(*miscEdgeTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(miscEdgeTests) / sizeof(*miscEdgeTests)];
 
 void dmaPrefetch(u32* out) {
 	u32* ptr = (u32*) 0x10000000;
@@ -112,16 +113,21 @@ void hblankBit(u32* out) {
 }
 
 static void printResult(int offset, int line, const char* preface, u32 expected, u32 value) {
-	static const int base = GRID_STRIDE * 3;
-	if (offset > line * 2 || base + GRID_STRIDE * (line * 2 - offset + 1) > 576) {
+	static const int base = 3;
+	if (offset > line * 2 || base + (line * 2 - offset + 1) > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset)], 31, "%s:", preface);
+	line += line - offset + base;
+	snprintf(TEXT_LOC(line, 0), 31, "%s:", preface);
 	if (value == expected) {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08lX PASS", value);
+		markLinePass(line);
+		markLinePass(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 28, "%08lX PASS", value);
 	} else {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08lX != %08lX", value, expected);
+		markLineFail(line);
+		markLineFail(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 28, "%08lX != %08lX", value, expected);
 	}
 }
 
@@ -145,13 +151,14 @@ static void printResults(const struct MiscEdgeTest* test, u32* values, int base)
 	}
 }
 
-static size_t listMiscEdgeSuite(const char** names, size_t size, size_t offset) {
+static size_t listMiscEdgeSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTests) {
 			break;
 		}
 		names[i] = miscEdgeTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }
@@ -167,9 +174,11 @@ static void runMiscEdgeSuite(void) {
 		u32 currentTest[32] = {0};
 		activeTest->test(currentTest);
 		int j;
+		unsigned failed = totalResults - passes;
 		for (j = 0; activeTest->valueNames[j]; ++j) {
 			doResult(activeTest->valueNames[j], activeTest->testName, activeTest->expected[j], currentTest[j]);
 		}
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }

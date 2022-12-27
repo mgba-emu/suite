@@ -401,13 +401,14 @@ static const u32 nTests = sizeof(videoTests) / sizeof(*videoTests);
 
 const static unsigned constZero = 0;
 
-static size_t listVideoSuite(const char** names, size_t size, size_t offset) {
+static size_t listVideoSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTests) {
 			break;
 		}
 		names[i] = videoTests[i + offset].testName;
+		passed[i] = true;
 	}
 	return i;
 }

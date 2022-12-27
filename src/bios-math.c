@@ -155,6 +155,7 @@ static const u32 nMathTests = sizeof(mathTests) / sizeof(*mathTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(mathTests) / sizeof(*mathTests)];
 
 IWRAM_CODE
 __attribute__((noinline))
@@ -188,16 +189,19 @@ static void runTest(struct TestMath* test) {
 }
 
 static void printResult(int offset, int line, const char* preface, s32 value, s32 expected) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || base + line - offset > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s: %08lX", preface, value);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-4s: %08lX", preface, value);
 	if (value == expected) {
-		strncpy(&textGrid[base + 32 * (line - offset) + 15], "PASS", 10);
+		markLinePass(line);
+		strncpy(TEXT_LOC(line, 15), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line - offset) + 15], 16, "!= %08lX", expected);
+		markLineFail(line);
+		snprintf(TEXT_LOC(line, 15), 16, "!= %08lX", expected);
 	}
 }
 
@@ -233,23 +237,26 @@ static void runMathSuite(void) {
 		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
+		int failed = totalResults - passes;
 		savprintf("Math test: %s", activeTest->testName);
 		doResult("r0", activeTest->testName, currentTest.outR0, activeTest->expected.outR0);
 		doResult("r1", activeTest->testName, currentTest.outR1, activeTest->expected.outR1);
 		doResult("r2", activeTest->testName, currentTest.outR2, activeTest->expected.outR2);
 		doResult("r3", activeTest->testName, currentTest.outR3, activeTest->expected.outR3);
 		doResult("cpsr", activeTest->testName, currentTest.outPsr, activeTest->expected.outPsr);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
 
-static size_t listMathSuite(const char** names, size_t size, size_t offset) {
+static size_t listMathSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nMathTests) {
 			break;
 		}
 		names[i] = mathTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

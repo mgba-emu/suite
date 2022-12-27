@@ -155,6 +155,7 @@ static const u32 nTests = sizeof(ioReadTests) / sizeof(*ioReadTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(ioReadTests) / sizeof(*ioReadTests)];
 
 static u16 _runTest(const struct IOReadTest* test) {
 	REG_IME = 0;
@@ -187,17 +188,22 @@ static u16 _runTest(const struct IOReadTest* test) {
 }
 
 static void printResults(int offset, int line, const struct IOReadTest* test) {
-	static const int base = GRID_STRIDE * 3;
-	if (offset > line * 2 || base + GRID_STRIDE * (line * 2 - offset + 1) > 576) {
+	static const int base = 3;
+	if (offset > line * 2 || base + (line * 2 - offset + 1) > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset)], 31, "%s:", test->testName);
+	line += line - offset + base;
+	snprintf(TEXT_LOC(line, 0), 31, "%s:", test->testName);
 	u16 value = _runTest(test);
 	if (value == test->expected) {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%04X PASS", value);
+		markLinePass(line);
+		markLinePass(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 28, "%04X PASS", value);
 	} else {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%04X != %04X", value, test->expected);
+		markLineFail(line);
+		markLineFail(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 28, "%04X != %04X", value, test->expected);
 	}
 }
 
@@ -213,13 +219,14 @@ static void doResult(const struct IOReadTest* test) {
 	++totalResults;
 }
 
-static size_t listIOReadSuite(const char** names, size_t size, size_t offset) {
+static size_t listIOReadSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTests) {
 			break;
 		}
 		names[i] = ioReadTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }
@@ -233,7 +240,9 @@ static void runIOReadSuite(void) {
 	for (i = 0; i < nTests; ++i) {
 		activeTestInfo.testId = i;
 		activeTest = &ioReadTests[i];
+		unsigned failed = totalResults - passes;
 		doResult(activeTest);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 	REG_SOUNDCNT_X = 0;

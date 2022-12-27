@@ -157,6 +157,7 @@ static const u32 nShifterTests = sizeof(shifterTests) / sizeof(*shifterTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(shifterTests) / sizeof(*shifterTests)];
 
 __attribute__((noinline))
 static void runTest(const struct ShifterTest* test, struct TestOutput* out) {
@@ -182,16 +183,19 @@ static void runTest(const struct ShifterTest* test, struct TestOutput* out) {
 }
 
 static void printResult(int offset, int line, const char* preface, u32 value, u32 expected) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || base + line - offset > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-2s: %08lX", preface, value);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-2s: %08lX", preface, value);
 	if (value == expected) {
-		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
+		markLinePass(line);
+		strncpy(TEXT_LOC(line, 21), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line - offset) + 19], 16, "!= %08lX", expected);
+		markLineFail(line);
+		snprintf(TEXT_LOC(line, 19), 16, "!= %08lX", expected);
 	}
 }
 
@@ -223,20 +227,23 @@ static void runShifterSuite(void) {
 		activeTestInfo.testId = i;
 		runTest(activeTest, &currentTest);
 
+		unsigned failed = totalResults - passes;
 		savprintf("Shifter test: %s", activeTest->testName);
 		doResult(activeTest->testName, "r0", currentTest.rd, activeTest->expected.rd);
 		doResult(activeTest->testName, "cpsr", currentTest.cpsr, activeTest->expected.cpsr);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
 
-static size_t listShifterSuite(const char** names, size_t size, size_t offset) {
+static size_t listShifterSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nShifterTests) {
 			break;
 		}
 		names[i] = shifterTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

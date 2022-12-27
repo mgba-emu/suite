@@ -153,6 +153,7 @@ static const u32 nMultiplyLongTests = sizeof(multiplyLongTests) / sizeof(*multip
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(multiplyLongTests) / sizeof(*multiplyLongTests)];
 
 __attribute__((noinline))
 static void runTest(struct MultiplyLong* test) {
@@ -234,16 +235,21 @@ static void runTest(struct MultiplyLong* test) {
 }
 
 static void printResult(int offset, int line, const char* preface, s32 value0, s32 value1, u32 cpsr, s32 expected0, s32 expected1, u32 expectedCpsr) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || base + line - offset > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s: %08lX:%08lX (%lX)", preface, value0, value1, cpsr >> 28);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-4s: %08lX:%08lX (%lX)", preface, value0, value1, cpsr >> 28);
 	if (value0 == expected0 && value1 == expected1 && cpsr == expectedCpsr) {
-		strncpy(&textGrid[base + 32 * (line + 1 - offset) + 26], "PASS", 10);
+		markLinePass(line);
+		markLinePass(line + 1);
+		strncpy(TEXT_LOC(line + 1, 26), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line + 1 - offset) + 4], 30, "!= %08lX:%08lX (%lX)", expected0, expected1, expectedCpsr >> 28);
+		markLineFail(line);
+		markLineFail(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 30, "!= %08lX:%08lX (%lX)", expected0, expected1, expectedCpsr >> 28);
 	}
 }
 
@@ -280,6 +286,7 @@ static void runMultiplyLongSuite(void) {
 		activeTestInfo.testId = i;
 		runTest(&currentTest);
 
+		unsigned failed = totalResults - passes;
 		savprintf("Multiply Long test: %s", activeTest->testName);
 		doResult("smulls", activeTest->testName, currentTest.outSmull0, currentTest.outSmull1, currentTest.outSmullCpsr, activeTest->expected.outSmull0, activeTest->expected.outSmull1, activeTest->expected.outSmullCpsr);
 		doResult("umulls", activeTest->testName, currentTest.outUmull0, currentTest.outUmull1, currentTest.outUmullCpsr, activeTest->expected.outUmull0, activeTest->expected.outUmull1, activeTest->expected.outUmullCpsr);
@@ -287,17 +294,19 @@ static void runMultiplyLongSuite(void) {
 			doResult("smlals", activeTest->testName, currentTest.outSmlal0, currentTest.outSmlal1, currentTest.outSmlalCpsr, activeTest->expected.outSmlal0, activeTest->expected.outSmlal1, activeTest->expected.outSmlalCpsr);
 			doResult("umlals", activeTest->testName, currentTest.outUmlal0, currentTest.outUmlal1, currentTest.outUmlalCpsr, activeTest->expected.outUmlal0, activeTest->expected.outUmlal1, activeTest->expected.outUmlalCpsr);
 		}
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
 
-static size_t listMultiplyLongSuite(const char** names, size_t size, size_t offset) {
+static size_t listMultiplyLongSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nMultiplyLongTests) {
 			break;
 		}
 		names[i] = multiplyLongTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

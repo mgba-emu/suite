@@ -33,6 +33,7 @@ static const u32 nTimerIRQTests = sizeof(timerIRQTests) / sizeof(*timerIRQTests)
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(timerIRQTests) / sizeof(*timerIRQTests)];
 
 IWRAM_CODE
 static void testIrq(void) {
@@ -269,16 +270,19 @@ static void runTest(struct TimerIRQTest* test) {
 }
 
 static void printResult(int offset, int line, const char* preface, uint16_t value, uint16_t expected) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || base + line - offset > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-4s: %04X", preface, value);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-4s: %04X", preface, value);
 	if (value == expected) {
-		strncpy(&textGrid[base + 32 * (line - offset) + 19], "PASS", 10);
+		markLinePass(line);
+		strncpy(TEXT_LOC(line, 19), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line - offset) + 19], 16, "!= %04X", expected);
+		markLineFail(line);
+		snprintf(TEXT_LOC(line, 19), 16, "!= %04X", expected);
 	}
 }
 
@@ -320,6 +324,7 @@ static void runTimerIRQSuite(void) {
 		memcpy(&currentTest, activeTest, sizeof(currentTest));
 		runTest(&currentTest);
 
+		unsigned failed = totalResults - passes;
 		savprintf("Timer IRQ test: %s", activeTest->testName);
 		doResult("0 nops", activeTest->testName, currentTest.results[0], activeTest->results[0]);
 		doResult("1 nop ", activeTest->testName, currentTest.results[1], activeTest->results[1]);
@@ -331,17 +336,19 @@ static void runTimerIRQSuite(void) {
 		doResult("7 nops", activeTest->testName, currentTest.results[7], activeTest->results[7]);
 		doResult("8 nops", activeTest->testName, currentTest.results[8], activeTest->results[8]);
 		doResult("9 nops", activeTest->testName, currentTest.results[9], activeTest->results[9]);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
 
-static size_t listTimerIRQSuite(const char** names, size_t size, size_t offset) {
+static size_t listTimerIRQSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTimerIRQTests) {
 			break;
 		}
 		names[i] = timerIRQTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

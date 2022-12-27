@@ -859,18 +859,22 @@ static const u32 nTimingTests = sizeof(timingTests) / sizeof(*timingTests);
 static struct TestTimings calibration;
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(timingTests) / sizeof(*timingTests)];
 
 static void printResult(int offset, int line, const char* preface, s32 value, s32 calibration, s32 expected) {
-	static const int base = 96;
-	if (offset > line || base + 32 * (line - offset) > 576) {
+	static const int base = 3;
+	if (offset > line || line - offset + base > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + 32 * (line - offset)], 31, "%-13s: %5li", preface, value - calibration);
+	line += base - offset;
+	snprintf(TEXT_LOC(line, 0), 31, "%-13s: %5li", preface, value - calibration);
 	if (value - calibration == expected) {
-		strncpy(&textGrid[base + 32 * (line - offset) + 21], "PASS", 10);
+		markLinePass(line);
+		strncpy(TEXT_LOC(line, 21), "PASS", 10);
 	} else {
-		snprintf(&textGrid[base + 32 * (line - offset) + 21], 10, "!= %5li", expected);
+		markLineFail(line);
+		snprintf(TEXT_LOC(line, 21), 10, "!= %5li", expected);
 	}
 }
 
@@ -934,6 +938,7 @@ static void runTimingSuite(void) {
 		activeTestInfo.testId = -1;
 		REG_IME = 1;
 
+		unsigned failed = totalResults - passes;
 		savprintf("Timing test: %s", activeTest->testName);
 		doResult("ARM/ROM ...", activeTest->testName, currentTest.arm_text_0000, calibration.arm_text_0000, activeTest->expected.arm_text_0000);
 		doResult("ARM/ROM P..", activeTest->testName, currentTest.arm_text_4000, calibration.arm_text_4000, activeTest->expected.arm_text_4000);
@@ -958,16 +963,18 @@ static void runTimingSuite(void) {
 			doResult("Thumb/WRAM", activeTest->testName, currentTest.thumb_ewram, calibration.thumb_ewram, activeTest->expected.thumb_ewram);
 			doResult("Thumb/IWRAM", activeTest->testName, currentTest.thumb_iwram, calibration.thumb_iwram, activeTest->expected.thumb_iwram);
 		}
+		results[i] = failed == totalResults - passes;
 	}
 }
 
-static size_t listTimingSuite(const char** names, size_t size, size_t offset) {
+static size_t listTimingSuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTimingTests) {
 			break;
 		}
 		names[i] = timingTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }

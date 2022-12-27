@@ -1132,18 +1132,24 @@ static const u32 nTests = sizeof(memoryTests) / sizeof(*memoryTests);
 
 static unsigned passes;
 static unsigned totalResults;
+EWRAM_DATA static bool results[sizeof(memoryTests) / sizeof(*memoryTests)];
 
 static void printResult(int offset, int line, const char* preface, u32 value, u32 expected) {
-	static const int base = GRID_STRIDE * 3;
-	if (offset > line * 2 || base + GRID_STRIDE * (line * 2 - offset + 1) > 576) {
+	static const int base = 3;
+	if (offset > line * 2 || base + (line * 2 - offset + 1) > 18) {
 		return;
 	}
 
-	snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset)], 31, "%s:", preface);
+	line += line - offset + base;
+	snprintf(TEXT_LOC(line, 0), 31, "%s:", preface);
 	if (value == expected) {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08lX PASS", value);
+		markLinePass(line);
+		markLinePass(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 28, "%08lX PASS", value);
 	} else {
-		snprintf(&textGrid[base + GRID_STRIDE * (line * 2 - offset + 1) + 4], 28, "%08lX != %08lX", value, expected);
+		markLineFail(line);
+		markLineFail(line + 1);
+		snprintf(TEXT_LOC(line + 1, 4), 28, "%08lX != %08lX", value, expected);
 	}
 }
 
@@ -1213,13 +1219,14 @@ static void printResults(const char* preface, const struct TestConfigurations* v
 	printResult(base, 43, "swi C 32 (unaligned 3)", values->_cf32u3[0], expected->_cf32u3[0]);
 }
 
-static size_t listMemorySuite(const char** names, size_t size, size_t offset) {
+static size_t listMemorySuite(const char** names, bool* passed, size_t size, size_t offset) {
 	size_t i;
 	for (i = 0; i < size; ++i) {
 		if (i + offset >= nTests) {
 			break;
 		}
 		names[i] = memoryTests[i + offset].testName;
+		passed[i] = results[i + offset];
 	}
 	return i;
 }
@@ -1238,6 +1245,7 @@ static void runMemorySuite(void) {
 		activeTest->test(&currentTest);
 		REG_IME = 1;
 
+		unsigned failed = totalResults - passes;
 		savprintf("Memory test: %s", activeTest->testName);
 		doResult("U8", activeTest->testName, currentTest._u8, activeTest->expected._u8);
 		if (activeTest->store) {
@@ -1289,6 +1297,7 @@ static void runMemorySuite(void) {
 		doResult("swi C 32 (unaligned 1)", activeTest->testName, currentTest._cf32u1[0], activeTest->expected._cf32u1[0]);
 		doResult("swi C 32 (unaligned 2)", activeTest->testName, currentTest._cf32u2[0], activeTest->expected._cf32u2[0]);
 		doResult("swi C 32 (unaligned 3)", activeTest->testName, currentTest._cf32u3[0], activeTest->expected._cf32u3[0]);
+		results[i] = failed == totalResults - passes;
 	}
 	activeTestInfo.testId = -1;
 }
