@@ -24,7 +24,7 @@ static void hblankBit(u32* out);
 
 static const struct MiscEdgeTest miscEdgeTests[] = {
 	{ "DMA Prefetch", dmaPrefetch, { "Break", "Read", 0 }, { 0x10002A64, 0xDEAD0000 } },
-	{ "H-blank bit start", hblankBit, { "Start", "Hblank", "Flip 1", "Flip 2", "Flip 3", "Flip 4", "Flip 5", "Flip 6", 0 }, { 0x1B, 0x4D1, 0x84, 0x3EC, 0xE4, 0x3EC, 0xE4, 0x3F5 } },
+	{ "H-blank bit start", hblankBit, { "Start", "Hblank", "Flip 1", "Flip 2", "Flip 3", "Flip 4", "Flip 5", "Flip 6", 0 }, { 0x1B, 0x4D1, 0x85, 0x3EC, 0xE4, 0x3EC, 0xE4, 0x3F5 } },
 };
 
 static const u32 nTests = sizeof(miscEdgeTests) / sizeof(*miscEdgeTests);
