@@ -21,6 +21,7 @@
 #include "misc-edge.h"
 #include "multiply-long.h"
 #include "shifter.h"
+#include "sio-read.h"
 #include "sio-timing.h"
 #include "suite.h"
 #include "timing.h"
@@ -59,6 +60,7 @@ const struct TestSuite* const suites[] = {
 	&multiplyLongTestSuite,
 	&biosMathTestSuite,
 	&dmaTestSuite,
+	&sioReadTestSuite,
 	&sioTimingTestSuite,
 	&miscEdgeTestSuite,
 	&videoTestSuite
