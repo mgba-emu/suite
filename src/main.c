@@ -107,6 +107,27 @@ static void runSuite(const struct TestSuite* activeSuite) {
 			++testIndex;
 			testIndex %= activeSuite->nTests;
 		}
+		if (keys & KEY_LEFT) {
+			if (testIndex != viewIndex) {
+				testIndex = viewIndex;
+			} else {
+				testIndex -= VIEW_SIZE;
+			}
+			if (testIndex < 0) {
+				testIndex = activeSuite->nTests - 1;
+			}
+		}
+		if (keys & KEY_RIGHT) {
+			if (testIndex == activeSuite->nTests - 1) {
+				testIndex = 0;
+			} else if (testIndex + VIEW_SIZE >= activeSuite->nTests) {
+				testIndex = activeSuite->nTests - 1;
+			} else if (viewIndex + VIEW_SIZE - 1 == testIndex) {
+				testIndex += VIEW_SIZE;
+			} else {
+				testIndex = viewIndex + VIEW_SIZE - 1;
+			}
+		}
 		if (testIndex < viewIndex) {
 			viewIndex = testIndex;
 		} else if (testIndex >= viewIndex + VIEW_SIZE) {
