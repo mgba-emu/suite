@@ -20,8 +20,8 @@
 
 struct VideoTest {
 	const char* testName;
-	void (*expected)(void);
-	void (*actual)(void);
+	bool (*expected)(bool refresh);
+	bool (*actual)(bool refresh);
 };
 
 static void fillSquare(u32* base, u32 fill) {
@@ -35,7 +35,7 @@ static void fillSquare(u32* base, u32 fill) {
 	base[7] = fill;
 }
 
-static void basicExpected(void) {
+static bool basicExpected(bool) {
 	REG_BG2CNT = CHAR_BASE(2) | SCREEN_BASE(1);
 	fillSquare((u32*) 0x06008000, 0);
 	fillSquare((u32*) 0x06008020, 0x11111111);
@@ -62,9 +62,10 @@ static void basicExpected(void) {
 	}
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_0 | BG2_ON;
+	return false;
 }
 
-static void basic3Actual(void) {
+static bool basic3Actual(bool) {
 	u32 x = 0xFFFFFFFF;
 	int i, j;
 	for (i = 0; i < 160; ++i) {
@@ -84,9 +85,10 @@ static void basic3Actual(void) {
 	}
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_3 | BG2_ON;
+	return false;
 }
 
-static void basic4Actual(void) {
+static bool basic4Actual(bool) {
 	u32 x = 0x00000000;
 	u32 y = 0x01010101;
 	int i, j;
@@ -104,9 +106,10 @@ static void basic4Actual(void) {
 	}
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_4 | BG2_ON;
+	return false;
 }
 
-static void degenerateObjTransform(void) {
+static bool degenerateObjTransform(bool) {
 	OBJ_COLORS[0x10] = 0x7F1C;
 	OBJ_COLORS[0x11] = 0x0000;
 	OBJ_COLORS[0x12] = 0x1084;
@@ -182,9 +185,10 @@ static void degenerateObjTransform(void) {
 	OAM[22].dummy = 256;
 	OAM[23].dummy = 256;
 	REG_DISPCNT = OBJ_ON | OBJ_1D_MAP;
+	return false;
 }
 
-static void degenerateObjTransformExpected(void) {
+static bool degenerateObjTransformExpected(bool) {
 	REG_BG2CNT = CHAR_BASE(2) | SCREEN_BASE(1);
 	LZ77UnCompVram((void*) degenerateObjTransformTiles, (void*) 0x06008000);
 	LZ77UnCompVram((void*) degenerateObjTransformMap, (void*) 0x06000800);
@@ -192,6 +196,7 @@ static void degenerateObjTransformExpected(void) {
 	uint32_t zero = 0;
 	CpuFastSet(&zero, (void*) 0x06000c00, 0x01000100);
 	REG_DISPCNT = MODE_0 | BG2_ON;
+	return false;
 }
 
 static void toggleBg0(void) {
@@ -200,7 +205,7 @@ static void toggleBg0(void) {
 	REG_DISPCNT ^= BG0_ON;
 }
 
-static void layerToggle(void) {
+static bool layerToggle(bool) {
 	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
 	*(u32*) 0x06008000 = 0x22221111;
 	*(u32*) 0x06008004 = 0x22221111;
@@ -220,9 +225,10 @@ static void layerToggle(void) {
 	irqEnable(IRQ_VCOUNT);
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_0 | BG0_ON;
+	return false;
 }
 
-static void layerToggleExpected(void) {
+static bool layerToggleExpected(bool) {
 	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
 	*(u32*) 0x06008000 = 0x22221111;
 	*(u32*) 0x06008004 = 0x22221111;
@@ -260,6 +266,7 @@ static void layerToggleExpected(void) {
 	irqDisable(IRQ_VCOUNT);
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_0 | BG0_ON;
+	return false;
 }
 
 static char oamDelayInside = 0;
@@ -282,7 +289,7 @@ static void oamDelayVcount(void) {
 	}
 }
 
-static void oamDelayActual(void) {
+static bool oamDelayActual(bool) {
 	REG_DISPCNT = MODE_0 | BG0_ON;
 	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
 	*(u32*) 0x06008000 = 0x22112211;
@@ -318,6 +325,7 @@ static void oamDelayActual(void) {
 	irqEnable(IRQ_VCOUNT);
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_0 | BG0_ON;
+	return false;
 }
 
 static void setTiles(int y, int x, int w, u16 val) {
@@ -343,7 +351,7 @@ static void oamDelayVcountBgOnly(void) {
 	}
 }
 
-static void oamDelayExpected(void) {
+static bool oamDelayExpected(bool) {
 	REG_DISPCNT = MODE_0 | BG0_ON;
 	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
 	*(u32*) 0x06008000 = 0x22112211;
@@ -387,6 +395,283 @@ static void oamDelayExpected(void) {
 	irqEnable(IRQ_VCOUNT);
 	VBlankIntrWait();
 	REG_DISPCNT = MODE_0 | BG0_ON;
+	return false;
+}
+
+static bool windowOffscreenActual(bool) {
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	REG_WINOUT = 0x0010;
+	REG_WININ = 0xFFFF;
+	REG_WIN0H = 0x0078;
+	REG_WIN0V = 0x50E3;
+	REG_WIN1H = 0x78F0;
+	REG_WIN1V = 0x50E4;
+	fillSquare((u32*) 0x06008000, 0x11111111);
+	BG_PALETTE[0] = RGB5(31, 31, 31);
+	BG_PALETTE[1] = RGB5(15, 15, 15);
+	REG_DISPCNT = MODE_0 | BG0_ON | WIN0_ON | WIN1_ON;
+	return false;
+}
+
+static bool windowOffscreenExpected(bool) {
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	REG_WINOUT = 0x0010;
+	REG_WINOUT = 0x0010;
+	REG_WININ = 0xFFFF;
+	REG_WIN0H = 0x0078;
+	REG_WIN0V = 0x50A0;
+	REG_WIN1H = 0x78F0;
+	REG_WIN1V = 0x00A0;
+	fillSquare((u32*) 0x06008000, 0x11111111);
+	BG_PALETTE[0] = RGB5(31, 31, 31);
+	BG_PALETTE[1] = RGB5(15, 15, 15);
+	REG_DISPCNT = MODE_0 | BG0_ON | WIN0_ON | WIN1_ON;
+	return false;
+}
+
+static void toggleLines(void) {
+	switch (REG_VCOUNT) {
+	case 0x00:
+	case 0x09:
+	case 0x12:
+	case 0x1B:
+	case 0x24:
+	case 0x2D:
+	case 0x37:
+	case 0x81:
+	case 0x8A:
+		REG_DISPCNT |= BG0_ON;
+		break;
+	case 0x40:
+	case 0x49:
+	case 0x52:
+	case 0x5B:
+	case 0x64:
+	case 0x6D:
+	case 0x77:
+	case 0x91:
+	case 0x9A:
+		while (REG_DISPSTAT & LCDC_HBL_FLAG);
+		REG_DISPCNT |= BG0_ON;
+		break;
+	case 0x07:
+	case 0x0F:
+	case 0x17:
+	case 0x1F:
+	case 0x27:
+	case 0x2F:
+	case 0x3F:
+	case 0x47:
+	case 0x4F:
+	case 0x57:
+	case 0x5F:
+	case 0x67:
+	case 0x6F:
+	case 0x7F:
+	case 0x88:
+	case 0x90:
+	case 0x98:
+		REG_DISPCNT &= ~BG0_ON;
+	}
+}
+
+static bool bgEnableExpected(bool) {
+	REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+	BG_PALETTE[0] = RGB5(31, 31, 31);
+	BG_PALETTE[1] = RGB5(0, 0, 0);
+	BG_PALETTE[2] = RGB5(15, 15, 15);
+
+	u32* base = (u32*) 0x06008000;
+
+	base[0x08] = 0x00000000;
+	base[0x09] = 0x00000000;
+	base[0x0A] = 0x00000000;
+	base[0x0B] = 0x11221122;
+	base[0x0C] = 0x22112211;
+	base[0x0D] = 0x22112211;
+	base[0x0E] = 0x11221122;
+	base[0x0F] = 0x11221122;
+
+	base[0x10] = 0x00000000;
+	base[0x11] = 0x00000000;
+	base[0x12] = 0x00000000;
+	base[0x13] = 0x00000000;
+	base[0x14] = 0x22112211;
+	base[0x15] = 0x22112211;
+	base[0x16] = 0x11221122;
+	base[0x17] = 0x11221122;
+
+	base[0x18] = 0x00000000;
+	base[0x19] = 0x00000000;
+	base[0x1A] = 0x00000000;
+	base[0x1B] = 0x00000000;
+	base[0x1C] = 0x00000000;
+	base[0x1D] = 0x22112211;
+	base[0x1E] = 0x11221122;
+	base[0x1F] = 0x11221122;
+
+	base[0x20] = 0x00000000;
+	base[0x21] = 0x00000000;
+	base[0x22] = 0x00000000;
+	base[0x23] = 0x00000000;
+	base[0x24] = 0x00000000;
+	base[0x25] = 0x00000000;
+	base[0x26] = 0x11221122;
+	base[0x27] = 0x11221122;
+
+	base[0x28] = 0x00000000;
+	base[0x29] = 0x00000000;
+	base[0x2A] = 0x00000000;
+	base[0x2B] = 0x00000000;
+	base[0x2C] = 0x00000000;
+	base[0x2D] = 0x00000000;
+	base[0x2E] = 0x00000000;
+	base[0x2F] = 0x11221122;
+
+	base[0x30] = 0x00000000;
+	base[0x31] = 0x00000000;
+	base[0x32] = 0x11221122;
+	base[0x33] = 0x11221122;
+	base[0x34] = 0x22112211;
+	base[0x35] = 0x22112211;
+	base[0x36] = 0x11221122;
+	base[0x37] = 0x11221122;
+
+	base[0x38] = 0x00000000;
+	base[0x39] = 0x22112211;
+	base[0x3A] = 0x00000000;
+	base[0x3B] = 0x00000000;
+	base[0x3C] = 0x22112211;
+	base[0x3D] = 0x22112211;
+	base[0x3E] = 0x11221122;
+	base[0x3F] = 0x11221122;
+
+	base[0x40] = 0x00000000;
+	base[0x41] = 0x11221100;
+	base[0x42] = 0x00000000;
+	base[0x43] = 0x00000000;
+	base[0x44] = 0x22112211;
+	base[0x45] = 0x22112211;
+	base[0x46] = 0x11221122;
+	base[0x47] = 0x11221122;
+
+	base[0x48] = 0x00000000;
+	base[0x49] = 0x00000000;
+	base[0x4A] = 0x00000000;
+	base[0x4B] = 0x11221122;
+	base[0x4C] = 0x22112211;
+	base[0x4D] = 0x22112211;
+	base[0x4E] = 0x11221122;
+	base[0x4F] = 0x11221122;
+
+	base[0x50] = 0x00000000;
+	base[0x51] = 0x00000000;
+	base[0x52] = 0x00000000;
+	base[0x53] = 0x00000000;
+	base[0x54] = 0x22112211;
+	base[0x55] = 0x22112211;
+	base[0x56] = 0x11221122;
+	base[0x57] = 0x11221122;
+
+	base[0x58] = 0x22112211;
+	base[0x59] = 0x00000000;
+	base[0x5A] = 0x00000000;
+	base[0x5B] = 0x00000000;
+	base[0x5C] = 0x00000000;
+	base[0x5D] = 0x22112211;
+	base[0x5E] = 0x11221122;
+	base[0x5F] = 0x11221122;
+
+	base[0x60] = 0x22112211;
+	base[0x61] = 0x00000000;
+	base[0x62] = 0x11221122;
+	base[0x63] = 0x00000000;
+	base[0x64] = 0x00000000;
+	base[0x65] = 0x22112211;
+	base[0x66] = 0x11221122;
+	base[0x67] = 0x11221122;
+
+	base[0x68] = 0x22112211;
+	base[0x69] = 0x00000000;
+	base[0x6A] = 0x22112211;
+	base[0x6B] = 0x00000000;
+	base[0x6C] = 0x00000000;
+	base[0x6D] = 0x22112211;
+	base[0x6E] = 0x11221122;
+	base[0x6F] = 0x11221122;
+
+	base[0x70] = 0x22112211;
+	base[0x71] = 0x00000000;
+	base[0x72] = 0x00000000;
+	base[0x73] = 0x00000000;
+	base[0x74] = 0x00000000;
+	base[0x75] = 0x00000000;
+	base[0x76] = 0x11221122;
+	base[0x77] = 0x11221122;
+
+	const u32 tileset[20] = {
+		0x00010001,
+		0x00020002,
+		0x00030003,
+		0x00040004,
+		0x00050005,
+		0,
+		0,
+		0x00060006,
+		0x00070007,
+		0x00030003,
+		0x00040004,
+		0x00050005,
+		0,
+		0,
+		0,
+		0x00090009,
+		0x000A000A,
+		0x000B000B,
+		0x000C000C,
+		0x000E000E,
+	};
+
+	int i;
+	for (i = 0; i < 20; ++i) {
+		CpuFastSet(&tileset[i], MAP[1][i], FILL | COPY32 | 0x10);
+	}
+	MAP[1][8][0] = 0x0008;
+	MAP[1][18][0] = 0x000D;
+
+	REG_DISPCNT = BG0_ON;
+	return false;
+}
+
+static bool bgEnableActual(bool refresh) {
+	if (!refresh) {
+		REG_BG0CNT = CHAR_BASE(2) | SCREEN_BASE(1);
+		BG_PALETTE[0] = RGB5(31, 31, 31);
+		BG_PALETTE[1] = RGB5(0, 0, 0);
+		BG_PALETTE[2] = RGB5(15, 15, 15);
+
+		u32* base = (u32*) 0x06008000;
+		base[0 + 8] = 0x22112211;
+		base[1 + 8] = 0x22112211;
+		base[2 + 8] = 0x11221122;
+		base[3 + 8] = 0x11221122;
+		base[4 + 8] = 0x22112211;
+		base[5 + 8] = 0x22112211;
+		base[6 + 8] = 0x11221122;
+		base[7 + 8] = 0x11221122;
+
+		int i;
+		for (i = 0; i < 1024; ++i) {
+			MAP[1][i >> 5][i & 0x1F] = 1;
+		}
+	}
+
+	REG_DISPSTAT = LCDC_VBL | LCDC_HBL;
+	irqSet(IRQ_HBLANK, toggleLines);
+	irqEnable(IRQ_HBLANK);
+
+	REG_DISPCNT = 0;
+	return true;
 }
 
 static const struct VideoTest videoTests[] = {
@@ -394,7 +679,9 @@ static const struct VideoTest videoTests[] = {
 	{ "Basic Mode 4", basicExpected, basic4Actual },
 	{ "Degenerate OBJ transforms", degenerateObjTransformExpected, degenerateObjTransform },
 	{ "Layer toggle", layerToggleExpected, layerToggle },
+	{ "Layer toggle 2", bgEnableExpected, bgEnableActual },
 	{ "OAM Update Delay", oamDelayExpected, oamDelayActual },
+	{ "Window offscreen reset", windowOffscreenExpected, windowOffscreenActual },
 };
 
 static const u32 nTests = sizeof(videoTests) / sizeof(*videoTests);
@@ -423,6 +710,7 @@ static void showVideoSuite(size_t index) {
 	bool showExpected = false;
 	bool performShow = true;
 	bool showNav = true;
+	bool refresh = false;
 	u16 dispcnt = REG_DISPCNT;
 	OAM[0].attr0 = ATTR0_COLOR_16 | ATTR0_WIDE | OBJ_Y(148);
 
@@ -455,7 +743,11 @@ static void showVideoSuite(size_t index) {
 			}
 		}
 		VBlankIntrWait();
-		if (performShow) {
+		if (performShow || refresh) {
+			if (performShow) {
+				refresh = false;
+				irqDisable(IRQ_VCOUNT | IRQ_HBLANK);
+			}
 			REG_DISPCNT = LCDC_OFF;
 			int i;
 			for (i = 1; i < 128; ++i) {
@@ -464,13 +756,13 @@ static void showVideoSuite(size_t index) {
 			if (showExpected) {
 				OAM[0].attr1 = ATTR1_SIZE_64 | OBJ_X(84);
 				OAM[0].attr2 = OBJ_CHAR(0x200);
-				activeTest->expected();
+				refresh = activeTest->expected(refresh);
 			} else {
 				OAM[0].attr1 = ATTR1_SIZE_64 | OBJ_X(91);
 				OAM[0].attr2 = OBJ_CHAR(0x220);
-				activeTest->actual();
+				refresh = activeTest->actual(refresh);
 			}
-			performShow = 0;
+			performShow = false;
 			REG_DISPCNT |= OBJ_ON | OBJ_1D_MAP;
 		}
 	}
@@ -483,7 +775,9 @@ static void showVideoSuite(size_t index) {
 	memset((void*) 0x06000500, 0, 0x300);
 	REG_DISPCNT = dispcnt;
 	REG_DISPSTAT &= ~0x0030;
-	irqDisable(IRQ_VCOUNT);
+	REG_BG1CNT = CHAR_BASE(1) | SCREEN_BASE(0);
+	REG_BG1VOFS = -4;
+	irqDisable(IRQ_VCOUNT | IRQ_HBLANK);
 	irqInit();
 }
 
